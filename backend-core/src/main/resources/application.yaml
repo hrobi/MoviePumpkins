@@ -1,0 +1,17 @@
+db:
+  schema: app
+spring:
+  application:
+    name: MoviePumpkins Backend Core
+  jpa:
+    database: postgresql
+    generate-ddl: false
+    hibernate:
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: db/changelog/changelog.xml
+    default-schema: app
