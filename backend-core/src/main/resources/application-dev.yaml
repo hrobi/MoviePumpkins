@@ -1,0 +1,13 @@
+logging:
+  file:
+    name:
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pumpkins
+    username: admin
+    password: gYLWLbQUcY

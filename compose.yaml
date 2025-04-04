@@ -1,0 +1,28 @@
+services:
+  db:
+    container_name: db_container
+    image: postgres:17
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: pumpkins
+      POSTGRES_PASSWORD: gYLWLbQUcY
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4:2
+    container_name: pgadmin4_container
+    restart: on-failure
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@moviepumpkins.net
+      PGADMIN_DEFAULT_PASSWORD: gYLWLbQUcY
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  pg_data:
+  pgadmin_data:
