@@ -1,0 +1,5 @@
+@base_address = http://localhost:8080
+@token =
+
+GET {{base_address}}/spec
+Accept: application/json
