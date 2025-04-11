@@ -1,6 +1,3 @@
-logging:
-  file:
-    name:
 spring:
   jpa:
     show-sql: true
@@ -11,3 +8,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/pumpkins
     username: admin
     password: gYLWLbQUcY
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/moviepumpkins

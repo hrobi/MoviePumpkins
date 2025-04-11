@@ -14,7 +14,7 @@ services:
   pgadmin:
     image: dpage/pgadmin4:2
     container_name: pgadmin4_container
-    restart: on-failure
+    restart: no
     ports:
       - "8888:80"
     environment:
@@ -22,6 +22,31 @@ services:
       PGADMIN_DEFAULT_PASSWORD: gYLWLbQUcY
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.7
+    container_name: keycloak_container
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/pumpkins
+      KC_DB_USERNAME: admin
+      KC_DB_PASSWORD: gYLWLbQUcY
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 9090
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: gaO1xZDFl5
+    command: start-dev
+    depends_on:
+      - db
+    ports:
+      - "9090:8080"
+
 
 volumes:
   pg_data:

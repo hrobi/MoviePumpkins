@@ -1,0 +1,43 @@
+openapi: 3.0.2
+info:
+  version: '1.0.0'
+  title: net.moviepumpkins.core
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+paths:
+  '/spec':
+    get:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Specification'
+
+components:
+  schemas:
+    Specification:
+      type: object
+      required:
+        - version
+        - license
+        - apiTitle
+      properties:
+        version:
+          type: string
+          pattern: '\d+\.\d+\.\d+'
+        license:
+          type: object
+          required:
+            - name
+            - url
+          properties:
+            name:
+              type: string
+            url:
+              type: string
+        apiTitle:
+          type: string

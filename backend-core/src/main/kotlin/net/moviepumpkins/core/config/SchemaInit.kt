@@ -2,7 +2,7 @@ package net.moviepumpkins.core.config
 
 import liquibase.change.DatabaseChange
 import liquibase.integration.spring.SpringLiquibase
-import net.moviepumpkins.core.extension.getLogger
+import net.moviepumpkins.core.general.getLogger
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AbstractDependsOnBeanFactoryPostProcessor

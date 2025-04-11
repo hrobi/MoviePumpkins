@@ -4,6 +4,8 @@ plugins {
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
+    kotlin("plugin.serialization") version "2.1.20"
+    id("ch.acanda.gradle.fabrikt") version "1.14.0"
 }
 
 group = "net.moviepumpkins"
@@ -29,6 +31,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("javax.validation:validation-api:2.0.1.Final")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.29")
+    implementation("io.swagger.core.v3:swagger-models:2.2.29")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.liquibase:liquibase-core")
@@ -57,6 +62,43 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+sourceSets {
+    main {
+        java {
+            srcDir("${layout.buildDirectory.get()}/build/generated/sources/fabrikt")
+        }
+    }
+}
+
+fabrikt {
+    generate("core-api") {
+        apiFile = file("src/main/resources/core.api.yaml")
+        basePackage = "net.moviepumpkins.core.integration"
+        externalReferenceResolution = targeted
+        outputDirectory = file("build/generated/sources/fabrikt")
+        sourcesPath = "src/main/kotlin"
+        resourcesPath = "src/main/resources"
+        validationLibrary = Jakarta
+        typeOverrides {
+            datetime = OffsetDateTime
+            date = LocalDate
+        }
+        controller {
+            generate = enabled
+            target = Spring
+        }
+        model {
+            generate = enabled
+            extensibleEnums = disabled
+            serializationLibrary = Jackson
+            sealedInterfacesForOneOf = enabled
+        }
+    }
+}
+
+tasks {
+
+    withType<Test> {
+        useJUnitPlatform()
+    }
 }
