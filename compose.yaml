@@ -46,8 +46,13 @@ services:
       - db
     ports:
       - "9090:8080"
-
+    volumes:
+      - keycloak:/opt/keycloak
+      - type: bind
+        source: ./keycloak-themes/pumpkins
+        target: /opt/keycloak/themes/pumpkins
 
 volumes:
   pg_data:
   pgadmin_data:
+  keycloak:
