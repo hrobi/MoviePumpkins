@@ -10,3 +10,4 @@
 | pgadmin default password | gYLWLbQUcY              |
 | keycloak admin user      | admin                   |
 | keycloak admin password  | gaO1xZDFl5              |
+| keycloak client id       | pumpkins-web            |
