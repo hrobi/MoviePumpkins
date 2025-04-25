@@ -1,7 +1,9 @@
-export default function Home() {
+import SignInButton from "@/app/SignInButton";
+
+export default async function () {
     return (
         <div>
-            <h1>This is the site MoviePumpkins!</h1>
+            <SignInButton/>
         </div>
     );
 }
