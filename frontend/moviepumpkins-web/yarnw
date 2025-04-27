@@ -1,0 +1,22 @@
+#!/bin/bash
+
+. ../../devenv ../../env.proj
+
+if [ -z YARN_VERSION ]; then
+  echo YARN_VERSION variable is not defined! >&2
+  exit 1
+fi
+
+mkdir -p $CACHE/.node
+
+PWD=$(pwd)
+cd $CACHE/.node
+
+if ! npm list yarn@$YARN_VERSION > /dev/null; then
+  npm install yarn@$YARN_VERSION
+fi
+
+[ $(yarn -version) != $YARN_VERSION ] && yarn set version $YARN_VERSION
+
+cd $PWD
+yarn $@
