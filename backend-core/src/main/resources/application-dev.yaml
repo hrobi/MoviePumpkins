@@ -1,3 +1,5 @@
+app:
+  auth-server-url-base: http://localhost:9090
 spring:
   jpa:
     show-sql: true
@@ -13,3 +15,11 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9090/realms/moviepumpkins
+      client:
+        provider:
+          keycloak:
+            token-uri: http://localhost:9090/realms/moviepumpkins/protocol/openid-connect/token
+        registration:
+          keycloak:
+            client-id: pumpkins-backend-core
+            client-secret: K2BZ3BRrmNjaDJ0kiz59Bgakv77JuaaD

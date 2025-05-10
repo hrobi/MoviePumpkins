@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.integration.apispec
+package net.moviepumpkins.core.apispec
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -18,7 +18,7 @@ class SpecController(
     @Valid
     override fun get(): ResponseEntity<Specification> {
         val specification =
-            objectMapper.readValue<Specification>(javaClass.classLoader.getResource("config/spec.response.json"))
+            objectMapper.readValue<Specification>(javaClass.classLoader.getResource("config/spec.response.json")!!)
         return ResponseEntity.ok(specification)
     }
 
