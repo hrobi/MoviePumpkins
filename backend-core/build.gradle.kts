@@ -22,11 +22,16 @@ repositories {
 }
 
 configurations {
-    all { exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging") }
+    all {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+        exclude(group = "ch.qos.logback", module = "logback-classic")
+        exclude(group = "org.apache.logging.log4j", module = "log4j-to-slf4j")
+    }
 }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -36,17 +41,24 @@ dependencies {
     implementation("io.swagger.core.v3:swagger-models:2.2.29")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.liquibase:liquibase-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly(group = "org.springframework.boot", name = "spring-boot-starter-log4j2")
     runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.0")
+    testCompileOnly("org.springframework.boot:spring-boot-starter-test") {
+        exclude(module = "junit")
+        exclude(module = "mockito-core")
+    }
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("io.mockk:mockk:1.8.8")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
+    testImplementation("io.zonky.test:embedded-database-spring-test:2.6.0")
+    testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test:10.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -71,8 +83,8 @@ sourceSets {
 }
 
 fabrikt {
-    generate("core-api") {
-        apiFile = file("src/main/resources/core.api.yaml")
+    generate("core-api-server") {
+        apiFile = file("src/main/resources/server-api.yml")
         basePackage = "net.moviepumpkins.core.integration"
         externalReferenceResolution = targeted
         outputDirectory = file("build/generated/sources/fabrikt")

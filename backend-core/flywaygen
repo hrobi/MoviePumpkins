@@ -1,0 +1,34 @@
+#!/bin/bash
+
+NUM="[0-9]\+"
+VP="\($NUM\)\.\($NUM\)\.\($NUM\)"
+MIGRATION_DIR="./src/main/resources/db/migration"
+UNDO_DIR="./src/main/resources/db/undo"
+
+LAST_VERSION=$(ls ./src/main/resources/db/migration | grep -o "V$NUM\.$NUM\.$NUM" | sed "s/^[A-Z]\+//" | sort -r | head -n 1)
+
+declare NEW_VERSION
+
+if [[ $1 = "1" ]]; then
+  MAJOR_VERSION=$(echo $LAST_VERSION | sed "s/$VP/\1/")
+  NEW_VERSION=$(echo $LAST_VERSION | sed "s/$VP/$((MAJOR_VERSION + 1)).\2.\3/")
+fi
+
+if [[ $1 = "2" ]]; then
+  MINOR_VERSION=$(echo $LAST_VERSION | sed "s/$VP/\2/")
+  NEW_VERSION=$(echo $LAST_VERSION | sed "s/$VP/\1.$((MINOR_VERSION + 1)).\3/")
+fi
+
+if [[ $1 = "3" ]]; then
+  EXTRA_MINOR_VERSION=$(echo $LAST_VERSION | sed "s/$VP/\3/")
+  NEW_VERSION=$(echo $LAST_VERSION | sed "s/$VP/\1.\2.$((EXTRA_MINOR_VERSION + 1))/")
+fi
+
+TICKET_NUM=$(git rev-parse --abbrev-ref HEAD | grep -o "^\([A-Z_-]\+-\|\)$NUM")
+
+touch "$MIGRATION_DIR/V${NEW_VERSION}.${TICKET_NUM}__$(echo ${@:2} | tr " " _ ).sql"
+cat <<EOF > "$UNDO_DIR/V${NEW_VERSION}.${TICKET_NUM}__$(echo ${@:2} | tr " " _ ).sql"
+DELETE
+FROM flyway_schema_history
+WHERE version = '${NEW_VERSION}.${TICKET_NUM}';
+EOF

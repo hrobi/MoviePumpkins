@@ -1,6 +1,6 @@
-db:
-  schema: app
 spring:
+  profiles:
+    active: dev
   application:
     name: MoviePumpkins Backend Core
   jpa:
@@ -8,10 +8,19 @@ spring:
     generate-ddl: false
     hibernate:
       naming:
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        default_schema: app
   datasource:
     driver-class-name: org.postgresql.Driver
-  liquibase:
-    change-log: db/changelog/changelog.xml
+  flyway:
+    baseline-on-migrate: true
     default-schema: app
+    enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            authorization-grant-type: client_credentials
