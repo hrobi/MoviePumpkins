@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.config
+package net.moviepumpkins.core.application.exception
 
 import jakarta.validation.ConstraintViolation
 

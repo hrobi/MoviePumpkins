@@ -1,6 +1,7 @@
-package net.moviepumpkins.core.config
+package net.moviepumpkins.core.application.intercept
 
 import jakarta.validation.Validator
+import net.moviepumpkins.core.application.exception.ResponseValidationException
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType
 import org.springframework.http.converter.HttpMessageConverter

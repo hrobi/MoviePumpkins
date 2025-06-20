@@ -16,8 +16,69 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Specification'
+  '/users/{username}/protected':
+    get:
+      operationId: getUserProtected
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        #[CLIENT_ONLY] - $ref: '#/components/parameters/Authorization'
+        - name: username
+          schema:
+            type: string
+          required: true
+          description: search by username
+          in: path
+      responses:
+        '200':
+          description: you successfully got back attributes of a user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProtectedUserResponse'
+        '404':
+          description: user with username couldn't be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status4xxResponse'
+  '/users/{username}/profile':
+    get:
+      operationId: getUserProfile
+      parameters:
+        - name: username
+          schema:
+            type: string
+          required: true
+          description: search by username
+          in: path
+      responses:
+        '200':
+          description: you successfully got back attributes of a user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserProfileResponse'
+        '404':
+          description: user with username couldn't be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status4xxResponse'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Authorization:
+      in: header
+      name: Authorization
+      schema:
+        type: string
+      required: true
   schemas:
     Specification:
       type: object
@@ -40,4 +101,52 @@ components:
             url:
               type: string
         apiTitle:
+          type: string
+    GetProtectedUserResponse:
+      type: object
+      required:
+        - username
+        - displayName
+        - role
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+    GetUserProfileResponse:
+      type: object
+      required:
+        - username
+        - fullName
+        - email
+        - displayName
+        - about
+        - role
+      properties:
+        username:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+        about:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+    UserRole:
+      type: string
+      enum:
+        - reviewer
+        - supervisor
+        - admin
+    Status4xxResponse:
+      type: object
+      required:
+        - reason
+      properties:
+        reason:
           type: string
