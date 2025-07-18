@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.user
+package net.moviepumpkins.core.application.model
 
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
@@ -6,12 +6,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 
 data class UserAccount(
     val username: String,
-    val email: String,
-    val fullName: String,
     val role: UserRole = UserRole.REVIEWER,
 ) : Authentication {
 
-    override fun getName(): String = email
+    override fun getName(): String = username
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> =
         listOf(SimpleGrantedAuthority("ROLE_${role.name}")).toMutableList()

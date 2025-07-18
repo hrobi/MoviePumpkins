@@ -1,6 +1,7 @@
-package net.moviepumpkins.core.config
+package net.moviepumpkins.core.application
 
-import net.moviepumpkins.core.oauth.AuthenticatedUserSyncFilter
+import net.moviepumpkins.core.application.intercept.AuthenticatedUserSyncFilter
+import net.moviepumpkins.core.application.usecase.SyncUserUseCase
 import net.moviepumpkins.core.oauth.KeycloakClient
 import net.moviepumpkins.core.user.UserService
 import org.springframework.context.annotation.Bean
@@ -20,18 +21,22 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory
 class AppConfig {
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, userService: UserService): SecurityFilterChain {
+    fun securityFilterChain(
+        http: HttpSecurity,
+        syncUserUseCase: SyncUserUseCase,
+        userService: UserService,
+    ): SecurityFilterChain {
         http {
             authorizeHttpRequests {
-                authorize("/error", permitAll)
-                authorize(anyRequest, authenticated)
+                authorize("/users/*/protected", authenticated)
+                authorize(anyRequest, permitAll)
             }
 
             oauth2ResourceServer {
                 jwt { }
             }
 
-            addFilterAfter<BearerTokenAuthenticationFilter>(AuthenticatedUserSyncFilter(userService))
+            addFilterAfter<BearerTokenAuthenticationFilter>(AuthenticatedUserSyncFilter(userService, syncUserUseCase))
 
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS

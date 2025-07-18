@@ -82,9 +82,11 @@ sourceSets {
     }
 }
 
+val serverApiSpecFile = "src/main/resources/server-api.yml"
+
 fabrikt {
     generate("core-api-server") {
-        apiFile = file("src/main/resources/server-api.yml")
+        apiFile = file(serverApiSpecFile)
         basePackage = "net.moviepumpkins.core.integration"
         externalReferenceResolution = targeted
         outputDirectory = file("build/generated/sources/fabrikt")
@@ -109,6 +111,19 @@ fabrikt {
 }
 
 tasks {
+
+    register<Copy>("copyOpenApiSpec") {
+        group = "openapi tools"
+        from(serverApiSpecFile)
+        into("../frontend/moviepumpkins-web")
+        rename(".*", ".core-apispec.yml")
+        filter { line ->
+            line.replace(
+                "#[CLIENT_ONLY] ",
+                ""
+            )
+        }
+    }
 
     withType<Test> {
         useJUnitPlatform()

@@ -1,18 +1,13 @@
 package net.moviepumpkins.core.oauth
 
-import net.moviepumpkins.core.general.getLogger
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestClient
 
 @Service
 class AuthorizationService(
-    private val restClient: RestClient,
     private val keycloakClient: KeycloakClient,
     clientRegistrationRepository: ClientRegistrationRepository,
 ) {
-
-    private val LOG = getLogger()
 
     private final val clientId: String
     private final val clientSecret: String
@@ -33,9 +28,9 @@ class AuthorizationService(
         return keycloakResponseAsMap["access_token"]
     }
 
-    fun addAppUserRoleByUserId(userId: String) {
+    fun addAppUserRoleBySid(sid: String) {
         val adminToken = fetchAdminToken()!!
         val role = keycloakClient.getRealmRole(authorization = BearerToken(adminToken), "app_user")
-        keycloakClient.addRolesToUser(authorization = BearerToken(adminToken), userId = userId, listOf(role))
+        keycloakClient.addRolesToUser(authorization = BearerToken(adminToken), userId = sid, listOf(role))
     }
 }

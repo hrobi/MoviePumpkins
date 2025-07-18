@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.config
+package net.moviepumpkins.core.application
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.bind.ConstructorBinding

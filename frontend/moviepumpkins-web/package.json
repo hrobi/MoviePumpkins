@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "openapi:generate:core": "npx openapi-typescript .core-apispec.yml -o api-client/core-client.d.ts"
   },
   "dependencies": {
     "next": "15.3.0",
     "next-auth": "^4.24.11",
+    "openapi-fetch": "^0.14.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
