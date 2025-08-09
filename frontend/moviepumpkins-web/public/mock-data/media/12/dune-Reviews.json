@@ -1,0 +1,28 @@
+[
+    {
+        "id": 1,
+        "userDisplayName": "Big Balls",
+        "username": "big-balls-69",
+        "title": "This is only the beginning!",
+        "content": "I must admit, I still believe \"Frank Herbert's Dune\" to be unfilmable. I realised that, watching Dune: Part One in my local movie theater today. That's why people who have read the book should see this movie adaptation as a single piece of art.\nForget the book while watching this movie. Dune, the book drives on the thoughts and inner emotions of the characters - the things that are left unsaid. Visually, that can only be adapted to a certain extent.\nVilleneuve has done a better job than anyone could ask for. I think he had to compromise on not bringing even more details to the movie, considering that the majority of the people will not have read the book. The information overload would have been difficult to follow for most.\nThis movie is definitely slow, so if you are accustomed to constant dopamine stimulation then you might find it boring.\nThe visuals in combination with the sound/music are hauntingly beautiful and will stick in your mind for a long time. I got goosebumps almost throughout the entire movie.\nDune: Part One definitely serves as a stepping stone for Dune: Part Two, and more to come... If you are looking for action, Dune: Part Two is definitely the movie to be waiting for. So grab some friends and go watch this movie.\nMake \"Dune: Part Two\" happen.",
+        "rating": 4.2,
+        "usefulness": {
+            "likes": 2000,
+            "dislikes": 43
+        },
+        "spoilerFree": true
+    },
+    {
+        "id": 2,
+        "userDisplayName": "Kätzchen",
+        "username": "katzhen",
+        "title": "Not bad, but mostly just setup",
+        "content": "The cinematography and Hans Zimmer music. An experience that should be obtained by all. Those spaceships accompanied with the music will remain for long time in my mind.\n\nYes books are read but this movie gives a good impression of the worlds created in our minds.",
+        "rating": 4.0,
+        "usefulness": {
+            "likes": 999,
+            "dislikes": 2
+        },
+        "spoilerFree": false
+    }
+]

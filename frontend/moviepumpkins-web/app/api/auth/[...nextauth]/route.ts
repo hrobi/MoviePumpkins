@@ -5,6 +5,9 @@ import { JWT } from "next-auth/jwt";
 import Keycloak, { KeycloakProfile } from "next-auth/providers/keycloak";
 import { OAuthConfig } from "next-auth/providers/oauth";
 
+const SIGN_IN_PAGE_ROUTE = "/auth/signin";
+const ERROR_PAGE_ROUTE = "/auth/error";
+
 declare module 'next-auth/jwt' {
     interface JWT {
         id_token?: string;
@@ -95,8 +98,8 @@ export const authOptions: AuthOptions = {
         },
     },
     pages: {
-        signIn: "/auth/sign-in",
-        error: "/auth/error",
+        signIn: SIGN_IN_PAGE_ROUTE,
+        error: ERROR_PAGE_ROUTE,
     },
 };
 const handler = NextAuth(authOptions);

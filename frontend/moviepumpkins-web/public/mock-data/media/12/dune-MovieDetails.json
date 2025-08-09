@@ -1,0 +1,16 @@
+{
+    "averageRating": { "average": 4.6, "raterCount": 3000 },
+    "title": "Dune Part One",
+    "shortDescription": "Paul Atreides arrives on Arrakis after his father accepts the stewardship of the dangerous planet. However, chaos ensues after a betrayal as forces clash to control melange, a precious resource.",
+    "pictureHref": "/mock-data/media/12/dune-poster.png",
+    "runtimeInMinutes": 155,
+    "directors": ["Denis Villeneuve"],
+    "writers": ["Jon Spaihts", "Denis Villeneuve", "Eric Roth"],
+    "actors": ["Timothée Chalamet", "Rebecca Ferguson", "Zendaya"],
+    "country": "United States",
+    "awards": {
+        "namedAwards": [{ "type": "Oscar", "count": 6 }, { "type": "Boscar", "count": 2 }, { "type": "noscar", "count": 5 }, { "type": "foscar", "count": 2 }],
+        "totalNominationCount": 298,
+        "totalWinCount": 175
+    }
+}

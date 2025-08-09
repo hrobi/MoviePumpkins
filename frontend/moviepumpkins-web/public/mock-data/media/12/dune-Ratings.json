@@ -1,0 +1,62 @@
+[
+  {
+    "label": "overall",
+    "average": 4.6,
+    "raterCount": 3000
+  },
+  {
+    "label": "characters",
+    "average": 4.1,
+    "raterCount": 45
+  },
+  {
+    "label": "plot",
+    "average": 4.4,
+    "raterCount": 100
+  },
+  {
+    "label": "fun",
+    "average": 4.6,
+    "raterCount": 230
+  },
+  {
+    "label": "cinematography",
+    "average": 4.7,
+    "raterCount": 500
+  },
+  {
+    "label": "grandiose",
+    "average": 4.4,
+    "raterCount": 600
+  },
+  {
+    "label": "thought-provoking",
+    "average": 4.2,
+    "raterCount": 55
+  },
+  {
+    "label": "creative",
+    "average": 4.0,
+    "raterCount": 99
+  },
+  {
+    "label": "emotional",
+    "average": 3.8,
+    "raterCount": 33
+  },
+  {
+    "label": "action-packed",
+    "average": 3.4,
+    "raterCount": 100
+  },
+  {
+    "label": "realistic",
+    "average": 2.3,
+    "raterCount": 50
+  },
+  {
+    "label": "scary",
+    "average": 5,
+    "raterCount": 1
+  }
+]
