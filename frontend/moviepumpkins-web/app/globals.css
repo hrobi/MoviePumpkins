@@ -1,15 +1,40 @@
 @import "tailwindcss";
 
-:root {
-    --background: #ffffff;
+:root {    
+    --bg-color: #eee;
+    --outline-color: #8e8e8e;
+    --primary-faint: #ffd1a9;
+    --primary: #ffa658;
+    --secondary: #58B1FF;
+    --secondary-dark: #0b80e7;
+    --background: #eee;
     --foreground: #171717;
+    --font-roboto: "Roboto", sans-serif;
 }
 
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
+    --color-primary: var(--primary);
+    --color-primary-faint: var(--primary-faint);
+    --color-outline: var(--outline-color);
+    --color-secondary: var(--secondary);
+    --color-secondary-dark: var(--secondary-dark);
     --font-sans: var(--font-geist-sans);
     --font-mono: var(--font-geist-mono);
+    --font-roboto: var(--font-roboto);
+}
+
+.transition-height {
+    transition-property: height;
+}
+
+.svg-fill-sky-hover-container:hover svg {
+    fill: var(--color-sky-200);
+}
+
+.svg-fill-red-hover-container:hover svg {
+    fill: var(--color-red-200);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +48,42 @@ body {
     background: var(--background);
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
+}
+
+h1, h2 {
+    @apply
+        font-roboto
+        font-bold
+}
+
+h2 {
+    @apply
+        text-2xl
+}
+
+input {
+    @apply
+        w-full
+        py-2
+        px-4
+        rounded-sm
+        border-[1px]
+        outline-0
+        focus:border-primary
+        focus:shadow-primary-faint
+        transition
+        ;
+}
+
+input:focus {
+    box-shadow: 0 0 0 2px var(--primary-faint);
+}
+
+p {
+    @apply
+        py-2
+}
+
+.shadow-b-outline {
+    box-shadow: -1px 2px var(--color-gray-200);
 }
