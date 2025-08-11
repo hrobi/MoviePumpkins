@@ -1,15 +1,15 @@
 import withAuth from "next-auth/middleware";
 
-const protectedRoutes: string[] = [];
+const protectedRoutes: string[] = ["/watchlist", "/profile", "/options"];
 
 export default withAuth({
-    callbacks: {
-        async authorized({req, token}) {
-            return protectedRoutes.indexOf(req.nextUrl.pathname) == -1 || !!token;
-        }
+  callbacks: {
+    async authorized({ req, token }) {
+      return protectedRoutes.indexOf(req.nextUrl.pathname) == -1 || !!token;
     },
-    pages: {
-        signIn: "/auth/sign-in",
-        error: "/auth/error",
-    },
+  },
+  pages: {
+    signIn: "/auth/signin",
+    error: "/auth/error",
+  },
 });

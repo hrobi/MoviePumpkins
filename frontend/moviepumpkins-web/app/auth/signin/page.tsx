@@ -12,12 +12,14 @@ export default async function ({ searchParams }) {
   if (searchParamsResolved.error) {
     return (
       <>
-        <ErrorMessage title="Fatal Error">
-          <div className="flex flex-row">
-            {translateError(searchParamsResolved.error)}
-            <GoHomeButton />
-          </div>
-        </ErrorMessage>
+        <div className="content-section">
+          <ErrorMessage title="Fatal Error">
+            <div className="flex flex-row">
+              {translateError(searchParamsResolved.error)}
+              <GoHomeButton />
+            </div>
+          </ErrorMessage>
+        </div>
       </>
     );
   }

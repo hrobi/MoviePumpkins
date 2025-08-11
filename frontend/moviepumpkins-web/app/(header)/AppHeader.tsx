@@ -19,7 +19,7 @@ export default async function AppHeader() {
   const links = match(session?.user)
     .with(P.nullish, () => (
       <>
-        <SecondaryLink href="">
+        <SecondaryLink href="/watchlist">
           <TextWithIcon text="Watchlist" icon={<ListCheckIcon />} />
         </SecondaryLink>
         <PrimaryLink href="/auth/signin" className="text-center">
@@ -35,20 +35,20 @@ export default async function AppHeader() {
         <SecondaryLink href="/profile">
           <TextWithIcon text="Profile" icon={<UserRoundPenIcon />} />
         </SecondaryLink>
-        <SecondaryLink href="">
+        <SecondaryLink href="/options">
           <TextWithIcon text="Other" icon={<GripIcon />} />
         </SecondaryLink>
       </>
     ))
     .with({ role: P.union("admin", "supervisor") }, () => (
       <>
-        <SecondaryLink href="">
+        <SecondaryLink href="/watchlist">
           <TextWithIcon text="Watchlist" icon={<ListCheckIcon />} />
         </SecondaryLink>
         <SecondaryLink href="/alerts">
           <TextWithIcon text="Alerts" icon={<UserRoundPenIcon />} />
         </SecondaryLink>
-        <SecondaryLink href="">
+        <SecondaryLink href="/options">
           <TextWithIcon text="Other" icon={<GripIcon />} />
         </SecondaryLink>
       </>
