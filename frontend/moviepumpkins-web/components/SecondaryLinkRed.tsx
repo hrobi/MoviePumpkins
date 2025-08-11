@@ -1,27 +1,25 @@
 import Link from "next/link";
-import React from "react";
 import { UrlObject } from "url";
 
-interface PrimaryLinkParams {
+interface SecondaryLinkParams {
   children: React.ReactNode;
   href: string | UrlObject;
   className?: string;
 }
 
-export default function PrimaryLink({
-  children,
+export default function SecondaryLink({
   href,
-  className,
-}: PrimaryLinkParams) {
+  children,
+  className = "",
+}: SecondaryLinkParams) {
   return (
     <Link
       href={href}
-      className={`
-        bg-secondary 
-        py-2 px-6
+      className={` 
+        px-2
         rounded-sm 
-        text-white 
-        hover:bg-secondary-dark
+        text-red-400
+      hover:text-red-600
         font-bold
         transition 
         ${className || ""}
