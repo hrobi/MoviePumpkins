@@ -1,31 +1,33 @@
 package net.moviepumpkins.core.user.db
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import net.moviepumpkins.core.general.BaseEntity
 import net.moviepumpkins.core.user.model.UserRole
 import net.moviepumpkins.core.utils.equalsBy
+import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.JdbcType
-import org.hibernate.annotations.NaturalId
 import org.hibernate.dialect.PostgreSQLEnumJdbcType
+import org.hibernate.validator.constraints.Length
 import javax.validation.constraints.Pattern
 
-@Entity(name = "user_account")
+@Entity
+@Table(name = "user_account")
+@DynamicUpdate
 class UserAccountEntity(
     @field:Id
-    @field:GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    @Pattern(regexp = "([a-z0-9]+-?[a-z0-9]+)+")
+    @Length(min = 3, max = 100)
+    var username: String?,
+
     var fullName: String,
 
-    @NaturalId
+    @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+\$")
     var email: String,
 
-    @NaturalId
-    @Pattern(regexp = "([a-z0-9]+-?[a-z0-9]+)+")
-    var username: String,
-
     var displayName: String,
-
-    var about: String = "",
 
     @field:Enumerated
     @field:JdbcType(PostgreSQLEnumJdbcType::class)

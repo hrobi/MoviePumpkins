@@ -1,5 +1,6 @@
 package net.moviepumpkins.core.general
 
+import jakarta.persistence.Column
 import jakarta.persistence.MappedSuperclass
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
@@ -7,6 +8,7 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 class BaseEntity {
+    @Column(updatable = false)
     lateinit var createdAt: LocalDateTime
     lateinit var modifiedAt: LocalDateTime
 

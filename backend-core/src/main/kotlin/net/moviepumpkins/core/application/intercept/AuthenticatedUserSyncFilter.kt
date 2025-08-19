@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import net.moviepumpkins.core.application.model.UserAccount
 import net.moviepumpkins.core.application.toUserAccount
-import net.moviepumpkins.core.application.usecase.SyncUserUseCase
 import net.moviepumpkins.core.user.UserService
 import net.moviepumpkins.core.user.exception.UserNotFoundByUsernameException
 import net.moviepumpkins.core.user.model.UserProfile
@@ -17,7 +16,6 @@ import net.moviepumpkins.core.user.model.UserRole as UserProfileRole
 
 open class AuthenticatedUserSyncFilter(
     private val userService: UserService,
-    private val syncUser: SyncUserUseCase,
 ) : OncePerRequestFilter() {
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -40,7 +38,7 @@ open class AuthenticatedUserSyncFilter(
                 ?: throw UserNotFoundByUsernameException(username)
         } else {
             val userProfile = accessToken.toUserProfileWithReviewerRole()
-            syncUser(userProfile = userProfile, sid = accessToken.subject)
+            userService.syncDatabaseUserWithAuthorizationServer(userProfile, sid = accessToken.subject)
             userProfile.toUserAccount()
         }
 

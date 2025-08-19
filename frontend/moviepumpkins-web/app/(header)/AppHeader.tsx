@@ -60,7 +60,10 @@ export default async function AppHeader() {
       <Band tag="header">
         <div className="flex lg:flex-row flex-col gap-3 xl:px-0 px-5 w-full xl:w-2/3 mx-auto items-center">
           <div className="grow relative w-full">
-            <TextInput placeholder="Search for title of series or movie" />
+            <TextInput
+              placeholder="Search for title of series or movie"
+              className="w-full"
+            />
             <Search
               className="absolute right-3 top-0 h-full"
               color="var(--outline-color)"

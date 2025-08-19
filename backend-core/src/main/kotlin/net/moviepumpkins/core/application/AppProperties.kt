@@ -5,5 +5,5 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding
 
 @ConfigurationProperties(prefix = "app")
 data class AppProperties @ConstructorBinding constructor(
-    val authServerUrlBase: String
+    val authServerUrlBase: String,
 )

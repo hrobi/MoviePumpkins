@@ -28,9 +28,34 @@ class AuthorizationService(
         return keycloakResponseAsMap["access_token"]
     }
 
-    fun addAppUserRoleBySid(sid: String) {
+    class WithAdminTokenScope(val adminToken: BearerToken) {}
+
+    private fun <T> withAdminToken(doAction: WithAdminTokenScope.() -> T) {
         val adminToken = fetchAdminToken()!!
-        val role = keycloakClient.getRealmRole(authorization = BearerToken(adminToken), "app_user")
-        keycloakClient.addRolesToUser(authorization = BearerToken(adminToken), userId = sid, listOf(role))
+        WithAdminTokenScope(BearerToken(adminToken)).doAction()
+    }
+
+    fun addAppUserRoleBySid(sid: String) = withAdminToken {
+        val role = keycloakClient.getRealmRole(authorization = adminToken, "app_user")
+        keycloakClient.addRolesToUser(authorization = adminToken, userId = sid, listOf(role))
+    }
+
+    fun updateUserByUsername(username: String, updateUserData: UpdateUserRepresentationData) = withAdminToken {
+        val user = keycloakClient.getUser(adminToken, username)[0]
+        keycloakClient.updateUser(adminToken, user.id, UserRepresentation(
+            id = user.id,
+            firstName = updateUserData.firstName ?: user.firstName,
+            lastName = updateUserData.lastName ?: user.lastName,
+            email = updateUserData.email ?: user.email,
+            attributes = updateUserData.attributes?.let {
+                UserRepresentation.UserAttributes(
+                    listOf(
+                        it.displayName!!.get(
+                            0
+                        )
+                    )
+                )
+            }
+        ))
     }
 }
