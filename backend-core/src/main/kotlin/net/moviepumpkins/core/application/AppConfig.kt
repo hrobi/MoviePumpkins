@@ -1,11 +1,11 @@
 package net.moviepumpkins.core.application
 
 import net.moviepumpkins.core.application.intercept.AuthenticatedUserSyncFilter
-import net.moviepumpkins.core.application.usecase.SyncUserUseCase
 import net.moviepumpkins.core.oauth.KeycloakClient
 import net.moviepumpkins.core.user.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
@@ -23,12 +23,12 @@ class AppConfig {
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
-        syncUserUseCase: SyncUserUseCase,
         userService: UserService,
     ): SecurityFilterChain {
         http {
             authorizeHttpRequests {
                 authorize("/users/*/protected", authenticated)
+                authorize(HttpMethod.PUT, "users/*/profile", authenticated)
                 authorize(anyRequest, permitAll)
             }
 
@@ -36,7 +36,9 @@ class AppConfig {
                 jwt { }
             }
 
-            addFilterAfter<BearerTokenAuthenticationFilter>(AuthenticatedUserSyncFilter(userService, syncUserUseCase))
+            csrf { disable() }
+
+            addFilterAfter<BearerTokenAuthenticationFilter>(AuthenticatedUserSyncFilter(userService))
 
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS

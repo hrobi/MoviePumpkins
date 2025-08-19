@@ -5,6 +5,5 @@ data class UserProfile(
     val fullName: String,
     val email: String,
     val displayName: String,
-    val about: String = "",
     val role: UserRole,
 )

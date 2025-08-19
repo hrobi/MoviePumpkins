@@ -17,13 +17,7 @@ export default function PrimaryLink({
     <Link
       href={href}
       className={`
-        bg-secondary 
-        py-2 px-6
-        rounded-sm 
-        text-white 
-        hover:bg-secondary-dark
-        font-bold
-        transition 
+        primary-btn
         ${className || ""}
     `}
     >

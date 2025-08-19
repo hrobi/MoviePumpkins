@@ -1,28 +1,50 @@
 package net.moviepumpkins.core.integration.api
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase
+import net.moviepumpkins.core.application.ErrorCode
+import net.moviepumpkins.core.integration.models.UpdateUserProfileRequest
+import net.moviepumpkins.core.oauth.AuthorizationService
 import net.moviepumpkins.core.user.db.UserAccountEntity
 import net.moviepumpkins.core.user.db.UserAccountRepository
-import net.moviepumpkins.core.user.model.UserRole
+import net.moviepumpkins.core.utils.defaultJwtWithClaims
 import org.flywaydb.test.annotation.FlywayTest
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.put
+import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import kotlin.test.assertEquals
 
 @SpringBootTest
 @FlywayTest
 @AutoConfigureEmbeddedDatabase
 class UsersProfileControllerTest {
-    lateinit var mockMvc: MockMvc
+    private lateinit var mockMvc: MockMvc
 
     @Autowired
-    lateinit var userAccountRepository: UserAccountRepository
+    private lateinit var userAccountRepository: UserAccountRepository
+
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
+
+    @MockkBean
+    private lateinit var authorizationService: AuthorizationService
 
     companion object {
         val validUsersString = """
@@ -40,19 +62,49 @@ class UsersProfileControllerTest {
                     email = email,
                     username = username,
                     displayName = displayName,
-                    role = UserRole.valueOf(roleLowerCase.uppercase())
+                    role = net.moviepumpkins.core.user.model.UserRole.valueOf(roleLowerCase.uppercase())
                 )
             }
+
+        fun paulAtraedes() = authentication(
+            JwtAuthenticationToken(
+                defaultJwtWithClaims(buildMap {
+                    put("realm_access", mapOf("roles" to listOf("app_user")))
+                    put("preferred_username", "paul-atraedes")
+                    put("email", "lisan-algaib@sietch.ar")
+                    put("display_name", "Muaddib")
+                    put("name", "Paul Atreides")
+                })
+            )
+        )
+
+        fun stillgar() = authentication(
+            JwtAuthenticationToken(
+                defaultJwtWithClaims(buildMap {
+                    put("realm_access", mapOf("roles" to listOf("app_user")))
+                    put("preferred_username", "stillgar")
+                    put("email", "stillgar@sietch.ar")
+                    put("display_name", "Stillgar")
+                    put("name", "Stillgar Of Fremen")
+                })
+            )
+        )
     }
 
     @BeforeEach
     fun setup(wac: WebApplicationContext) {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build()
+        mockMvc = MockMvcBuilders
+            .webAppContextSetup(wac)
+            .apply<DefaultMockMvcBuilder>(springSecurity())
+            .build()
+
+        userAccountRepository.saveAll(validUserAccountEntities)
+
+        every { authorizationService.updateUserByUsername(any(), any()) } just Runs
     }
 
     @Test
     fun `expect all valid users to be returned in http json response`() {
-        userAccountRepository.saveAll(validUserAccountEntities)
         for (validUserString in validUsersString.lines()) {
             val (username, name, displayName, email, roleLowerCase) = validUserString.split(",")
             mockMvc.get("/users/${username}/profile").andExpect {
@@ -63,7 +115,6 @@ class UsersProfileControllerTest {
                     jsonPath("$.email") { value(email) }
                     jsonPath("$.username") { value(username) }
                     jsonPath("$.displayName") { value(displayName) }
-                    jsonPath("$.about") { value("") }
                     jsonPath("$.role") { value(roleLowerCase) }
                 }
             }
@@ -74,6 +125,99 @@ class UsersProfileControllerTest {
     fun `expect to get back 404 error when trying to find a non-existent user`() {
         mockMvc.get("/users/does.not.exist/profile").andExpect {
             status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `expect to modify profile correctly`() {
+
+        mockMvc.put("/users/paul-atraedes/profile") {
+            with(paulAtraedes())
+            content = objectMapper.writeValueAsString(
+                UpdateUserProfileRequest(
+                    displayName = "Lisan Al-Gaib",
+                    fullName = "Paul Atreides",
+                    email = "lisan-algaib@sietch.ar"
+                )
+            )
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isNoContent() }
+        }
+
+        val paulFromDb = userAccountRepository.viewFirstByUsername("paul-atraedes")!!
+
+        assertAll(
+            { assertEquals(expected = "Lisan Al-Gaib", actual = paulFromDb.displayName) },
+            { assertEquals(expected = "Paul Atreides", actual = paulFromDb.fullName) },
+            { assertEquals(expected = "lisan-algaib@sietch.ar", actual = paulFromDb.email) },
+        )
+
+        mockMvc.put("/users/stillgar/profile") {
+            with(stillgar())
+            content = objectMapper.writeValueAsString(
+                UpdateUserProfileRequest(
+                    displayName = "The Naib",
+                    fullName = "Stillgar Tabr",
+                    email = "still@sietch.ar"
+                )
+            )
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isNoContent() }
+        }
+
+        val stillgarFromDb = userAccountRepository.viewFirstByUsername("stillgar")!!
+
+        assertAll(
+            { assertEquals(expected = "The Naib", actual = stillgarFromDb.displayName) },
+            { assertEquals(expected = "Stillgar Tabr", actual = stillgarFromDb.fullName) },
+            { assertEquals(expected = "still@sietch.ar", actual = stillgarFromDb.email) },
+        )
+
+    }
+
+    @Test
+    fun `expect to fail modifying another users' profile`() {
+
+        mockMvc.put("/users/stillgar/profile") {
+            with(paulAtraedes())
+            content = objectMapper.writeValueAsString(
+                UpdateUserProfileRequest(
+                    displayName = "The Naib",
+                    fullName = "Stillgar Tabr",
+                    email = "still@sietch.ar"
+                )
+            )
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isForbidden() }
+        }
+    }
+
+    @Test
+    fun `expect to fail modifying user's profile with invalid request body`() {
+        mockMvc.put("/users/paul-atraedes/profile") {
+            with(paulAtraedes())
+            content = objectMapper.writeValueAsString(
+                UpdateUserProfileRequest(
+                    displayName = "  Lisan Al-Gaib",
+                    fullName = "Paul  Atreides ",
+                    email = "lisan-algaib"
+                )
+            )
+            contentType = MediaType.APPLICATION_JSON
+        }.andExpect {
+            status { isBadRequest() }
+            jsonPath(
+                "$.errors[*].errorCode",
+                containsInAnyOrder(
+                    ErrorCode.USER_PROPERTY_CONSTRAINT_01.name,
+                    ErrorCode.USER_PROPERTY_CONSTRAINT_02.name,
+                    ErrorCode.USER_PROPERTY_CONSTRAINT_03.name,
+                    ErrorCode.USER_PROPERTY_CONSTRAINT_04.name
+                )
+            )
         }
     }
 }

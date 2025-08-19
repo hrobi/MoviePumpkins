@@ -1,3 +1,6 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getServerSession, Session } from "next-auth";
+
 export function take<T>(array: T[], n: number): T[] {
   return array.filter((_, index) => index < n);
 }
@@ -29,4 +32,23 @@ export function formatCount(count: number): string {
     : isBetweenInc(countStringLen, 1000, 100_000)
     ? formatDigits(count / 1000) + "K"
     : count.toString();
+}
+
+export async function getUser(): Promise<Session["user"]> {
+  const session = await getServerSession(authOptions);
+  return session?.user;
+}
+
+export async function withUser<T>(
+  produce: (
+    user: NonNullable<Session["user"]>,
+    authParams: () => { header: { Authorization: string } }
+  ) => T
+): Promise<T> {
+  const user = (await getUser())!;
+  return produce(user, () => ({
+    header: {
+      Authorization: `bearer ${user!.accessToken}`,
+    },
+  }));
 }

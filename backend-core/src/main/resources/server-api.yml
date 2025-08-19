@@ -43,6 +43,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/Status4xxResponse'
   '/users/{username}/profile':
+    put:
+      operationId: updateUserProfile
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        #[CLIENT_ONLY] - $ref: '#/components/parameters/Authorization'
+        - name: username
+          schema:
+            type: string
+          required: true
+          description: search by username
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserProfileRequest'
+      responses:
+        '401':
+          description: you must be logged in to modify the profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status4xxResponse'
+        '403':
+          description: you are not authorized to modify this profile!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status4xxResponse'
+        '400':
+          description: request body is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status400Response'
+        '204':
+          description: profile modified successfully
+
     get:
       operationId: getUserProfile
       parameters:
@@ -122,7 +162,6 @@ components:
         - fullName
         - email
         - displayName
-        - about
         - role
       properties:
         username:
@@ -133,10 +172,21 @@ components:
           type: string
         displayName:
           type: string
-        about:
-          type: string
         role:
           $ref: '#/components/schemas/UserRole'
+    UpdateUserProfileRequest:
+      type: object
+      required:
+        - fullName
+        - email
+        - displayName
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
     UserRole:
       type: string
       enum:
@@ -149,4 +199,28 @@ components:
         - reason
       properties:
         reason:
+          type: string
+    Status400Response:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/BadRequestBodyError"
+    BadRequestBodyError:
+      type: object
+      required:
+        - fields
+        - reason
+        - errorCode
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+        errorCode:
           type: string

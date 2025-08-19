@@ -7,8 +7,18 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.service.annotation.GetExchange
 import org.springframework.web.service.annotation.PostExchange
+import org.springframework.web.service.annotation.PutExchange
 
 interface KeycloakClient {
+
+    @GetExchange(
+        "/admin/realms/moviepumpkins/users?username={username}"
+    )
+    fun getUser(
+        @RequestHeader("Authorization") authorization: BearerToken,
+        @PathVariable("username") username: String,
+    ): List<UserRepresentation>
+
     @PostExchange(
         "/realms/moviepumpkins/protocol/openid-connect/token",
         contentType = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
@@ -33,5 +43,15 @@ interface KeycloakClient {
         @RequestHeader("Authorization") authorization: BearerToken,
         @PathVariable userId: String,
         @RequestBody body: List<RoleRepresentation>
+    )
+
+    @PutExchange(
+        "/admin/realms/moviepumpkins/users/{userId}",
+        contentType = MediaType.APPLICATION_JSON_VALUE
+    )
+    fun updateUser(
+        @RequestHeader("Authorization") authorization: BearerToken,
+        @PathVariable userId: String,
+        @RequestBody body: UserRepresentation
     )
 }

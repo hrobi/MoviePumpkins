@@ -48,6 +48,24 @@
     }
 }
 
+.primary-btn {
+    @apply
+        cursor-pointer
+        bg-secondary 
+        py-2 px-6
+        rounded-sm 
+        text-white 
+        hover:bg-secondary-dark
+        font-bold
+        transition 
+}
+
+.input-error {
+    @apply
+        border-red-500
+        border-[1px]
+}
+
 body {
     background: var(--background);
     color: var(--foreground);
@@ -67,7 +85,6 @@ h2 {
 
 input {
     @apply
-        w-full
         py-2
         px-4
         rounded-sm
@@ -77,6 +94,10 @@ input {
         focus:shadow-primary-faint
         transition
         ;
+}
+
+input:disabled {
+    @apply bg-gray-100;
 }
 
 input:focus {

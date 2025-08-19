@@ -52,7 +52,7 @@ dependencies {
     }
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-    testImplementation("io.mockk:mockk:1.8.8")
+    testImplementation("io.mockk:mockk:1.13.3")
     testImplementation("com.ninja-squad:springmockk:4.0.2")
     testImplementation("io.zonky.test:embedded-database-spring-test:2.6.0")
     testImplementation("org.flywaydb.flyway-test-extensions:flyway-spring-test:10.0.0")
