@@ -1,7 +1,7 @@
 package net.moviepumpkins.core.application
 
 import net.moviepumpkins.core.application.intercept.AuthenticatedUserSyncFilter
-import net.moviepumpkins.core.oauth.KeycloakClient
+import net.moviepumpkins.core.oauth.keycloak.KeycloakClient
 import net.moviepumpkins.core.user.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
