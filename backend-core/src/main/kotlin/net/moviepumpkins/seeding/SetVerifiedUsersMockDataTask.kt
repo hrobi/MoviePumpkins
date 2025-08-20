@@ -9,7 +9,6 @@ import net.moviepumpkins.core.user.model.UserProfile
 import net.moviepumpkins.core.user.model.UserRole
 import net.moviepumpkins.core.user.toUserAccountEntity
 import net.moviepumpkins.core.utils.getLogger
-import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Component
 class SetVerifiedUsersMockDataTask(
     private val userAccountRepository: UserAccountRepository,
     private val useKeycloakAsAdmin: UseKeycloakAsAdminService,
-) : CommandLineRunner {
+) : MockSeedingTask("users") {
 
     val LOG = getLogger()
 
@@ -68,11 +67,7 @@ class SetVerifiedUsersMockDataTask(
     )
 
     @Transactional
-    override fun run(vararg args: String?) {
-
-        if (args.contains("NoUsers")) {
-            return
-        }
+    override fun run() {
 
         LOG.info("Seeding has started")
 
