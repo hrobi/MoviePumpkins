@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional
 import net.moviepumpkins.core.application.ErrorCode
 import net.moviepumpkins.core.application.validations
 import net.moviepumpkins.core.oauth.AuthorizationService
-import net.moviepumpkins.core.oauth.UpdateUserRepresentationData
+import net.moviepumpkins.core.oauth.keycloak.UpdateUserRepresentationData
 import net.moviepumpkins.core.user.db.UserAccountRepository
 import net.moviepumpkins.core.user.model.UpdateUserProfileData
 import net.moviepumpkins.core.user.model.UserProfile

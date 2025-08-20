@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.oauth
+package net.moviepumpkins.core.oauth.keycloak
 
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PathVariable
@@ -54,4 +54,15 @@ interface KeycloakClient {
         @PathVariable userId: String,
         @RequestBody body: UserRepresentation
     )
+
+    @PostExchange(
+        "/admin/realms/moviepumpkins/users",
+        contentType = MediaType.APPLICATION_JSON_VALUE
+    )
+    fun addUser(
+        @RequestHeader("Authorization") authorization: BearerToken,
+        @RequestBody body: NewUserRepresentationData
+    ) {
+
+    }
 }

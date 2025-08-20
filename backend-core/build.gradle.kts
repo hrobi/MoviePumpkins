@@ -125,6 +125,15 @@ tasks {
         }
     }
 
+    register<JavaExec>("seedMock") {
+        group = "application"
+        description = "Fills database and authorization servers with mock data for local smoke tests"
+        mainClass.set("net.moviepumpkins.core.BackendCoreApplicationKt")
+        classpath(sourceSets["main"].runtimeClasspath)
+        args = listOf()
+        systemProperty("spring.profiles.active", "mockseed")
+    }
+
     withType<Test> {
         useJUnitPlatform()
     }
