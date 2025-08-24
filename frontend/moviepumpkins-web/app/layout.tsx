@@ -1,9 +1,8 @@
+import { Providers } from "@/configuration/providers";
+import { MainSpace, Scaffold } from "@/features/app.scaffold/components";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
-import Main from "./(scaffold)/Main";
-import Scaffold from "./(scaffold)/Scaffold";
 import "./globals.css";
-import { Providers } from "./Providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +35,7 @@ export default function RootLayout({
       >
         <Providers>
           <Scaffold />
-          <Main>{children}</Main>
+          <MainSpace>{children}</MainSpace>
         </Providers>
       </body>
     </html>

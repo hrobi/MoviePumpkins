@@ -1,8 +1,7 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import DoSignin from "@/app/auth/signin/_components/DoSignin";
+import { nextAuthOptions } from "@/configuration/auth";
+import { DoSignin, ErrorAlert } from "@/features/auth/components";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { ErrorAlert } from "./_components/ErrorAlert";
 
 interface ErrorMessage {
   title: string;
@@ -10,7 +9,7 @@ interface ErrorMessage {
 }
 
 export default async function ({ searchParams }) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(nextAuthOptions);
   const searchParamsResolved = await searchParams;
   console.log(session);
   if (searchParamsResolved.error) {
