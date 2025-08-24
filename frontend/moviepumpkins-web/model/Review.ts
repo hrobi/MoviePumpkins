@@ -6,7 +6,8 @@ export interface Review {
   rating: number;
   content: string;
   spoilerFree: boolean;
-  usefulness: {
+  userReaction?: "like" | "dislike";
+  reactions: {
     likes: number;
     dislikes: number;
   };

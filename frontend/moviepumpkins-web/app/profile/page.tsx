@@ -2,8 +2,8 @@ import { coreClient } from "@/api-client";
 import Section from "@/components/Section";
 import { UserProfile } from "@/model/User";
 import { getServerSession } from "next-auth";
+import { UserProfileMenu } from "../(scaffold)/UserProfileMenu";
 import { authOptions } from "../api/auth/[...nextauth]/route";
-import Form from "./Form";
 
 async function fetchProfile(): Promise<UserProfile> {
   const session = await getServerSession(authOptions);
@@ -21,7 +21,7 @@ export default async function Page() {
   return (
     <>
       <Section title="Profile">
-        <Form profile={profile} />
+        <UserProfileMenu profile={profile} />
       </Section>
     </>
   );

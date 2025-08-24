@@ -1,7 +1,10 @@
+"use client";
+
+import { Paper, Stack, Typography, useTheme } from "@mui/material";
 import React from "react";
 
 interface SectionParams {
-  title: React.ReactNode;
+  title?: React.ReactNode;
   additionalButton?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -13,17 +16,17 @@ export default function Section({
   className = "",
   additionalButton,
 }: SectionParams) {
+  const theme = useTheme();
+
   return (
     <>
-      <section
-        className={`content-section rounded-md p-8 bg-white border-gray-300 border-[1px] shadow-b-outline ${className}`}
-      >
-        <h1 className="flex flex-row flex-wrap items-center gap-2 text-3xl border-l-5 border-primary pl-5 font-bold mb-3">
-          {title}
+      <Paper sx={{ padding: theme.spacing(3), marginTop: theme.spacing(5) }}>
+        <Stack direction="row" spacing={1} marginBottom={2}>
+          <Typography variant="h1">{title}</Typography>
           {additionalButton}
-        </h1>
+        </Stack>
         {children}
-      </section>
+      </Paper>
     </>
   );
 }

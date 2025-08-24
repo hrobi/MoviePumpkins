@@ -8,17 +8,32 @@ export function useToggle(): [boolean, () => void] {
   return [b, toggle];
 }
 
-export function useRefElementWidth<E extends HTMLElement>(
-  baseWidth: number
+export function useRefElementHeight<E extends HTMLElement>(
+  defaultHeight: number
 ): [Ref<E> | undefined, number] {
-  const ref = useRef<E>(undefined);
-  const [width, setWidth] = useState(baseWidth);
+  const ref = useRef<E>(null);
+  const [height, setHeight] = useState(defaultHeight);
   useEffect(() => {
-    if (!ref.current) {
-      return;
-    }
-    const { width } = ref.current.getBoundingClientRect();
-    setWidth(width);
+    console.log("[useMaxRefElementHeight] " + ref.current!.offsetHeight);
+    setHeight(ref.current!.offsetHeight);
   }, []);
-  return [ref as Ref<E>, width];
+  return [ref, height];
+}
+
+export function useMenuAnchor<E extends HTMLElement>(): {
+  anchorEl: HTMLElement | null;
+  open: boolean;
+  openOnEvent: (event: React.MouseEvent<E>) => void;
+  onClose: () => void;
+} {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const openOnEvent = (event: React.MouseEvent<E>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const onClose = () => {
+    setAnchorEl(null);
+  };
+
+  return { anchorEl, open, openOnEvent, onClose };
 }

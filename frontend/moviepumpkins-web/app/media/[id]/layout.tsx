@@ -1,14 +1,14 @@
-import NotificationMessage from "@/components/message-box/NotificationMessage";
 import { MediaDetails } from "@/model/MediaDetails";
 import { Ratings } from "@/model/Ratings";
 import { Review } from "@/model/Review";
-import RatingsView from "./(ratings)/RatingsView";
-import ReviewsView from "./(reviews)/ReviewsView";
-import MediaDetailsView from "./MediaDetailsView";
 
 import DUNE_MOVIE_DETAILS from "@/public/mock-data/media/12/dune-MovieDetails.json";
 import DUNE_RATINGS from "@/public/mock-data/media/12/dune-Ratings.json";
 import DUNE_REVIEWS from "@/public/mock-data/media/12/dune-Reviews.json";
+import MediaDetailsView from "./_components/MediaDetailsView";
+import { MediaNotFoundAlert } from "./_components/MediaNotFoundAlert";
+import RatingsView from "./_components/RatingsView";
+import ReviewsView from "./_components/ReviewsView";
 
 async function fetchMediaDetailsById(
   id: number
@@ -45,13 +45,7 @@ export default async function Layout({
   if (notFound) {
     return (
       <>
-        <div className="xl:w-2/3 mx-auto rounded-md p-8 mt-5">
-          <NotificationMessage title="Ooops! Media does not exist">
-            <p>
-              The media you were looking for with id {id} appears not to exist!
-            </p>
-          </NotificationMessage>
-        </div>
+        <MediaNotFoundAlert id={id} />
       </>
     );
   }

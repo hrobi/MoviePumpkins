@@ -1,6 +1,7 @@
 "use server";
 
 import { coreClient } from "@/api-client";
+import { operations } from "@/api-client/core-client";
 import { withUser } from "@/lib";
 import z from "zod";
 
@@ -63,6 +64,10 @@ export async function updateProfileAction(
       body: rawFormData,
     }))
   );
+
+  const status = 400;
+
+  clientCallResult.error as unknown as operations["updateUserProfile"]["responses"][status];
 
   if (!clientCallResult.response.ok) {
     throw Error(
