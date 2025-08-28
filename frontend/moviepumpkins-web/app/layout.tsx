@@ -1,7 +1,7 @@
-import SessionProvider from "@/SessionProvider";
+import { Providers } from "@/configuration/providers";
+import { MainSpace, Scaffold } from "@/features/app.scaffold/components";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
-import AppHeader from "./(header)/AppHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,10 +33,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider>
-          <AppHeader />
-          <main>{children}</main>
-        </SessionProvider>
+        <Providers>
+          <Scaffold />
+          <MainSpace>{children}</MainSpace>
+        </Providers>
       </body>
     </html>
   );

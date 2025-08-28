@@ -47,68 +47,9 @@
         --foreground: #ededed;
     }
 }
-
-.primary-btn {
-    @apply
-        cursor-pointer
-        bg-secondary 
-        py-2 px-6
-        rounded-sm 
-        text-white 
-        hover:bg-secondary-dark
-        font-bold
-        transition 
-}
-
-.input-error {
-    @apply
-        border-red-500
-        border-[1px]
-}
-
 body {
     background: var(--background);
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
 }
 
-h1, h2 {
-    @apply
-        font-roboto
-        font-bold
-}
-
-h2 {
-    @apply
-        text-2xl
-}
-
-input {
-    @apply
-        py-2
-        px-4
-        rounded-sm
-        border-[1px]
-        outline-0
-        focus:border-primary
-        focus:shadow-primary-faint
-        transition
-        ;
-}
-
-input:disabled {
-    @apply bg-gray-100;
-}
-
-input:focus {
-    box-shadow: 0 0 0 2px var(--primary-faint);
-}
-
-p {
-    @apply
-        py-2
-}
-
-.shadow-b-outline {
-    box-shadow: -1px 2px var(--color-gray-200);
-}
