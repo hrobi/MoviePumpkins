@@ -6,11 +6,11 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase
-import net.moviepumpkins.core.application.ErrorCode
+import net.moviepumpkins.core.app.config.*
 import net.moviepumpkins.core.integration.models.UpdateUserProfileRequest
 import net.moviepumpkins.core.oauth.AuthorizationService
-import net.moviepumpkins.core.user.db.UserAccountEntity
-import net.moviepumpkins.core.user.db.UserAccountRepository
+import net.moviepumpkins.core.user.entity.UserAccountEntity
+import net.moviepumpkins.core.user.repository.UserAccountRepository
 import net.moviepumpkins.core.utils.defaultJwtWithClaims
 import org.flywaydb.test.annotation.FlywayTest
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -212,10 +212,10 @@ class UsersProfileControllerTest {
             jsonPath(
                 "$.errors[*].errorCode",
                 containsInAnyOrder(
-                    ErrorCode.USER_PROPERTY_CONSTRAINT_01.name,
-                    ErrorCode.USER_PROPERTY_CONSTRAINT_02.name,
-                    ErrorCode.USER_PROPERTY_CONSTRAINT_03.name,
-                    ErrorCode.USER_PROPERTY_CONSTRAINT_04.name
+                    UserPropertyConstraint01.name,
+                    UserPropertyConstraint02.name,
+                    UserPropertyConstraint03.name,
+                    UserPropertyConstraint04.name
                 )
             )
         }

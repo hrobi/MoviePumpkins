@@ -1,3 +1,5 @@
+"use client";
+
 import { VSpacer } from "@/features/app/components";
 import { REM } from "@/features/app/model";
 import {

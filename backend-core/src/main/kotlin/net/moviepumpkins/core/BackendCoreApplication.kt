@@ -1,6 +1,6 @@
 package net.moviepumpkins.core
 
-import net.moviepumpkins.core.application.AppProperties
+import net.moviepumpkins.core.app.config.AppProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication

@@ -3,10 +3,8 @@
 import { Section } from "@/features/app.scaffold/components";
 import { RatingsContentBox } from "@/features/media.ratings/components";
 import { Ratings } from "@/features/media.ratings/model";
-import { drop, take } from "@/utils/lib";
 import HotelClassIcon from "@mui/icons-material/HotelClass";
 import { Button, Divider, Pagination, Stack } from "@mui/material";
-import { useRef } from "react";
 
 interface RatingsViewParams {
   id: number;
@@ -14,11 +12,6 @@ interface RatingsViewParams {
 }
 
 export function RatingsSection({ id, ratings }: RatingsViewParams) {
-  const mostImportantRatings = take(ratings, 9);
-  const restOfRatings = drop(ratings, 9);
-
-  const contentContainerElement = useRef<HTMLDivElement | null>(null);
-
   return (
     <>
       <Section

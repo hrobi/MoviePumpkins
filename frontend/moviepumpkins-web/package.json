@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "openapi:generate:core": "npx openapi-typescript .core-apispec.yml -o configuration/api-client/model/PumpkinsCoreClient.d.ts"
+    "openapi:generate:pumpkinsCore": "openapi-ts -f ./configuration/api-client/config/PumpkinsOpenApiConfig.ts",
+    "openapi:help": "openapi-ts --help"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -18,7 +19,6 @@
     "@mui/material-nextjs": "^7.3.0",
     "next": "15.3.0",
     "next-auth": "^4.24.11",
-    "openapi-fetch": "^0.14.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-responsive": "^10.0.1",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@hey-api/openapi-ts": "0.82.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

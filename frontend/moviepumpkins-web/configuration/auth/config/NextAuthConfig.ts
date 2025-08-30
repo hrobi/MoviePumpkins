@@ -1,3 +1,4 @@
+import { pumpkinsClient } from "@/configuration/api-client/clients";
 import { fetchUserOrThrow, signOutOfKeycloak } from "@/configuration/auth/lib";
 import {
   ERROR_PAGE_ROUTE,
@@ -25,6 +26,10 @@ export const nextAuthOptions: AuthOptions = {
       if (profile) {
         token.username = profile.preferred_username;
       }
+
+      pumpkinsClient.setConfig({
+        auth: token.access_token,
+      });
 
       try {
         const user = await fetchUserOrThrow({ token });

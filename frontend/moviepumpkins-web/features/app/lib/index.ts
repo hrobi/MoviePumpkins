@@ -18,3 +18,11 @@ export async function withUser<T>(
     },
   }));
 }
+
+export function throwFatalError(error: unknown): never {
+  throw new Error(
+    `Pumpkins core backend api has returned an error that cannot be resolved: ${JSON.stringify(
+      error
+    )}`
+  );
+}
