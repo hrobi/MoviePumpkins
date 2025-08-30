@@ -1,15 +1,17 @@
 package net.moviepumpkins.core.user
 
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.application.ErrorCode
-import net.moviepumpkins.core.application.validations
 import net.moviepumpkins.core.oauth.AuthorizationService
 import net.moviepumpkins.core.oauth.keycloak.UpdateUserRepresentationData
-import net.moviepumpkins.core.user.db.UserAccountRepository
-import net.moviepumpkins.core.user.model.UpdateUserProfileData
 import net.moviepumpkins.core.user.model.UserProfile
-import net.moviepumpkins.core.utils.getAuthentication
-import net.moviepumpkins.core.utils.throwUnauthorized
+import net.moviepumpkins.core.user.model.UserProfilePropertyConstraintViolation
+import net.moviepumpkins.core.user.model.UserProfileUpdate
+import net.moviepumpkins.core.user.model.UserProfileUpdateForbiddenError
+import net.moviepumpkins.core.user.repository.UserAccountRepository
+import net.moviepumpkins.core.util.Failure
+import net.moviepumpkins.core.util.Fallible
+import net.moviepumpkins.core.util.Success
+import net.moviepumpkins.core.util.getAuthentication
 import org.springframework.stereotype.Service
 
 @Service
@@ -35,9 +37,9 @@ class UserService(
     }
 
     @Transactional
-    fun updateUserProfile(username: String, data: UpdateUserProfileData) {
+    fun updateUserProfile(username: String, data: UserProfileUpdate): Fallible<UserProfileUpdateForbiddenError> {
         if (getAuthentication().username != username) {
-            throwUnauthorized("Only $username is able to modify their profile!")
+            return Failure(UserProfileUpdateForbiddenError.CANNOT_MODIFY_OTHERS_PROFILE)
         }
 
         val user = userAccountRepository.findFirstByUsername(username)!!
@@ -63,32 +65,38 @@ class UserService(
                 attributes = UpdateUserRepresentationData.UserAttributes(displayName = listOf(data.displayName))
             )
         )
+        return Success(Unit)
     }
 
-    fun validateUpdateUserProfile(profileUpdate: UpdateUserProfileData) {
-        validations {
-            validateSingleParameter(UpdateUserProfileData::email.name, ErrorCode.USER_PROPERTY_CONSTRAINT_01) {
-                profileUpdate.email.matches(Regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+\$"))
+    fun validateUpdateUserProfile(profileUpdate: UserProfileUpdate): Fallible<List<UserProfilePropertyConstraintViolation>> {
+
+        val constraintViolationList = buildList<UserProfilePropertyConstraintViolation> {
+            if (!profileUpdate.email.matches(Regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+\$"))) {
+                add(UserProfilePropertyConstraintViolation.EMAIL_PATTERN)
             }
-            validateSingleParameter(
-                UpdateUserProfileData::displayName.name,
-                ErrorCode.USER_PROPERTY_CONSTRAINT_02
-            ) {
-                profileUpdate.displayName.trim() == profileUpdate.displayName
+
+            if (!profileUpdate.email.matches(Regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+\$"))) {
+                add(UserProfilePropertyConstraintViolation.EMAIL_PATTERN)
             }
-            validateSingleParameter(
-                UpdateUserProfileData::fullName.name,
-                ErrorCode.USER_PROPERTY_CONSTRAINT_03
-            ) {
-                profileUpdate.fullName.trim() == profileUpdate.fullName
+
+            if (profileUpdate.displayName.trim() != profileUpdate.displayName) {
+                add(UserProfilePropertyConstraintViolation.TRIMMED_DISPLAY_NAME)
             }
-            validateSingleParameter(
-                UpdateUserProfileData::fullName.name,
-                ErrorCode.USER_PROPERTY_CONSTRAINT_04
-            ) {
-                val nameParts = profileUpdate.fullName.split(" ")
-                nameParts.size > 1 && nameParts.none { it.isEmpty() }
+
+            if (profileUpdate.fullName.trim() != profileUpdate.fullName) {
+                add(UserProfilePropertyConstraintViolation.TRIMMED_FULL_NAME)
             }
+
+            val nameParts = profileUpdate.fullName.split(" ")
+            if (nameParts.size <= 1 || nameParts.any { it.isEmpty() }) {
+                add(UserProfilePropertyConstraintViolation.FULLNAME_SHOULD_CONTAIN_AT_LEAST_TWO_WORDS)
+            }
+        }
+
+        return if (constraintViolationList.isNotEmpty()) {
+            Failure(constraintViolationList)
+        } else {
+            Success(Unit)
         }
     }
 }

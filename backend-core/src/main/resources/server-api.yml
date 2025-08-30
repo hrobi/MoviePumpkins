@@ -1,3 +1,7 @@
+# GLOSSARY:
+#  ES <- Error Status
+#  ESC400R <- Error Status Code 400 Response
+
 openapi: 3.0.2
 info:
   version: '1.0.0'
@@ -22,7 +26,6 @@ paths:
       security:
         - bearerAuth: [ ]
       parameters:
-        #[CLIENT_ONLY] - $ref: '#/components/parameters/Authorization'
         - name: username
           schema:
             type: string
@@ -48,7 +51,6 @@ paths:
       security:
         - bearerAuth: [ ]
       parameters:
-        #[CLIENT_ONLY] - $ref: '#/components/parameters/Authorization'
         - name: username
           schema:
             type: string
@@ -73,16 +75,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Status4xxResponse'
+                $ref: "#/components/schemas/UpdateUserProfileESC403R"
         '400':
           description: request body is incorrect
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Status400Response'
+                $ref: "#/components/schemas/UpdateUserProfileESC400R"
         '204':
           description: profile modified successfully
-
     get:
       operationId: getUserProfile
       parameters:
@@ -200,15 +201,6 @@ components:
       properties:
         reason:
           type: string
-    Status400Response:
-      type: object
-      required:
-        - errors
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: "#/components/schemas/BadRequestBodyError"
     BadRequestBodyError:
       type: object
       required:
@@ -224,3 +216,30 @@ components:
           type: string
         errorCode:
           type: string
+    UpdateUserProfileESC400R:
+      type: object
+      required:
+        - status
+        - errors
+      properties:
+        status:
+          type: string
+          enum:
+            - BAD_REQUEST
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/BadRequestBodyError"
+    UpdateUserProfileESC403R:
+      type: object
+      required:
+        - status
+        - error
+      properties:
+        status:
+          type: string
+          enum:
+            - FORBIDDEN
+          default: FORBIDDEN
+        error:
+          $ref: "#/components/schemas/Status4xxResponse"

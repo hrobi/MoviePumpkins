@@ -25,18 +25,27 @@ export function ModifyProfileDialog({
   onClose,
 }: ModifyProfileDialogParams) {
   const [state, formAction, isPending] = useActionState(updateProfileAction, {
-    error: undefined,
     data: profile,
+    state: { status: "uninitialized" },
   });
-
-  const getFieldError = (
-    field: keyof NonNullable<typeof state.error>["fieldErrors"]
-  ) => state.error?.fieldErrors[field];
 
   const [updateJustSucceeded, setUpdateJustSucceeded] = useState(false);
   useEffect(() => {
-    setUpdateJustSucceeded(!isPending && !!state.updateSucceeded);
+    setUpdateJustSucceeded(!isPending && state.state.status === "all-ok");
   }, [isPending]);
+
+  const getFieldError = (name: string) =>
+    state.state.status === "request-body-error"
+      ? state.state.errors
+          .filter(({ fields }) => fields.includes(name))
+          .map(({ reason }) => reason)
+      : [];
+
+  const inputErrors = {
+    displayName: getFieldError("displayName"),
+    fullName: getFieldError("fullName"),
+    email: getFieldError("email"),
+  };
 
   return (
     <Dialog
@@ -59,8 +68,8 @@ export function ModifyProfileDialog({
             <TextField
               label="Display name"
               defaultValue={state.data.displayName}
-              error={!!getFieldError("displayName")}
-              helperText={getFieldError("displayName")}
+              error={inputErrors.displayName.length > 0}
+              helperText={inputErrors.displayName[0]}
               name="displayName"
               disabled={isPending}
               fullWidth
@@ -70,8 +79,8 @@ export function ModifyProfileDialog({
             <TextField
               label="Full name"
               defaultValue={state.data.fullName}
-              error={!!getFieldError("fullName")}
-              helperText={getFieldError("fullName")}
+              error={inputErrors.fullName.length > 0}
+              helperText={inputErrors.fullName[0]}
               name="fullName"
               disabled={isPending}
               fullWidth
@@ -81,8 +90,8 @@ export function ModifyProfileDialog({
             <TextField
               label="E-mail"
               defaultValue={state.data.email}
-              error={!!getFieldError("email")}
-              helperText={getFieldError("email")}
+              error={inputErrors.email.length > 0}
+              helperText={inputErrors.email[0]}
               name="email"
               disabled={isPending}
               fullWidth

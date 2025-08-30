@@ -4,10 +4,10 @@ import net.moviepumpkins.core.integration.models.GetProtectedUserResponse
 import net.moviepumpkins.core.integration.models.GetUserProfileResponse
 import net.moviepumpkins.core.integration.models.UpdateUserProfileRequest
 import net.moviepumpkins.core.integration.models.UserRole
-import net.moviepumpkins.core.user.db.SimpleUserView
-import net.moviepumpkins.core.user.db.UserAccountEntity
-import net.moviepumpkins.core.user.model.UpdateUserProfileData
+import net.moviepumpkins.core.user.entity.SimpleUserView
+import net.moviepumpkins.core.user.entity.UserAccountEntity
 import net.moviepumpkins.core.user.model.UserProfile
+import net.moviepumpkins.core.user.model.UserProfileUpdate
 
 fun SimpleUserView.toUserProfile() = UserProfile(
     username = username,
@@ -39,7 +39,7 @@ fun UserProfile.toGetUserProfileResponse() = GetUserProfileResponse(
     role = UserRole.valueOf(role.name)
 )
 
-fun UpdateUserProfileRequest.toUpdateUserProfileData() = UpdateUserProfileData(
+fun UpdateUserProfileRequest.toUpdateUserProfileData() = UserProfileUpdate(
     email = email,
     displayName = displayName,
     fullName = fullName,

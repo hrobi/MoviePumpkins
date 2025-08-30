@@ -1,3 +1,5 @@
+"use client";
+
 import { RatingCard } from "@/features/media.ratings/components";
 import { Rating } from "@/features/media.ratings/model";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";

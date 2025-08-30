@@ -1,49 +1,60 @@
 "use server";
 
-import { pumpkinsCoreClient } from "@/configuration/api-client";
-import { withUser } from "@/features/app/lib";
+import { updateUserProfile } from "@/configuration/api-client/clients/pumpkins-core";
+import { getUser, throwFatalError } from "@/features/app/lib";
 import {
-  profileModel,
-  UpdateProfileState,
+  UpdateUserProfileActionState,
+  UpdateUserProfileState,
 } from "@/features/user-profile/model";
-import z from "zod";
+import { revalidateTag } from "next/cache";
+import { match, P } from "ts-pattern";
 
 export type UpdateProfileAction = typeof updateProfileAction;
 
 export async function updateProfileAction(
-  prevState: UpdateProfileState,
+  prevState: UpdateUserProfileActionState,
   formData: FormData
-): Promise<UpdateProfileState> {
+): Promise<UpdateUserProfileActionState> {
+  const currentUser = await getUser();
+  if (!currentUser) {
+    throw new Error(
+      "updateProfileAction can only be performed if user is logged in!"
+    );
+  }
+
   const rawFormData = {
     email: formData.get("email") as string,
     fullName: formData.get("fullName") as string,
     displayName: formData.get("displayName") as string,
   };
 
-  const error = profileModel.safeParse(rawFormData).error;
+  const updateUserProfileResult = await updateUserProfile({
+    path: { username: currentUser.username },
+    body: rawFormData,
+  });
 
-  if (error) {
-    return { error: z.flattenError(error), data: rawFormData };
+  if (!updateUserProfileResult.error) {
+    revalidateTag("getUserProfile");
   }
 
-  const clientCallResult = await pumpkinsCoreClient.PUT(
-    "/users/{username}/profile",
-    await withUser((user, authParams) => ({
-      params: {
-        ...authParams(),
-        path: { username: user.username },
-      },
-      body: rawFormData,
-    }))
-  );
-
-  if (!clientCallResult.response.ok) {
-    throw Error(
-      `Backend server response not ok: ${JSON.stringify(
-        clientCallResult.response
-      )}`
-    );
-  }
-
-  return { data: rawFormData, updateSucceeded: true };
+  return {
+    data: rawFormData,
+    state: updateUserProfileResult.error
+      ? match(updateUserProfileResult.error)
+          .with({ status: "FORBIDDEN" }, ({ error }) => {
+            throwFatalError(error);
+          })
+          .with(
+            { status: "BAD_REQUEST" },
+            ({ errors }): UpdateUserProfileState => ({
+              status: "request-body-error",
+              errors: errors,
+            })
+          )
+          .with({ reason: P.nonNullable }, (error) => {
+            throwFatalError(error);
+          })
+          .exhaustive()
+      : { status: "all-ok" },
+  };
 }

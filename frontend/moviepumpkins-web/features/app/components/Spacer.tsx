@@ -1,3 +1,5 @@
+"use client";
+
 import { Box } from "@mui/material";
 
 export function HSpacer({ size }: { size: number | string }) {

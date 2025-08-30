@@ -1,18 +1,25 @@
-import { pumpkinsCoreClient } from "@/configuration/api-client";
+import { getUserProtected } from "@/configuration/api-client/clients/pumpkins-core";
+import { UserRole } from "@/configuration/user/model";
 import { JWT } from "next-auth/jwt";
+import { match, P } from "ts-pattern";
 
-export async function fetchUserOrThrow({ token }: { token: JWT }) {
-  const user = await pumpkinsCoreClient.GET("/users/{username}/protected", {
-    params: {
-      path: { username: token.username! },
-      header: { Authorization: `Bearer ${token.access_token}` },
-    },
-    cache: "no-cache",
+export async function fetchUserOrThrow({ token }: { token: JWT }): Promise<{
+  username: string;
+  displayName: string;
+  role: UserRole;
+}> {
+  const user = await getUserProtected({
+    path: { username: token.username! },
   });
-  if (user.error) {
-    throw new Error(
-      `Communication with the core server was unsuccessful, status code: ${user.response.status}`
-    );
-  }
-  return user.data;
+
+  return match(user)
+    .with({ data: P.nonNullable }, ({ data }) => data)
+    .with({ error: P.nonNullable }, ({ error }) => {
+      throw new Error(
+        `User couldn't be fetched. Pumpkins backend core gave us the following error: ${JSON.stringify(
+          error
+        )}`
+      );
+    })
+    .exhaustive();
 }

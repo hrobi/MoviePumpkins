@@ -4,11 +4,11 @@ import jakarta.transaction.Transactional
 import net.moviepumpkins.core.oauth.keycloak.NewUserRepresentationData
 import net.moviepumpkins.core.oauth.keycloak.UseKeycloakAsAdminService
 import net.moviepumpkins.core.oauth.keycloak.UserRepresentation
-import net.moviepumpkins.core.user.db.UserAccountRepository
 import net.moviepumpkins.core.user.model.UserProfile
 import net.moviepumpkins.core.user.model.UserRole
+import net.moviepumpkins.core.user.repository.UserAccountRepository
 import net.moviepumpkins.core.user.toUserAccountEntity
-import net.moviepumpkins.core.utils.getLogger
+import net.moviepumpkins.core.util.getLogger
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
