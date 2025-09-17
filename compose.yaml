@@ -49,7 +49,7 @@ services:
     volumes:
       - keycloak:/opt/keycloak
       - type: bind
-        source: ./keycloak-themes/pumpkins
+        source: ./keycloak/themes/pumpkins
         target: /opt/keycloak/themes/pumpkins
 
 volumes:
