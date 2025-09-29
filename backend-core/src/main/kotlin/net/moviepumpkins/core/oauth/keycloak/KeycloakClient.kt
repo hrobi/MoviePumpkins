@@ -54,15 +54,4 @@ interface KeycloakClient {
         @PathVariable userId: String,
         @RequestBody body: UserRepresentation
     )
-
-    @PostExchange(
-        "/admin/realms/moviepumpkins/users",
-        contentType = MediaType.APPLICATION_JSON_VALUE
-    )
-    fun addUser(
-        @RequestHeader("Authorization") authorization: BearerToken,
-        @RequestBody body: NewUserRepresentationData
-    ) {
-
-    }
 }

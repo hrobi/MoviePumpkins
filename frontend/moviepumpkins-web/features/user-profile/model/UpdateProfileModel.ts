@@ -1,18 +1,18 @@
-export type UpdateUserProfileState =
-  | { status: "all-ok" }
-  | { status: "uninitialized" }
-  | {
-      status: "request-body-error";
-      errors: { fields: string[]; reason: string }[];
-    };
+export type StateUpdateUserProfile =
+    | { status: "ok" }
+    | { status: "uninitialized" }
+    | {
+    status: "requestBodyError";
+    errors: { fields: string[]; reason: string }[];
+};
 
 interface UserProfileUpdate {
-  email: string;
-  fullName: string;
-  displayName: string;
+    email: string;
+    fullName: string;
+    displayName: string;
 }
 
-export interface UpdateUserProfileActionState {
-  data: UserProfileUpdate;
-  state: UpdateUserProfileState;
+export interface ActionStateUpdateUserProfile {
+    data: UserProfileUpdate;
+    state: StateUpdateUserProfile;
 }

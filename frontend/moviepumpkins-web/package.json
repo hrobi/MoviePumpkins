@@ -10,6 +10,11 @@
     "openapi:generate:pumpkinsCore": "openapi-ts -f ./configuration/api-client/config/PumpkinsOpenApiConfig.ts",
     "openapi:help": "openapi-ts --help"
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "objectWrap": "preserve",
+    "printWidth": 90
+  },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
@@ -22,7 +27,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-responsive": "^10.0.1",
-    "ts-pattern": "^5.7.1",
+    "toori": "^0.1.3-alpha",
     "zod": "^4.0.17"
   },
   "devDependencies": {

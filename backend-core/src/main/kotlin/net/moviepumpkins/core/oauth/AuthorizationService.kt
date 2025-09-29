@@ -21,10 +21,14 @@ class AuthorizationService(
         clientSecret = keycloakClient.clientSecret
     }
 
-    fun addAppUserRoleBySid(sid: String) {
+    fun addAppUserRoleByUsername(username: String) {
         useKeycloakAsAdmin {
             val role = keycloakClient.getRealmRole(authorization = adminAccessToken, "app_user")
-            keycloakClient.addRolesToUser(authorization = adminAccessToken, userId = sid, listOf(role))
+            val users = keycloakClient.getUser(adminAccessToken, username)
+            if (users.isEmpty()) {
+                throw IllegalStateException("User with username $username couldn't be found in keycloak")
+            }
+            keycloakClient.addRolesToUser(authorization = adminAccessToken, userId = users[0].id, listOf(role))
         }
     }
 

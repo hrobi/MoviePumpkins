@@ -1,0 +1,180 @@
+@base_address = <<KEYCLOAK_BASE_ADDRESS>>
+@token = <<ADMIN_TOKEN>>
+
+POST {{base_address}}/admin/realms/moviepumpkins/users
+Content-Type: application/json
+Authorization: bearer {{token}}
+
+{
+  "enabled": true,
+  "emailVerified": true,
+  "username": "jack-hoffman",
+  "firstName": "Jack",
+  "lastName": "Hoffman",
+  "email": "jack-hoffman@mailsfake.com",
+  "attributes": {
+    "displayName": [
+      "Jack Hoffman"
+    ]
+  },
+  "realmRoles": [
+    "app_user"
+  ],
+  "credentials": [
+    {
+      "type": "password",
+      "value": "pass",
+      "temporary": false
+    }
+  ]
+}
+
+###
+
+POST {{base_address}}/admin/realms/moviepumpkins/users
+Content-Type: application/json
+Authorization: bearer {{token}}
+
+{
+  "enabled": true,
+  "emailVerified": true,
+  "username": "richard-rider",
+  "firstName": "Richard",
+  "lastName": "Rider",
+  "email": "richard-rider@mailsfake.com",
+  "attributes": {
+    "displayName": [
+      "MR Advisor"
+    ]
+  },
+  "realmRoles": [
+    "app_user"
+  ],
+  "credentials": [
+    {
+      "type": "password",
+      "value": "pass",
+      "temporary": false
+    }
+  ]
+}
+
+###
+
+POST {{base_address}}/admin/realms/moviepumpkins/users
+Content-Type: application/json
+Authorization: bearer {{token}}
+
+{
+  "username": "emily-wokerson",
+  "firstName": "Emily",
+  "lastName": "Wokerson",
+  "email": "emilyw@mailsfake.com",
+  "attributes": {
+    "displayName": [
+      "The Right One"
+    ]
+  },
+  "realmRoles": [
+    "app_user"
+  ],
+  "credentials": [
+    {
+      "type": "password",
+      "value": "pass",
+      "temporary": false
+    }
+  ],
+  "enabled": true,
+  "emailVerified": true
+}
+
+###
+
+POST {{base_address}}/admin/realms/moviepumpkins/users
+Content-Type: application/json
+Authorization: bearer {{token}}
+
+{
+  "username": "chase-wood",
+  "firstName": "Chase",
+  "lastName": "Wood",
+  "email": "chase-wood@mailsfake.com",
+  "attributes": {
+    "displayName": [
+      "Chase Wood"
+    ]
+  },
+  "realmRoles": [
+    "app_user"
+  ],
+  "credentials": [
+    {
+      "type": "password",
+      "value": "pass",
+      "temporary": false
+    }
+  ],
+  "enabled": true,
+  "emailVerified": true
+}
+
+###
+
+POST {{base_address}}/admin/realms/moviepumpkins/users
+Content-Type: application/json
+Authorization: bearer {{token}}
+
+{
+  "username": "justin-case",
+  "firstName": "Justin",
+  "lastName": "Case",
+  "email": "justin-case@mailsfake.com",
+  "attributes": {
+    "displayName": [
+      "Justin Case"
+    ]
+  },
+  "realmRoles": [
+    "app_user"
+  ],
+  "credentials": [
+    {
+      "type": "password",
+      "value": "pass",
+      "temporary": false
+    }
+  ],
+  "enabled": true,
+  "emailVerified": true
+}
+
+###
+
+POST {{base_address}}/admin/realms/moviepumpkins/users
+Content-Type: application/json
+Authorization: bearer {{token}}
+
+{
+  "username": "cameron-geller",
+  "firstName": "Cameron",
+  "lastName": "Geller",
+  "email": "cameron-geller@mailsfake.com",
+  "attributes": {
+    "displayName": [
+      "The Creator"
+    ]
+  },
+  "realmRoles": [
+    "app_user"
+  ],
+  "credentials": [
+    {
+      "type": "password",
+      "value": "pass",
+      "temporary": false
+    }
+  ],
+  "enabled": true,
+  "emailVerified": true
+}

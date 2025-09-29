@@ -6,12 +6,13 @@ import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase
-import net.moviepumpkins.core.app.config.*
+import net.moviepumpkins.core.app.model.UserAccount
+import net.moviepumpkins.core.app.model.UserRole
 import net.moviepumpkins.core.integration.models.UpdateUserProfileRequest
 import net.moviepumpkins.core.oauth.AuthorizationService
 import net.moviepumpkins.core.user.entity.UserAccountEntity
 import net.moviepumpkins.core.user.repository.UserAccountRepository
-import net.moviepumpkins.core.utils.defaultJwtWithClaims
+import net.moviepumpkins.core.util.jwtAuthenticationByUserAccount
 import org.flywaydb.test.annotation.FlywayTest
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.junit.jupiter.api.BeforeEach
@@ -20,8 +21,6 @@ import org.junit.jupiter.api.assertAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
@@ -53,42 +52,22 @@ class UsersProfileControllerTest {
             jamis,Jamis Of Fremen,Jamis,jamis@sietch.ar,reviewer
         """.trimIndent()
 
-        val validUserAccountEntities = validUsersString
+        val validUserAccounts = validUsersString
             .lines()
             .map {
                 val (username, name, displayName, email, roleLowerCase) = it.split(",")
-                UserAccountEntity(
+                UserAccount(
                     fullName = name,
                     email = email,
                     username = username,
                     displayName = displayName,
-                    role = net.moviepumpkins.core.user.model.UserRole.valueOf(roleLowerCase.uppercase())
+                    role = UserRole.valueOf(roleLowerCase.uppercase()),
+                    isAppUser = true
                 )
             }
 
-        fun paulAtraedes() = authentication(
-            JwtAuthenticationToken(
-                defaultJwtWithClaims(buildMap {
-                    put("realm_access", mapOf("roles" to listOf("app_user")))
-                    put("preferred_username", "paul-atraedes")
-                    put("email", "lisan-algaib@sietch.ar")
-                    put("display_name", "Muaddib")
-                    put("name", "Paul Atreides")
-                })
-            )
-        )
-
-        fun stillgar() = authentication(
-            JwtAuthenticationToken(
-                defaultJwtWithClaims(buildMap {
-                    put("realm_access", mapOf("roles" to listOf("app_user")))
-                    put("preferred_username", "stillgar")
-                    put("email", "stillgar@sietch.ar")
-                    put("display_name", "Stillgar")
-                    put("name", "Stillgar Of Fremen")
-                })
-            )
-        )
+        fun paulAtraedes() = jwtAuthenticationByUserAccount(validUserAccounts[0])
+        fun stillgar() = jwtAuthenticationByUserAccount(validUserAccounts[1])
     }
 
     @BeforeEach
@@ -98,7 +77,15 @@ class UsersProfileControllerTest {
             .apply<DefaultMockMvcBuilder>(springSecurity())
             .build()
 
-        userAccountRepository.saveAll(validUserAccountEntities)
+        userAccountRepository.saveAll(validUserAccounts.map {
+            UserAccountEntity(
+                username = it.username,
+                fullName = it.fullName,
+                email = it.email,
+                displayName = it.displayName,
+                role = it.role
+            )
+        })
 
         every { authorizationService.updateUserByUsername(any(), any()) } just Runs
     }
@@ -210,12 +197,11 @@ class UsersProfileControllerTest {
         }.andExpect {
             status { isBadRequest() }
             jsonPath(
-                "$.errors[*].errorCode",
+                "$.violations[*].fields[*]",
                 containsInAnyOrder(
-                    UserPropertyConstraint01.name,
-                    UserPropertyConstraint02.name,
-                    UserPropertyConstraint03.name,
-                    UserPropertyConstraint04.name
+                    "displayName",
+                    "fullName",
+                    "email"
                 )
             )
         }
