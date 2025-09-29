@@ -20,31 +20,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Specification'
-  '/users/{username}/protected':
-    get:
-      operationId: getUserProtected
+  '/users':
+    post:
+      operationId: createOwnUser
       security:
         - bearerAuth: [ ]
-      parameters:
-        - name: username
-          schema:
-            type: string
-          required: true
-          description: search by username
-          in: path
       responses:
+        '201':
+          description: user successfully created their own user account
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UserProfile"
         '200':
-          description: you successfully got back attributes of a user
+          description: request was accepted, but user account already exists
           content:
-            application/json:
+            "application/json":
               schema:
-                $ref: '#/components/schemas/GetProtectedUserResponse'
-        '404':
-          description: user with username couldn't be found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status4xxResponse'
+                $ref: "#/components/schemas/UserProfile"
+        '401':
+          description: user needs to be authenticated for this operation
   '/users/{username}/profile':
     put:
       operationId: updateUserProfile
@@ -65,23 +60,15 @@ paths:
               $ref: '#/components/schemas/UpdateUserProfileRequest'
       responses:
         '401':
-          description: you must be logged in to modify the profile
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status4xxResponse'
+          description: user must be logged in to modify the profile
         '403':
-          description: you are not authorized to modify this profile!
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateUserProfileESC403R"
+          description: user is not authorized to modify this profile!
         '400':
           description: request body is incorrect
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UpdateUserProfileESC400R"
+                $ref: "#/components/schemas/Status400Response"
         '204':
           description: profile modified successfully
     get:
@@ -95,18 +82,13 @@ paths:
           in: path
       responses:
         '200':
-          description: you successfully got back attributes of a user
+          description: user successfully got back attributes of a user
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetUserProfileResponse'
+                $ref: '#/components/schemas/UserProfile'
         '404':
           description: user with username couldn't be found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status4xxResponse'
-
 components:
   securitySchemes:
     bearerAuth:
@@ -143,20 +125,7 @@ components:
               type: string
         apiTitle:
           type: string
-    GetProtectedUserResponse:
-      type: object
-      required:
-        - username
-        - displayName
-        - role
-      properties:
-        username:
-          type: string
-        displayName:
-          type: string
-        role:
-          $ref: '#/components/schemas/UserRole'
-    GetUserProfileResponse:
+    UserProfile:
       type: object
       required:
         - username
@@ -194,19 +163,11 @@ components:
         - reviewer
         - supervisor
         - admin
-    Status4xxResponse:
-      type: object
-      required:
-        - reason
-      properties:
-        reason:
-          type: string
     BadRequestBodyError:
       type: object
       required:
         - fields
         - reason
-        - errorCode
       properties:
         fields:
           type: array
@@ -214,32 +175,12 @@ components:
             type: string
         reason:
           type: string
-        errorCode:
-          type: string
-    UpdateUserProfileESC400R:
+    Status400Response:
       type: object
       required:
-        - status
-        - errors
+        - violations
       properties:
-        status:
-          type: string
-          enum:
-            - BAD_REQUEST
-        errors:
+        violations:
           type: array
           items:
             $ref: "#/components/schemas/BadRequestBodyError"
-    UpdateUserProfileESC403R:
-      type: object
-      required:
-        - status
-        - error
-      properties:
-        status:
-          type: string
-          enum:
-            - FORBIDDEN
-          default: FORBIDDEN
-        error:
-          $ref: "#/components/schemas/Status4xxResponse"

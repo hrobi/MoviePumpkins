@@ -2,7 +2,7 @@ package net.moviepumpkins.core.app.exception
 
 import org.springframework.http.HttpStatus
 
-class ClientErrorException(
+open class ClientErrorException(
     val status: HttpStatus,
-    val body: Any
+    val body: Any? = null
 ) : RuntimeException()

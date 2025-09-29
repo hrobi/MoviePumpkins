@@ -5,7 +5,7 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import net.moviepumpkins.core.app.entity.BaseEntity
-import net.moviepumpkins.core.user.model.UserRole
+import net.moviepumpkins.core.app.model.UserRole
 import net.moviepumpkins.core.util.equalsBy
 import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.JdbcType

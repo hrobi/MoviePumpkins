@@ -41,3 +41,5 @@ out/
 
 ### Logs ###
 /logs
+
+!**/src/main/resources/mock/keycloak/*.http

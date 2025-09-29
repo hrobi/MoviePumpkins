@@ -1,17 +1,15 @@
 package net.moviepumpkins.core.user
 
 import jakarta.transaction.Transactional
+import net.moviepumpkins.core.app.model.UserAccount
+import net.moviepumpkins.core.app.model.UserRole
+import net.moviepumpkins.core.app.model.UserView
 import net.moviepumpkins.core.oauth.AuthorizationService
 import net.moviepumpkins.core.oauth.keycloak.UpdateUserRepresentationData
-import net.moviepumpkins.core.user.model.UserProfile
-import net.moviepumpkins.core.user.model.UserProfilePropertyConstraintViolation
+import net.moviepumpkins.core.user.entity.UserAccountEntity
 import net.moviepumpkins.core.user.model.UserProfileUpdate
-import net.moviepumpkins.core.user.model.UserProfileUpdateForbiddenError
 import net.moviepumpkins.core.user.repository.UserAccountRepository
-import net.moviepumpkins.core.util.Failure
-import net.moviepumpkins.core.util.Fallible
-import net.moviepumpkins.core.util.Success
-import net.moviepumpkins.core.util.getAuthentication
+import net.moviepumpkins.core.util.*
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,84 +17,57 @@ class UserService(
     private val userAccountRepository: UserAccountRepository,
     private val authorizationService: AuthorizationService,
 ) {
+    val LOG = getLogger()
 
     @Transactional
-    fun saveUser(userProfile: UserProfile) {
-        userAccountRepository.save(userProfile.toUserAccountEntity())
+    fun createUser(userAccount: UserAccount) {
+        userAccountRepository.save(
+            UserAccountEntity(
+                username = userAccount.username,
+                fullName = userAccount.fullName,
+                email = userAccount.email,
+                displayName = userAccount.displayName,
+                role = userAccount.role
+            )
+        )
+        authorizationService.addAppUserRoleByUsername(userAccount.username)
     }
 
     @Transactional
-    fun getUserProfileByUsername(username: String): UserProfile? {
-        return userAccountRepository.viewFirstByUsername(username)?.toUserProfile()
+    fun getUser(username: String): UserView? {
+        LOG.info("START method getUser")
+        val user = userAccountRepository.viewFirstByUsername(username)
+        LOG.info("EXIT method getUser")
+        return user
     }
 
     @Transactional
-    fun syncDatabaseUserWithAuthorizationServer(userProfile: UserProfile, sid: String) {
-        saveUser(userProfile)
-        authorizationService.addAppUserRoleBySid(sid)
+    fun getUserRoleByUsername(username: String): UserRole? {
+        return userAccountRepository.getUserRoleByUsername(username)
     }
 
     @Transactional
-    fun updateUserProfile(username: String, data: UserProfileUpdate): Fallible<UserProfileUpdateForbiddenError> {
-        if (getAuthentication().username != username) {
-            return Failure(UserProfileUpdateForbiddenError.CANNOT_MODIFY_OTHERS_PROFILE)
-        }
+    fun updateUserProfile(username: String, userProfileUpdate: UserProfileUpdate) {
+        LOG.info("START method updateUserProfile")
+        checkEmail(userProfileUpdate::email).require()
+        checkTrimmed(userProfileUpdate::displayName).require()
+        (checkThat(userProfileUpdate::fullName) matches { isTrimmed() && isMultipleWords() } orElse "should be trimmed and contain at least two words").require()
 
         val user = userAccountRepository.findFirstByUsername(username)!!
-        if (user.email != data.email) {
-            user.email = data.email
-        }
-
-        if (user.fullName != data.fullName) {
-            user.fullName = data.fullName
-        }
-
-        if (user.displayName != data.displayName) {
-            user.displayName = data.displayName
-        }
-
-        val (firstName, lastName) = user.fullName.split(" ", limit = 2)
+        val (firstName, lastName) = userProfileUpdate.fullName.split(" ", limit = 2)
         authorizationService.updateUserByUsername(
             username,
             UpdateUserRepresentationData(
                 firstName = firstName,
                 lastName = lastName,
-                email = data.email,
-                attributes = UpdateUserRepresentationData.UserAttributes(displayName = listOf(data.displayName))
+                email = userProfileUpdate.email,
+                attributes = UpdateUserRepresentationData.UserAttributes(displayName = listOf(userProfileUpdate.displayName))
             )
         )
-        return Success(Unit)
-    }
 
-    fun validateUpdateUserProfile(profileUpdate: UserProfileUpdate): Fallible<List<UserProfilePropertyConstraintViolation>> {
-
-        val constraintViolationList = buildList<UserProfilePropertyConstraintViolation> {
-            if (!profileUpdate.email.matches(Regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+\$"))) {
-                add(UserProfilePropertyConstraintViolation.EMAIL_PATTERN)
-            }
-
-            if (!profileUpdate.email.matches(Regex("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+\$"))) {
-                add(UserProfilePropertyConstraintViolation.EMAIL_PATTERN)
-            }
-
-            if (profileUpdate.displayName.trim() != profileUpdate.displayName) {
-                add(UserProfilePropertyConstraintViolation.TRIMMED_DISPLAY_NAME)
-            }
-
-            if (profileUpdate.fullName.trim() != profileUpdate.fullName) {
-                add(UserProfilePropertyConstraintViolation.TRIMMED_FULL_NAME)
-            }
-
-            val nameParts = profileUpdate.fullName.split(" ")
-            if (nameParts.size <= 1 || nameParts.any { it.isEmpty() }) {
-                add(UserProfilePropertyConstraintViolation.FULLNAME_SHOULD_CONTAIN_AT_LEAST_TWO_WORDS)
-            }
-        }
-
-        return if (constraintViolationList.isNotEmpty()) {
-            Failure(constraintViolationList)
-        } else {
-            Success(Unit)
-        }
+        user.email = userProfileUpdate.email
+        user.fullName = userProfileUpdate.fullName
+        user.displayName = userProfileUpdate.displayName
+        LOG.info("EXIT method updateUserProfile")
     }
 }
