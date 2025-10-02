@@ -10,11 +10,14 @@ export interface SessionUser {
 
 declare module "next-auth/jwt" {
   interface JWT {
-    id_token?: string;
-    access_token?: string;
-    provider?: string;
-    username?: string;
-    role?: UserRole;
+    idToken: string;
+    accessToken: string;
+    accessTokenExpiresAt: number;
+    refreshToken: string;
+    provider: string;
+    username: string;
+    role: UserRole;
+    error?: "RefreshTokenError";
   }
 }
 
@@ -25,5 +28,6 @@ declare module "next-auth" {
 
   interface Session {
     user?: SessionUser;
+    error?: "RefreshTokenError";
   }
 }
