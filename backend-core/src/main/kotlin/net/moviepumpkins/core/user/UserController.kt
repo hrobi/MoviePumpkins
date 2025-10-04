@@ -7,6 +7,7 @@ import net.moviepumpkins.core.integration.controllers.UsersController
 import net.moviepumpkins.core.integration.controllers.UsersProfileController
 import net.moviepumpkins.core.integration.models.UpdateUserProfileRequest
 import net.moviepumpkins.core.integration.models.UserProfile
+import net.moviepumpkins.core.user.validation.UserRequestsValidationService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.net.URI
@@ -14,14 +15,16 @@ import java.net.URI
 @RestController
 class UserController(
     private val userService: UserService,
-    private val authenticationFacade: AuthenticationFacade
+    private val authenticationFacade: AuthenticationFacade,
+    private val userRequestsValidationService: UserRequestsValidationService
 ) : UsersController, UsersProfileController {
 
     override fun updateUserProfile(
         updateUserProfileRequest: UpdateUserProfileRequest,
         username: String
     ): ResponseEntity<Unit> {
-        val profileUpdate = updateUserProfileRequest.toUpdateUserProfileDataOrThrow()
+        userRequestsValidationService.validateUpdateUserProfileRequest(updateUserProfileRequest)
+        val profileUpdate = updateUserProfileRequest.toUserProfileUpdate()
         if (username != authenticationFacade.authenticationName) {
             throw ForbiddenException()
         }
