@@ -37,6 +37,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("javax.validation:validation-api:2.0.1.Final")
+    implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.29")
     implementation("io.swagger.core.v3:swagger-models:2.2.29")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
