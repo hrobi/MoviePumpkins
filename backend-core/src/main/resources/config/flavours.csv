@@ -1,0 +1,19 @@
+ACT1;action;How well done action sequences are
+ACT2;high stakes;How high the stakes are in a movie/series
+GEN1;fun;How fun series/movie is
+EMO1;comedy;How funny a series/movie is
+PAR1;absurdity;How absurd/bunkers a series/movie is
+THR1;mystery;How mysterious/intriguing a series/movie is
+GEN2;creativity;How creative a series/movie is
+GEN3;historicity;How historically accurate a series/movie is
+GEN4;beauty;How beautiful series/movie is. In live-action pieces, it's the cinematography, in animation it's the animation.
+THR2;scare;How scary a series/movie is
+THR3;unease;How uneasy a series/movie is
+EMO2;romance;How romantic a series/movie is
+PAR2;irony;How satirical a series/movie is
+SCI1;fictional science;How much is fictional science important for the movie/series
+GEN5;character;How well characters are written and how interesting they are
+EMO3;tragedy;How sad/tragic a movie/series is
+GEN6;impact;How impactful the movie/series is with its message/take-away
+GEN7;(voice) acting;How good the acting/voice acting is
+GEN8;music;How good the soundtrack/music is in the show/movie

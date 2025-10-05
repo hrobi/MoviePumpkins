@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS review_like
 
 CREATE TABLE IF NOT EXISTS media_flavour
 (
-    id                VARCHAR(5)                  NOT NULL,
+    id                VARCHAR(4)                  NOT NULL,
     flavour_name      TEXT,
     short_description TEXT,
     created_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()::TIMESTAMP,

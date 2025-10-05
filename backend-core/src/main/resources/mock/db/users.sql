@@ -36,25 +36,25 @@ VALUES ('cameron-geller',
         'ADMIN');
 INSERT INTO user_account (username, full_name, email, display_name, role)
 VALUES ('user7',
-        'user7',
+        'num7 user',
         'user7@mailsfake.com',
         'user7',
         'REVIEWER');
 INSERT INTO user_account (username, full_name, email, display_name, role)
 VALUES ('user8',
-        'user8',
+        'num8 user',
         'user8@mailsfake.com',
         'user8',
         'REVIEWER');
 INSERT INTO user_account (username, full_name, email, display_name, role)
 VALUES ('user9',
-        'user9',
+        'num9 user',
         'user9@mailsfake.com',
         'user9',
         'REVIEWER');
 INSERT INTO user_account (username, full_name, email, display_name, role)
 VALUES ('user10',
-        'user10',
+        'num10 user',
         'user10@mailsfake.com',
         'user10',
         'REVIEWER');
