@@ -1,0 +1,9 @@
+@base_address = http://localhost:9090
+@client_secret = gYLWLbQUcY
+
+POST {{base_address}}/realms/moviepumpkins/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type = client_credentials &
+client_id = pumpkins-backend-core &
+client_secret = K2BZ3BRrmNjaDJ0kiz59Bgakv77JuaaD
