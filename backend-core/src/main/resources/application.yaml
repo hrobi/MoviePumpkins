@@ -12,6 +12,8 @@ spring:
     properties:
       hibernate:
         default_schema: app
+        id:
+          db_structure_naming_strategy: net.moviepumpkins.core.app.config.PostgresSequenceNamingStrategy
   datasource:
     driver-class-name: org.postgresql.Driver
   flyway:

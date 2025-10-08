@@ -1,5 +1,9 @@
 app:
   auth-server-url-base: http://localhost:9090
+  server-url-base: http://localhost:8080/
+  poster-image:
+    max-size-in-bytes: 2_000_000
+    width-in-px: 500
 spring:
   jpa:
     show-sql: true

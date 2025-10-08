@@ -43,6 +43,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.imgscalr:imgscalr-lib:4.2")
+    implementation("io.konform:konform-jvm:0.11.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly(group = "org.springframework.boot", name = "spring-boot-starter-log4j2")
