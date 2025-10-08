@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserAccountRepository : JpaRepository<UserAccountEntity, Long> {
+interface UserAccountRepository : JpaRepository<UserAccountEntity, String> {
     @Query("SELECT u FROM UserAccountEntity u WHERE u.username = :username")
     fun viewFirstByUsername(@Param("username") username: String): UserView?
 

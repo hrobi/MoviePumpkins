@@ -11,7 +11,7 @@ private const val ROLE_PREFIX = "ROLE_"
 
 @Component
 class AuthenticationFacade {
-    fun extractUserAccountFromJwt(): UserAccount {
+    fun extractUserAccount(): UserAccount {
         val authentication = SecurityContextHolder.getContext().authentication
         val jwt = authentication.principal as Jwt
         val roles = jwt.getClaimAsMap("realm_access")["roles"] as List<String>
@@ -31,7 +31,7 @@ class AuthenticationFacade {
             "app_user"
         )
 
-    val authenticationName
+    val authenticationName: String
         get() = SecurityContextHolder.getContext().authentication.name
 
     private fun Collection<GrantedAuthority>.findFirstRole() =

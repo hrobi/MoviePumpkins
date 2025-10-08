@@ -1,36 +1,27 @@
 package net.moviepumpkins.core.app.exception
 
 import net.moviepumpkins.core.integration.models.BadRequestBodyError
-import net.moviepumpkins.core.integration.models.Status400Response
-import net.moviepumpkins.core.util.PropertyCheck
+import net.moviepumpkins.core.integration.models.BadRequestResponse
 import org.springframework.http.HttpStatus
 
-class BadRequestException(body: Status400Response) : ClientErrorException(status = HttpStatus.BAD_REQUEST, body)
+class BadRequestException(body: BadRequestResponse) : ClientErrorException(status = HttpStatus.BAD_REQUEST, body)
 
-interface BadRequestBuilderScope {
-    operator fun PropertyCheck.unaryPlus()
+interface BadRequestExceptionBuilderScope {
+    fun forField(name: String, reason: String)
 }
 
-class BadRequestBuilder : BadRequestBuilderScope {
-    private val errors: MutableList<BadRequestBodyError> = mutableListOf()
-    override operator fun PropertyCheck.unaryPlus() {
-        if (matches) {
-            return
-        }
-        errors.add(BadRequestBodyError(propertyPaths.split(","), errorMessageIfNotMatching))
+class BadRequestExceptionBuilder : BadRequestExceptionBuilderScope {
+
+    val badRequestErrors = mutableListOf<BadRequestBodyError>()
+
+    override fun forField(name: String, reason: String) {
+        badRequestErrors.add(BadRequestBodyError(field = name, reason = reason))
     }
 
-    fun violationsOccured() = errors.isNotEmpty()
-
-    fun throwBadRequestException() {
-        throw BadRequestException(Status400Response(errors))
-    }
 }
 
-fun checkRequest(builder: BadRequestBuilderScope.() -> Unit) {
-    val badRequestBuilder = BadRequestBuilder()
-    badRequestBuilder.builder()
-    if (badRequestBuilder.violationsOccured()) {
-        badRequestBuilder.throwBadRequestException()
-    }
+fun buildBadRequestException(transform: BadRequestExceptionBuilderScope.() -> Unit): BadRequestException {
+    val builder = BadRequestExceptionBuilder()
+    builder.transform()
+    return BadRequestException(BadRequestResponse(violations = builder.badRequestErrors))
 }

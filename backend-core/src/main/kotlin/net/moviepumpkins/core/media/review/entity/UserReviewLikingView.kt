@@ -25,5 +25,5 @@ class ReviewLikesAggregateView(
 
     val likes: Int,
 
-    val dislikes: Int
+    val dislikes: Int,
 )

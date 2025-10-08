@@ -3,6 +3,7 @@ package net.moviepumpkins.core.user
 import net.moviepumpkins.core.app.config.AuthenticationFacade
 import net.moviepumpkins.core.app.exception.ForbiddenException
 import net.moviepumpkins.core.app.exception.NotFoundException
+import net.moviepumpkins.core.app.mapping.toBadRequestException
 import net.moviepumpkins.core.integration.controllers.UsersController
 import net.moviepumpkins.core.integration.controllers.UsersProfileController
 import net.moviepumpkins.core.integration.models.UpdateUserProfileRequest
@@ -16,14 +17,20 @@ import java.net.URI
 class UserController(
     private val userService: UserService,
     private val authenticationFacade: AuthenticationFacade,
-    private val userRequestsValidationService: UserRequestsValidationService
+    private val userRequestsValidationService: UserRequestsValidationService,
 ) : UsersController, UsersProfileController {
 
     override fun updateUserProfile(
         updateUserProfileRequest: UpdateUserProfileRequest,
-        username: String
+        username: String,
     ): ResponseEntity<Unit> {
-        userRequestsValidationService.validateUpdateUserProfileRequest(updateUserProfileRequest)
+        val validationErrors =
+            userRequestsValidationService.validateUpdateUserProfileRequest(updateUserProfileRequest)
+
+        if (validationErrors.isNotEmpty()) {
+            throw validationErrors.toBadRequestException()
+        }
+
         val profileUpdate = updateUserProfileRequest.toUserProfileUpdate()
         if (username != authenticationFacade.authenticationName) {
             throw ForbiddenException()
@@ -45,7 +52,7 @@ class UserController(
         return if (authenticationFacade.isStoredUser) {
             ResponseEntity.ok(userService.getUser(username)!!.toUserProfile())
         } else {
-            val userAccount = authenticationFacade.extractUserAccountFromJwt()
+            val userAccount = authenticationFacade.extractUserAccount()
             userService.createUser(userAccount)
             ResponseEntity.created(URI.create("/users/${username}"))
                 .body(userAccount.toUserProfile())

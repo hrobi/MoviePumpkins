@@ -68,7 +68,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Status400Response"
+                $ref: "#/components/schemas/BadRequestResponse"
         '204':
           description: profile modified successfully
     get:
@@ -89,6 +89,236 @@ paths:
                 $ref: '#/components/schemas/UserProfile'
         '404':
           description: user with username couldn't be found
+  /media/{id}:
+    get:
+      operationId: getMediaById
+      parameters:
+        - name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          in: path
+      responses:
+        '200':
+          description: media is found and returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMediaResponse"
+        '404':
+          description: media cannot be found
+  /media/{id}/poster:
+    get:
+      operationId: getMediaPosterById
+      parameters:
+        - name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          in: path
+      responses:
+        '200':
+          description: media poster is found and returned successfully
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+        '410':
+          description: the media id is correct, but there is no poster uploaded
+        '404':
+          description: media cannot be found
+  /media-modifications/:
+    post:
+      operationId: createMediaModification
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - details
+              properties:
+                details:
+                  $ref: "#/components/schemas/CreateMediaModificationRequest"
+                poster:
+                  type: string
+                  format: binary
+            encoding:
+              poster:
+                contentType: image/*
+              details:
+                contentType: application/json
+      responses:
+        '201':
+          description: media modification successfully created
+        '409':
+          description: media modification already exists by user
+        '401':
+          description: user needs to be logged in
+        '404':
+          description: media does not exist
+  /media-modifications/{id}:
+    delete:
+      operationId: deleteMediaModification
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '204':
+          description: modification deleted successfully
+        '401':
+          description: login required
+        '403':
+          description: no right to delete, user either has to be admin or the author of the modification
+    put:
+      operationId: updateMediaModification
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - details
+              properties:
+                details:
+                  $ref: "#/components/schemas/UpdateMediaModificationRequest"
+                poster:
+                  type: string
+                  format: binary
+            encoding:
+              poster:
+                contentType: image/*
+              details:
+                contentType: application/json
+      responses:
+        '204':
+          description: update was successful
+        '401':
+          description: user needs to be logged in
+        '403':
+          description: user is not the one making the original modification
+        '404':
+          description: modification does not exist
+  /media/{id}/reviews:
+    get:
+      operationId: getReviewsByPageOrCreator
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: creator
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        200:
+          description: reviews returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetReviewResponse"
+        404:
+          description: media does not exist
+    put:
+      operationId: saveReview
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveReviewRequest"
+      responses:
+        200:
+          description: review created or modified
+        400:
+          description: review content is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        401:
+          description: user needs to be logged in
+        404:
+          description: media doesn't exist
+  /reviews/{id}:
+    delete:
+      operationId: deleteReview
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        204:
+          description: review deleted successfully
+        403:
+          description: user either has to be the original creator, a supervisor or an admin
+        401:
+          description: login is required
+        404:
+          description: review couldn't be found
+  /reviews/{id}/rate:
+    put:
+      operationId: saveReviewRating
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveReviewRatingRequest"
+      responses:
+        204:
+          description: review rated successfully
+        404:
+          description: review does not exist
+        401:
+          description: login is required
+
 components:
   securitySchemes:
     bearerAuth:
@@ -166,16 +396,14 @@ components:
     BadRequestBodyError:
       type: object
       required:
-        - fields
+        - field
         - reason
       properties:
-        fields:
-          type: array
-          items:
-            type: string
+        field:
+          type: string
         reason:
           type: string
-    Status400Response:
+    BadRequestResponse:
       type: object
       required:
         - violations
@@ -184,3 +412,224 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BadRequestBodyError"
+    GetMediaResponse:
+      type: object
+      required:
+        - id
+        - type
+        - title
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        directors:
+          type: array
+          items:
+            type: string
+        writers:
+          type: array
+          items:
+            type: string
+        actors:
+          type: array
+          items:
+            type: string
+        originalTitle:
+          type: string
+        countries:
+          type: array
+          items:
+            type: string
+        awards:
+          type: array
+          items:
+            type: string
+            example: "6 oscars"
+        totalWins:
+          type: integer
+        totalNominations:
+          type: integer
+        posterLink:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          movie: "#/components/schemas/GetMovieResponse"
+          series: "#/components/schemas/GetSeriesResponse"
+    GetMovieResponse:
+      allOf:
+        - $ref: "#/components/schemas/GetMediaResponse"
+        - type: object
+          required:
+            - releaseYear
+          properties:
+            releaseYear:
+              type: integer
+            lengthInMinutes:
+              type: integer
+    GetSeriesResponse:
+      allOf:
+        - $ref: "#/components/schemas/GetMediaResponse"
+        - type: object
+          required:
+            - startedInYear
+          properties:
+            seasons:
+              type: integer
+            startedInYear:
+              type: integer
+            endedInYear:
+              type: integer
+    GenericMediaModification:
+      type: object
+      required:
+        - mediaId
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        directors:
+          type: array
+          items:
+            type: string
+        writers:
+          type: array
+          items:
+            type: string
+        actors:
+          type: array
+          items:
+            type: string
+        originalTitle:
+          type: string
+        countries:
+          type: array
+          items:
+            type: string
+        awards:
+          type: array
+          items:
+            type: string
+            example: "6 oscars"
+        totalWins:
+          type: integer
+        totalNominations:
+          type: integer
+    CreateMediaModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/GenericMediaModification"
+        - type: object
+          required:
+            - mediaId
+          properties:
+            mediaId:
+              type: integer
+              format: int64
+      discriminator:
+        propertyName: mediaType
+        mapping:
+          movie: "#/components/schemas/CreateMovieModificationRequest"
+          series: "#/components/schemas/CreateSeriesModificationRequest"
+    UpdateMediaModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/GenericMediaModification"
+      discriminator:
+        propertyName: mediaType
+        mapping:
+          movie: "#/components/schemas/UpdateMovieModificationRequest"
+          series: "#/components/schemas/UpdateSeriesModificationRequest"
+    GenericAdditionalMovieDetails:
+      type: object
+      properties:
+        releaseYear:
+          type: integer
+        lengthInMinutes:
+          type: integer
+    GenericAdditionalSeriesDetails:
+      type: object
+      properties:
+        seasons:
+          type: integer
+        startedInYear:
+          type: integer
+        endedInYear:
+          type: integer
+    CreateMovieModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/CreateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalMovieDetails"
+    CreateSeriesModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/CreateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalSeriesDetails"
+    UpdateMovieModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/UpdateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalMovieDetails"
+    UpdateSeriesModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/UpdateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalSeriesDetails"
+    # reviews
+    GetReviewResponse:
+      type: object
+      required:
+        - user
+        - title
+        - content
+        - spoilerFree
+        - createdAt
+        - modifiedAt
+        - likes
+        - dislikes
+      properties:
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        title:
+          type: string
+        content:
+          type: string
+        spoilerFree:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        modifiedAt:
+          type: string
+          format: date-time
+        likes:
+          type: integer
+        dislikes:
+          type: integer
+    SaveReviewRequest:
+      type: object
+      required:
+        - title
+        - content
+        - spoilerFree
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        spoilerFree:
+          type: boolean
+    SaveReviewRatingRequest:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - LIKE
+            - DISLIKE
+            - NO_RATING

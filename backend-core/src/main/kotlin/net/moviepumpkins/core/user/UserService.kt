@@ -9,7 +9,7 @@ import net.moviepumpkins.core.oauth.keycloak.UpdateUserRepresentationData
 import net.moviepumpkins.core.user.entity.UserAccountEntity
 import net.moviepumpkins.core.user.model.UserProfileUpdate
 import net.moviepumpkins.core.user.repository.UserAccountRepository
-import net.moviepumpkins.core.util.*
+import net.moviepumpkins.core.util.getLogger
 import org.springframework.stereotype.Service
 
 @Service
@@ -49,9 +49,6 @@ class UserService(
     @Transactional
     fun updateUserProfile(username: String, userProfileUpdate: UserProfileUpdate) {
         LOG.info("START method updateUserProfile")
-        checkEmail(userProfileUpdate::email).require()
-        checkTrimmed(userProfileUpdate::displayName).require()
-        (checkThat(userProfileUpdate::fullName) matches { isTrimmed() && isMultipleWords() } orElse "should be trimmed and contain at least two words").require()
 
         val user = userAccountRepository.findFirstByUsername(username)!!
         val (firstName, lastName) = userProfileUpdate.fullName.split(" ", limit = 2)
