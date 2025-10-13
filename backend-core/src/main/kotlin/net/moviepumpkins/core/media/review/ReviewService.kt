@@ -1,7 +1,7 @@
 package net.moviepumpkins.core.media.review
 
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.app.config.ReviewsProperties
+import net.moviepumpkins.core.app.config.PagedProperties
 import net.moviepumpkins.core.app.model.UserAccount
 import net.moviepumpkins.core.app.model.UserRole
 import net.moviepumpkins.core.media.mediadetails.entity.MediaEntity
@@ -22,6 +22,7 @@ import net.moviepumpkins.core.media.review.model.Review
 import net.moviepumpkins.core.media.review.model.ReviewContent
 import net.moviepumpkins.core.media.review.model.ReviewDoesNotExistError
 import net.moviepumpkins.core.media.review.model.ReviewRatingType
+import net.moviepumpkins.core.media.review.model.UserRatingOwnReviewError
 import net.moviepumpkins.core.media.review.validation.ValidateReviewService
 import net.moviepumpkins.core.user.repository.UserAccountRepository
 import net.moviepumpkins.core.util.result.Failure
@@ -39,15 +40,16 @@ class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val reviewLikeRepository: ReviewLikeRepository,
     private val userRepository: UserAccountRepository,
-    private val reviewsProperties: ReviewsProperties,
+    private val pagedProperties: PagedProperties,
     private val validateReviewService: ValidateReviewService,
 ) {
     fun getPagedReviews(mediaId: Long, page: Int): Result<List<Review>, ErrorFindingPagedReviews> {
+        mediaRepository.existsById(mediaId).trueOrElse { return Failure(MediaNotFoundError) }
+
         val mediaReference = mediaRepository.getReferenceById(mediaId)
-        mediaReference.id ?: return Failure(MediaNotFoundError)
         val reviews = reviewRepository.findByMedia(
             mediaReference,
-            PageRequest.of(page, reviewsProperties.pageSize, Sort.by(MediaEntity::modifiedAt.name).descending())
+            PageRequest.of(page, pagedProperties.pageSize, Sort.by(MediaEntity::modifiedAt.name).descending())
         ).map(ReviewEntity::toReview)
 
         return Success(reviews)
@@ -57,7 +59,7 @@ class ReviewService(
         return reviewRepository.findByMediaAndCreator(
             mediaRepository.getReferenceById(mediaId),
             userRepository.getReferenceById(creatorUsername)
-        )?.let(ReviewEntity::toReview);
+        )?.let(ReviewEntity::toReview)
     }
 
     @Transactional
@@ -97,25 +99,29 @@ class ReviewService(
         return null
     }
 
+    fun countReviewsForMediaIfExists(mediaId: Long): Int? {
+        return reviewRepository.countByMediaId(mediaId)
+    }
+
     @Transactional
     fun rateReviewOrError(reviewId: Long, raterUsername: String, ratingType: ReviewRatingType): ErrorRatingReview? {
-        if (!reviewRepository.existsById(reviewId)) {
-            return ReviewDoesNotExistError
-        }
+        val reviewEntity = reviewRepository.findByIdOrNull(reviewId) ?: return ReviewDoesNotExistError
 
-        val reviewReference = reviewRepository.getReferenceById(reviewId)
         val userReference = userRepository.getReferenceById(raterUsername)
 
-        val reviewLikeIdIfExists = reviewLikeRepository.getIdByReviewAndRater(reviewReference, userReference)
+        val reviewLikeIdIfExists = reviewLikeRepository.getIdByReviewAndRater(reviewEntity, userReference)
 
         when (ratingType) {
             ReviewRatingType.LIKE, ReviewRatingType.DISLIKE -> {
+                if (reviewEntity.creator.username == raterUsername) {
+                    return UserRatingOwnReviewError
+                }
                 reviewLikeRepository.save(
                     ReviewLikeEntity(
                         id = reviewLikeIdIfExists,
-                        review = reviewReference,
+                        review = reviewEntity,
                         rater = userReference,
-                        isLike = ratingType == ReviewRatingType.LIKE
+                        isLiked = ratingType == ReviewRatingType.LIKE
                     )
                 )
             }
@@ -127,5 +133,16 @@ class ReviewService(
         }
 
         return null
+    }
+
+    @Transactional
+    fun retrieveRatingOrNullIfReviewDoesntExist(reviewId: Long, raterUsername: String): ReviewRatingType? {
+        if (!reviewRepository.existsById(reviewId)) {
+            return null
+        }
+        return reviewLikeRepository.findByReviewAndRater(
+            reviewRepository.getReferenceById(reviewId),
+            userRepository.getReferenceById(raterUsername)
+        )?.let { if (it.isLiked) ReviewRatingType.LIKE else ReviewRatingType.DISLIKE } ?: ReviewRatingType.NO_RATING
     }
 }

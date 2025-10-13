@@ -277,6 +277,25 @@ paths:
           description: user needs to be logged in
         404:
           description: media doesn't exist
+  /media/{id}/reviews/paging:
+    get:
+      operationId: getReviewsPagingInfo
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        200:
+          description: paging info returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagingInfo"
+        404:
+          description: media doesn't exist
   /reviews/{id}:
     delete:
       operationId: deleteReview
@@ -297,6 +316,26 @@ paths:
         404:
           description: review couldn't be found
   /reviews/{id}/rate:
+    get:
+      operationId: getOwnReviewRating
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        200:
+          description: retrieved rating successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewRatingDTO"
+        404:
+          description: review was not found
+        401:
+          description: login is required
     put:
       operationId: saveReviewRating
       parameters:
@@ -310,14 +349,115 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SaveReviewRatingRequest"
+              $ref: "#/components/schemas/ReviewRatingDTO"
       responses:
         204:
           description: review rated successfully
+        409:
+          description: user cannot rate own review
         404:
           description: review does not exist
         401:
           description: login is required
+  /media/{id}/scores:
+    get:
+      operationId: getScoresByPage
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: username
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: flavour
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        200:
+          description: scores returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetMediaScoreResponse"
+        404:
+          description: media does not exist
+    put:
+      operationId: saveScore
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveMediaScoreRequest"
+      responses:
+        200:
+          description: score saved successfully
+        400:
+          description: score is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        404:
+          description: media or flavour doesn't exist
+        401:
+          description: login required
+  /media/{id}/scores/paging:
+    get:
+      operationId: getMediaScorePagingInfo
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - name: username
+          in: query
+          schema:
+            type: string
+          required: false
+      responses:
+        200:
+          description: paging info returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagingInfo"
+        404:
+          description: media doesn't exist
+  /flavours:
+    get:
+      operationId: getAllFlavours
+      responses:
+        200:
+          description: retrieved all flavours successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetFlavourResponse"
 
 components:
   securitySchemes:
@@ -622,7 +762,7 @@ components:
           type: string
         spoilerFree:
           type: boolean
-    SaveReviewRatingRequest:
+    ReviewRatingDTO:
       type: object
       required:
         - type
@@ -633,3 +773,51 @@ components:
             - LIKE
             - DISLIKE
             - NO_RATING
+    GetFlavourResponse:
+      type: object
+      required:
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    SaveMediaScoreRequest:
+      type: object
+      required:
+        - flavourId
+        - score
+      properties:
+        flavourId:
+          type: string
+        score:
+          type: number
+          format: float
+    GetMediaScoreResponse:
+      type: object
+      required:
+        - score
+        - flavour
+      properties:
+        score:
+          type: number
+          format: float
+        flavour:
+          $ref: "#/components/schemas/GetFlavourResponse"
+        count:
+          type: integer
+          default: 1
+    PagingInfo:
+      type: object
+      required:
+        - pageCount
+        - pageSize
+      properties:
+        pageCount:
+          type: integer
+        pageSize:
+          type: integer

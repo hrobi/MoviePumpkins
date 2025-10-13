@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS media_rating
     username         VARCHAR(100)                NOT NULL,
     media_id         SERIAL                      NOT NULL,
     media_flavour_id VARCHAR(5)                  NOT NULL,
-    score            SMALLINT,
+    score            FLOAT,
     created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()::TIMESTAMP,
     modified_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT now()::TIMESTAMP
 );

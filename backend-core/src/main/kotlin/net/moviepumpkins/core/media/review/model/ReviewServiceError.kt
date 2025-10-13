@@ -10,5 +10,6 @@ sealed interface ErrorRevokingReviewRating
 
 data object MediaNotFoundError : ErrorFindingPagedReviews, ErrorSavingReviewContent
 data object ReviewDoesNotExistError : ErrorRemovingReview, ErrorRatingReview, ErrorRevokingReviewRating
+data object UserRatingOwnReviewError : ErrorRatingReview
 data object DisallowedUserError : ErrorRemovingReview
 data class InvalidReviewContentError(val validationErrors: List<ValidationError>) : ErrorSavingReviewContent

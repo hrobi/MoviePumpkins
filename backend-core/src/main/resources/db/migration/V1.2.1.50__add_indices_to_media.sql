@@ -1,1 +1,0 @@
-CREATE INDEX IF NOT EXISTS review_modified_at_idx ON review (modified_at);

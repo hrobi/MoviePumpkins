@@ -36,6 +36,9 @@ interface ReviewRepository : JpaRepository<ReviewEntity, Long> {
 
     @Query("""SELECT re.id FROM ReviewEntity re WHERE re.media = :media AND re.creator = :creator""")
     fun getIdByMediaAndCreatorOrNull(media: MediaEntity, creator: UserAccountEntity): Long?
+
+    fun countByMediaId(mediaId: Long): Int?
+
 }
 
 @Entity
@@ -63,26 +66,3 @@ class ReviewEntity(
     @JoinColumn(name = "id", insertable = false, updatable = false)
     val reviewLikesAggregateView: ReviewLikesAggregateView? = null,
 ) : BaseEntity()
-
-interface SetReviewEntityScope {
-    fun title(title: String)
-    fun content(content: String)
-    fun spoilerFree(spoilerFree: Boolean)
-}
-
-class SetReviewEntity(
-    val reviewEntity: ReviewEntity?,
-) : SetReviewEntityScope {
-    override fun title(title: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun content(content: String) {
-        TODO("Not yet implemented")
-    }
-
-    override fun spoilerFree(spoilerFree: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-}

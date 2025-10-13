@@ -1,10 +1,14 @@
 package net.moviepumpkins.core.media.review
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase
-import net.moviepumpkins.core.media.mediadetails.entity.MediaRepository
+import net.moviepumpkins.core.TestHelperService
 import net.moviepumpkins.core.media.review.model.ErrorFindingPagedReviews
+import net.moviepumpkins.core.media.review.model.InvalidReviewContentError
+import net.moviepumpkins.core.media.review.model.MediaNotFoundError
 import net.moviepumpkins.core.media.review.model.Review
 import net.moviepumpkins.core.media.review.model.ReviewContent
+import net.moviepumpkins.core.media.review.model.ReviewRatingType
+import net.moviepumpkins.core.media.review.model.UserRatingOwnReviewError
 import net.moviepumpkins.core.util.result.Failure
 import net.moviepumpkins.core.util.result.Success
 import org.flywaydb.test.annotation.FlywayTest
@@ -18,17 +22,19 @@ import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @SpringBootTest
 @FlywayTest
-@AutoConfigureEmbeddedDatabase
+@AutoConfigureEmbeddedDatabase(replace = AutoConfigureEmbeddedDatabase.Replace.ANY)
+@Sql("/test-mock/users.sql", "/test-mock/medias.sql", "/test-mock/reviews.sql", "/test-mock/reviews_likes.sql")
 class ReviewServiceTest {
 
     @Autowired
     private lateinit var reviewService: ReviewService
 
     @Autowired
-    private lateinit var mediaRepository: MediaRepository
+    private lateinit var testHelperService: TestHelperService
 
     data class TestComparableReviewView(
         val reviewerUsername: String,
@@ -107,10 +113,9 @@ class ReviewServiceTest {
     }
 
     @Test
-    @Sql("/test-mock/users.sql", "/test-mock/medias.sql", "/test-mock/reviews.sql", "/test-mock/reviews_likes.sql")
     fun `get paged reviews for dune - success`() {
 
-        val duneMediaId = mediaRepository.getIdByTitleOrNull("Dune: Part One")!!
+        val duneMediaId = testHelperService.getDuneId()
 
         val pagedReviewsResult = reviewService.getPagedReviews(duneMediaId, 0)
         assertInstanceOf<Success<List<Review>>>(pagedReviewsResult)
@@ -134,16 +139,14 @@ class ReviewServiceTest {
     }
 
     @Test
-    @Sql("/test-mock/users.sql", "/test-mock/medias.sql", "/test-mock/reviews.sql", "/test-mock/reviews_likes.sql")
     fun `get paged reviews for non-existent - not found`() {
         val pagedReviews = reviewService.getPagedReviews(-1, 0)
         assertInstanceOf<Failure<ErrorFindingPagedReviews>>(pagedReviews)
     }
 
     @Test
-    @Sql("/test-mock/users.sql", "/test-mock/medias.sql", "/test-mock/reviews.sql", "/test-mock/reviews_likes.sql")
     fun `create and update review for dune - success`() {
-        val duneMediaId = mediaRepository.getIdByTitleOrNull("Dune: Part One")!!
+        val duneMediaId = testHelperService.getDuneId()
 
         val possibleReviewCreatingError = reviewService.saveReviewOrError(
             mediaId = duneMediaId,
@@ -180,4 +183,129 @@ class ReviewServiceTest {
         assertEquals(ownCreatedComparableReviewView1Updated, TestComparableReviewView.fromReview(reviewModified))
     }
 
+    @Test
+    fun `create review for dune - invalid content`() {
+        val duneMediaId = testHelperService.getDuneId()
+
+        val possibleReviewCreatingError = reviewService.saveReviewOrError(
+            mediaId = duneMediaId,
+            creatorUsername = "jack-hoffman",
+            reviewContent = ReviewContent(
+                title = "Lorem ipsum sit amet",
+                content = "Cras.",
+                spoilerFree = true
+            )
+        )
+
+        assertNotNull(possibleReviewCreatingError)
+        assertInstanceOf<InvalidReviewContentError>(possibleReviewCreatingError)
+        val validationErrorPaths = possibleReviewCreatingError.validationErrors.map { it.dataPath }
+
+        assertContains(validationErrorPaths, ".content")
+    }
+
+    @Test
+    fun `ceate review for non-existent media - failure`() {
+        val possibleReviewCreatingError = reviewService.saveReviewOrError(
+            mediaId = Long.MIN_VALUE,
+            creatorUsername = "jack-hoffman",
+            reviewContent = ReviewContent(
+                title = "Lorem ipsum sit amet",
+                content = "Donec eget justo molestie, suscipit dolor sed, varius ex.",
+                spoilerFree = true
+            )
+        )
+
+        assertNotNull(possibleReviewCreatingError)
+        assertInstanceOf<MediaNotFoundError>(possibleReviewCreatingError)
+    }
+
+    @Test
+    fun `add 2 plus likes and 1 dislike and remove a rating for dune review by user7 - success`() {
+
+        val getReview = {
+            reviewService.getReview(
+                mediaId = testHelperService.getDuneId(),
+                creatorUsername = "user7"
+            )!!
+        }
+
+        val initialReview = getReview()
+
+        val resultList = buildList {
+            reviewService.rateReviewOrError(initialReview.id, raterUsername = "user11", ReviewRatingType.LIKE)
+                .also { add(it) }
+            reviewService.rateReviewOrError(initialReview.id, raterUsername = "user12", ReviewRatingType.LIKE)
+                .also { add(it) }
+            reviewService.rateReviewOrError(initialReview.id, raterUsername = "user13", ReviewRatingType.DISLIKE)
+                .also { add(it) }
+            reviewService.rateReviewOrError(
+                initialReview.id,
+                raterUsername = "emily-wokerson",
+                ReviewRatingType.NO_RATING
+            )
+                .also { add(it) }
+        }
+
+        assertTrue(resultList.all { it == null }, "all ratings should be successful")
+
+        val updatedReview = getReview()
+        assertAll(
+            { assertEquals(7, updatedReview.likes) },
+            { assertEquals(3, updatedReview.dislikes) },
+            {
+                assertEquals(
+                    ReviewRatingType.LIKE,
+                    reviewService.retrieveRatingOrNullIfReviewDoesntExist(
+                        reviewId = updatedReview.id,
+                        raterUsername = "user11"
+                    )
+                )
+            },
+            {
+                assertEquals(
+                    ReviewRatingType.LIKE,
+                    reviewService.retrieveRatingOrNullIfReviewDoesntExist(
+                        reviewId = updatedReview.id,
+                        raterUsername = "user12"
+                    )
+                )
+            },
+            {
+                assertEquals(
+                    ReviewRatingType.DISLIKE,
+                    reviewService.retrieveRatingOrNullIfReviewDoesntExist(
+                        reviewId = updatedReview.id,
+                        raterUsername = "user13"
+                    )
+                )
+            },
+            {
+                assertEquals(
+                    ReviewRatingType.NO_RATING,
+                    reviewService.retrieveRatingOrNullIfReviewDoesntExist(
+                        reviewId = updatedReview.id,
+                        raterUsername = "emily-wokerson"
+                    )
+                )
+            },
+        )
+    }
+
+    @Test
+    fun `user tries rating their own review - failure`() {
+        val review = reviewService.getReview(
+            mediaId = testHelperService.getDuneId(),
+            creatorUsername = "user7"
+        )!!
+
+        val reviewRatingError = reviewService.rateReviewOrError(
+            reviewId = review.id,
+            raterUsername = "user7",
+            ratingType = ReviewRatingType.LIKE
+        )
+
+        assertNotNull(reviewRatingError)
+        assertInstanceOf<UserRatingOwnReviewError>(reviewRatingError)
+    }
 }

@@ -60,3 +60,21 @@ VALUES ('user10',
         'user10@mailsfake.com',
         'user10',
         'REVIEWER');
+INSERT INTO user_account (username, full_name, email, display_name, role)
+VALUES ('user11',
+        'num11 user',
+        'user11@mailsfake.com',
+        'user11',
+        'REVIEWER');
+INSERT INTO user_account (username, full_name, email, display_name, role)
+VALUES ('user12',
+        'num12 user',
+        'user12@mailsfake.com',
+        'user12',
+        'REVIEWER');
+INSERT INTO user_account (username, full_name, email, display_name, role)
+VALUES ('user13',
+        'num13 user',
+        'user13@mailsfake.com',
+        'user13',
+        'REVIEWER');

@@ -1,20 +1,17 @@
-package net.moviepumpkins.core.flavoursetup.service
+package net.moviepumpkins.core.flavour.service
 
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.flavoursetup.entity.MediaFlavourEntity
-import net.moviepumpkins.core.flavoursetup.model.MediaFlavour
+import net.moviepumpkins.core.flavour.entity.MediaFlavourEntity
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
-import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 
 @Component
 class FlavoursSetupService(
-    private val entityManager: EntityManager
+    private val readFlavoursFromFileService: ReadFlavoursFromFileService,
+    private val entityManager: EntityManager,
 ) : ApplicationRunner {
-
-    private val SEPARATOR = ";"
 
     @Transactional
     override fun run(args: ApplicationArguments?) {
@@ -28,16 +25,7 @@ class FlavoursSetupService(
                 .groupBy(MediaFlavourEntity::id)
                 .mapValues { (_, value) -> value[0] }
 
-        val mediaFlavoursFromFile = ClassPathResource("/config/flavours.csv", FlavoursSetupService::class.java)
-            .file
-            .useLines {
-                it
-                    .map { line ->
-                        val (id, name, description) = line.split(SEPARATOR)
-                        MediaFlavour(id, name, description)
-                    }
-                    .toList()
-            }
+        val mediaFlavoursFromFile = readFlavoursFromFileService.readAllFlavours()
 
         for ((id, name, description) in mediaFlavoursFromFile) {
             val entity = mediaFlavourEntitiesFromDb[id]

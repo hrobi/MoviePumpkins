@@ -15,6 +15,8 @@ import org.springframework.data.jpa.repository.Query
 interface ReviewLikeRepository : JpaRepository<ReviewLikeEntity, Long> {
     @Query("SELECT rle.id FROM ReviewLikeEntity rle WHERE rle.review = :review AND rle.rater = :rater")
     fun getIdByReviewAndRater(review: ReviewEntity, rater: UserAccountEntity): Long?
+
+    fun findByReviewAndRater(review: ReviewEntity, rater: UserAccountEntity): ReviewLikeEntity?
 }
 
 @Entity
@@ -32,5 +34,5 @@ class ReviewLikeEntity(
     @JoinColumn(name = "username")
     var rater: UserAccountEntity,
 
-    var isLike: Boolean,
+    var isLiked: Boolean,
 )
