@@ -32,3 +32,8 @@ data class ScoringProperties @ConstructorBinding constructor(
     val maxScore: Float,
     override val pageSize: Int,
 ) : PaginationProperties
+
+@ConfigurationProperties(prefix = "app.interest-list")
+data class InterestListProperties @ConstructorBinding constructor(
+    override val pageSize: Int,
+) : PaginationProperties
