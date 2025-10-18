@@ -1,14 +1,21 @@
 export interface Review {
-  id: number;
-  userDisplayName: string;
-  username: string;
-  title: string;
-  rating: number;
-  content: string;
-  spoilerFree: boolean;
-  userReaction?: "like" | "dislike";
-  reactions: {
+    id: number;
+    user: {
+        username: string;
+        displayName: string;
+    };
+    title: string;
+    content: string;
+    spoilerFree: boolean;
+    createdAt: string;
+    modifiedAt: string;
     likes: number;
     dislikes: number;
-  };
+    userOwnRating?: "LIKE" | "DISLIKE" | "NO_RATING" | undefined;
+}
+
+export interface Reviews {
+    pageCount: number;
+    currentPageReviews: Review[];
+    page: number;
 }

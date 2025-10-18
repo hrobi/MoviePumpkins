@@ -1,3 +1,10 @@
+app:
+  scoring:
+    min-score: 1
+    max-score: 5
+    page-size: 12
+  reviewing:
+    page-size: 5
 spring:
   profiles:
     active: dev
@@ -12,6 +19,8 @@ spring:
     properties:
       hibernate:
         default_schema: app
+        id:
+          db_structure_naming_strategy: net.moviepumpkins.core.app.config.PostgresSequenceNamingStrategy
   datasource:
     driver-class-name: org.postgresql.Driver
   flyway:

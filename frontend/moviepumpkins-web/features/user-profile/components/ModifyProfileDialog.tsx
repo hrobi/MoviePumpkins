@@ -37,7 +37,7 @@ export function ModifyProfileDialog({
     const getFieldError = (name: string) =>
         state.state.status === "requestBodyError"
             ? state.state.errors
-                .filter(({fields}) => fields.includes(name))
+                .filter(({field}) => field == name)
                 .map(({reason}) => reason)
             : [];
 
@@ -48,12 +48,7 @@ export function ModifyProfileDialog({
     };
 
     return (
-        <Dialog
-            open={open}
-            onClose={() => onClose()}
-            fullWidth
-            sx={{position: "relative"}}
-        >
+        <Dialog open={open} onClose={() => onClose()} fullWidth sx={{position: "relative"}}>
             <DialogTitle>Modify your profile</DialogTitle>
             <Snackbar
                 open={updateJustSucceeded}

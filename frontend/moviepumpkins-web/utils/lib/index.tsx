@@ -26,3 +26,5 @@ export function formatCount(count: number): string {
     ? formatDigits(count / 1000) + "K"
     : count.toString();
 }
+
+export type WithKeys<Keys extends string, Rec extends { [Key in Keys]?: Key }> = Rec;

@@ -6,18 +6,9 @@ export async function getUser(): Promise<Session["user"]> {
     return session?.user;
 }
 
-export async function withUser<T>(
-    produce: (
-        user: NonNullable<Session["user"]>,
-        authParams: () => { header: { Authorization: string } },
-    ) => T,
-): Promise<T> {
-    const user = (await getUser())!;
-    return produce(user, () => ({
-        header: {
-            Authorization: `bearer ${user!.accessToken}`,
-        },
-    }));
+export async function isAuthenticated(): Promise<boolean> {
+    const session = await getServerSession(nextAuthOptions);
+    return session == null;
 }
 
 export const unexpectedNoAuthError = (status: number): Error => {

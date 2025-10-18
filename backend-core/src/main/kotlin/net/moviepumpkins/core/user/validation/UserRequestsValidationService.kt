@@ -1,20 +1,19 @@
 package net.moviepumpkins.core.user.validation
 
-import net.moviepumpkins.core.app.exception.checkRequest
+import io.konform.validation.Validation
 import net.moviepumpkins.core.integration.models.UpdateUserProfileRequest
-import net.moviepumpkins.core.util.checkEmail
-import net.moviepumpkins.core.util.checkIsMultipleWords
-import net.moviepumpkins.core.util.checkTrimmed
+import net.moviepumpkins.core.util.validations.email
+import net.moviepumpkins.core.util.validations.multipleWords
+import net.moviepumpkins.core.util.validations.trimmed
 import org.springframework.stereotype.Component
 
 @Component
 class UserRequestsValidationService {
-    fun validateUpdateUserProfileRequest(updateUserProfileRequest: UpdateUserProfileRequest) {
-        checkRequest {
-            +checkEmail(updateUserProfileRequest::email)
-            +checkTrimmed(updateUserProfileRequest::fullName)
-            +checkIsMultipleWords(updateUserProfileRequest::fullName)
-            +checkTrimmed(updateUserProfileRequest::displayName)
-        }
-    }
+    fun validateUpdateUserProfileRequest(updateUserProfileRequest: UpdateUserProfileRequest) =
+        Validation<UpdateUserProfileRequest> {
+            UpdateUserProfileRequest::email { email() }
+            UpdateUserProfileRequest::fullName { trimmed() }
+            UpdateUserProfileRequest::fullName { multipleWords() }
+            UpdateUserProfileRequest::displayName { trimmed() }
+        }.validate(updateUserProfileRequest).errors
 }

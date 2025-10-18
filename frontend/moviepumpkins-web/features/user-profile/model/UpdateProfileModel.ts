@@ -3,7 +3,7 @@ export type StateUpdateUserProfile =
     | { status: "uninitialized" }
     | {
     status: "requestBodyError";
-    errors: { fields: string[]; reason: string }[];
+    errors: { field: string; reason: string }[];
 };
 
 interface UserProfileUpdate {

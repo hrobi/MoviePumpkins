@@ -7,6 +7,9 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import net.jcip.annotations.Immutable
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface MediaFlavourRepository : JpaRepository<MediaFlavourReadOnlyEntity, String>
 
 @Entity
 @Table(name = "media_flavour")
@@ -19,5 +22,5 @@ class MediaFlavourReadOnlyEntity(
 
     val flavourName: String,
 
-    val shortDescription: String
+    val shortDescription: String,
 )

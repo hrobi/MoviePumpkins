@@ -9,13 +9,25 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import net.moviepumpkins.core.user.entity.UserAccountEntity
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+
+interface ReviewLikeRepository : JpaRepository<ReviewLikeEntity, Long> {
+    @Query("SELECT rle.id FROM ReviewLikeEntity rle WHERE rle.review = :review AND rle.rater = :rater")
+    fun getIdByReviewAndRater(review: ReviewEntity, rater: UserAccountEntity): Long?
+
+    fun findByReviewAndRater(review: ReviewEntity, rater: UserAccountEntity): ReviewLikeEntity?
+
+    @Query("SELECT rle FROM ReviewLikeEntity rle WHERE rle.review.id IN :reviewIds AND rle.rater.username = :raterUsername")
+    fun findByRaterUsernameAndReviewIdIn(raterUsername: String, reviewIds: List<Long>): List<ReviewLikeEntity>
+}
 
 @Entity
 @Table(name = "review_like")
 class ReviewLikeEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    var id: Int?,
+    var id: Long? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
@@ -23,7 +35,7 @@ class ReviewLikeEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "username")
-    var voter: UserAccountEntity,
+    var rater: UserAccountEntity,
 
-    var isLike: Boolean
+    var isLiked: Boolean,
 )

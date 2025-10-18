@@ -1,7 +1,15 @@
 export interface Rating {
-  label: string;
-  average: number;
-  raterCount: number;
+    flavour: {
+        name: string;
+        id: string;
+        description: string;
+    };
+    score: number;
+    count: number;
 }
 
-export type Ratings = Rating[];
+export interface Ratings {
+    pageCount: number;
+    page: number;
+    ratings: Rating[];
+}

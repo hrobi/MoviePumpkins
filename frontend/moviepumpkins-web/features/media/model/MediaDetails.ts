@@ -1,35 +1,29 @@
-import { Rating } from "@/features/media.ratings/model";
-
-export interface Award {
-  type: string;
-  count: number;
+export interface GenericMediaDetails {
+    id: number;
+    title: string;
+    description: string;
+    directors?: Array<string>;
+    writers?: Array<string>;
+    actors?: Array<string>;
+    originalTitle?: string;
+    countries?: Array<string>;
+    awards?: Array<string>;
+    totalWins?: number;
+    totalNominations?: number;
+    posterLink?: string;
 }
 
-export interface Awards {
-  namedAwards: Award[];
-  totalWinCount?: number;
-  totalNominationCount?: number;
+export interface MovieDetails extends GenericMediaDetails {
+    type: "movie";
+    releaseYear: number;
+    lengthInMinutes?: number;
 }
 
-export interface MediaBaseDetails {
-  averageRating?: Omit<Rating, "label">;
-  title: string;
-  shortDescription: string;
-  pictureHref: string;
-  directors: string[];
-  writers: string[];
-  actors: string[];
-  country?: string;
-  awards?: Awards;
-}
-
-export interface MovieDetails extends MediaBaseDetails {
-  runtimeInMinutes: number;
-}
-
-export interface SeriesDetails extends MediaBaseDetails {
-  seasonCount: number;
-  episodeCount: number;
+export interface SeriesDetails extends GenericMediaDetails {
+    type: "series";
+    seasons?: number;
+    startedInYear: number;
+    endedInYear?: number;
 }
 
 export type MediaDetails = MovieDetails | SeriesDetails;

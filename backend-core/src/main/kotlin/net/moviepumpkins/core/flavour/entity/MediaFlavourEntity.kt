@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.flavoursetup.entity
+package net.moviepumpkins.core.flavour.entity
 
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -12,5 +12,5 @@ class MediaFlavourEntity(
 
     var flavourName: String,
 
-    var shortDescription: String
+    var shortDescription: String,
 )

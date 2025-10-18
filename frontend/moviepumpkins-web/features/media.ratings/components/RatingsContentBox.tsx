@@ -9,26 +9,24 @@ import { useState } from "react";
 
 const ROW_HEIGHT = 175;
 
-export function RatingsContentBox({ ratings }: { ratings: Rating[] }) {
-  const [collapsed, setCollapsed] = useState(true);
-  return (
-    <>
-      <Collapse in={!collapsed} collapsedSize={ROW_HEIGHT * 3}>
-        <Grid container spacing={2}>
-          {ratings.map((rating, index) => (
-            <Grid key={index} size={{ lg: 3, md: 4, xs: 12 }}>
-              <RatingCard rating={ratings[index]} gold={index == 0} />
-            </Grid>
-          ))}
-        </Grid>
-      </Collapse>
-      <Box
-        sx={{ justifyContent: "center", display: { xs: "flex", lg: "none" } }}
-      >
-        <IconButton onClick={() => setCollapsed(!collapsed)}>
-          {collapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-        </IconButton>
-      </Box>
-    </>
-  );
+export function RatingsContentBox({ratings}: { ratings: Rating[] }) {
+    const [collapsed, setCollapsed] = useState(true);
+    return (
+        <>
+            <Collapse in={!collapsed} collapsedSize={ROW_HEIGHT * (ratings.length / 4)}>
+                <Grid container spacing={2}>
+                    {ratings.map((rating) => (
+                        <Grid key={rating.flavour.id} size={{lg: 3, md: 4, xs: 12}}>
+                            <RatingCard rating={rating} gold={rating.flavour.id === "OVRL"}/>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Collapse>
+            <Box sx={{justifyContent: "center", display: {xs: "flex", lg: "none"}}}>
+                <IconButton onClick={() => setCollapsed(!collapsed)}>
+                    {collapsed ? <ExpandMoreIcon/> : <ExpandLessIcon/>}
+                </IconButton>
+            </Box>
+        </>
+    );
 }

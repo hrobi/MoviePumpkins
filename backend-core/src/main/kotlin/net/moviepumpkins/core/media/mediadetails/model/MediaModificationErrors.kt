@@ -1,0 +1,15 @@
+package net.moviepumpkins.core.media.mediadetails.model
+
+import io.konform.validation.ValidationResult
+
+sealed interface ErrorCreatingMediaModification
+sealed interface ErrorUpdatingMediaModification
+sealed interface ErrorRemovingMediaModification
+data class InvalidMediaModificationError(val validationResult: ValidationResult<MediaModification>) :
+    ErrorCreatingMediaModification, ErrorUpdatingMediaModification
+
+data object MediaDoesNotExistError : ErrorCreatingMediaModification
+data object ModificationDoesNotExistError : ErrorUpdatingMediaModification, ErrorRemovingMediaModification
+data object ModificationAlreadyExistsError : ErrorCreatingMediaModification
+data object PosterImageError : ErrorCreatingMediaModification, ErrorUpdatingMediaModification
+data object UserDoesNotMatchError : ErrorUpdatingMediaModification, ErrorRemovingMediaModification
