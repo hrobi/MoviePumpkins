@@ -1,9 +1,10 @@
 app:
-  paged:
-    page-size: 5
   scoring:
     min-score: 1
     max-score: 5
+    page-size: 12
+  reviewing:
+    page-size: 5
 spring:
   profiles:
     active: dev

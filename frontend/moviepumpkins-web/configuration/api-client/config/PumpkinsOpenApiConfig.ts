@@ -1,7 +1,7 @@
 import { defineConfig } from "@hey-api/openapi-ts";
 
 export default defineConfig({
-    input: "./.core-apispec.yml",
+    input: "./server-api.yml",
     output: "./_generated/configuration/api-client/clients/pumpkins-core",
     plugins: [
         {

@@ -1,7 +1,6 @@
 package net.moviepumpkins.core.media.scores
 
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.app.config.PagedProperties
 import net.moviepumpkins.core.app.config.ScoringProperties
 import net.moviepumpkins.core.flavour.model.MediaFlavour
 import net.moviepumpkins.core.media.mediadetails.entity.MediaRepository
@@ -33,7 +32,6 @@ class ScoreService(
     private val mediaRatingAggregateRepository: MediaRatingAggregateRepository,
     private val userAccountRepository: UserAccountRepository,
     private val scoringProperties: ScoringProperties,
-    private val pagedProperties: PagedProperties,
 ) {
     @Transactional
     fun getAllFlavours(): Set<MediaFlavour> {
@@ -104,7 +102,7 @@ class ScoreService(
             mediaId,
             PageRequest.of(
                 page,
-                pagedProperties.pageSize,
+                scoringProperties.pageSize,
                 Sort.by(MediaRatingAggregateView::raterCount.name).descending()
             )
         )
@@ -129,7 +127,7 @@ class ScoreService(
         val mediaRatings = mediaRatingRepository.findByUserAndMedia(
             userAccountRepository.getReferenceById(username),
             mediaRepository.getReferenceById(mediaId),
-            PageRequest.of(page, pagedProperties.pageSize, Sort.by(MediaRatingEntity::score.name).descending())
+            PageRequest.of(page, scoringProperties.pageSize, Sort.by(MediaRatingEntity::score.name).descending())
         )
 
         return Success(mediaRatings.map(MediaRatingEntity::toMediaScore))

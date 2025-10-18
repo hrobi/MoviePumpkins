@@ -19,4 +19,5 @@ data class Review(
     val createdAt: OffsetDateTime,
     val modifiedAt: OffsetDateTime,
     val creator: UserAccount,
+    val userOwnRating: ReviewRatingType? = null,
 ) : ReviewContent(title, content, spoilerFree)

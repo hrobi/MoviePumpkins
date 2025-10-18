@@ -16,15 +16,19 @@ data class PosterImageProperties @ConstructorBinding constructor(
     val widthInPx: Int,
 )
 
-@ConfigurationProperties(prefix = "app.paged")
-data class PagedProperties @ConstructorBinding constructor(
-    val pageSize: Int,
-) {
+interface PaginationProperties {
+    val pageSize: Int
     fun derivePageCount(count: Int) = count / pageSize + if (count % pageSize == 0) 0 else 1
 }
+
+@ConfigurationProperties(prefix = "app.reviewing")
+data class ReviewingProperties @ConstructorBinding constructor(
+    override val pageSize: Int,
+) : PaginationProperties
 
 @ConfigurationProperties(prefix = "app.scoring")
 data class ScoringProperties @ConstructorBinding constructor(
     val minScore: Float,
     val maxScore: Float,
-)
+    override val pageSize: Int,
+) : PaginationProperties

@@ -245,9 +245,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/GetReviewResponse"
+                $ref: "#/components/schemas/GetPagedReviewsResponse"
         404:
           description: media does not exist
     put:
@@ -275,25 +273,6 @@ paths:
                 $ref: "#/components/schemas/BadRequestResponse"
         401:
           description: user needs to be logged in
-        404:
-          description: media doesn't exist
-  /media/{id}/reviews/paging:
-    get:
-      operationId: getReviewsPagingInfo
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      responses:
-        200:
-          description: paging info returned successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PagingInfo"
         404:
           description: media doesn't exist
   /reviews/{id}:
@@ -390,9 +369,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/GetMediaScoreResponse"
+                $ref: "#/components/schemas/GetPagedMediaScoresResponse"
         404:
           description: media does not exist
     put:
@@ -422,30 +399,6 @@ paths:
           description: media or flavour doesn't exist
         401:
           description: login required
-  /media/{id}/scores/paging:
-    get:
-      operationId: getMediaScorePagingInfo
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-        - name: username
-          in: query
-          schema:
-            type: string
-          required: false
-      responses:
-        200:
-          description: paging info returned successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PagingInfo"
-        404:
-          description: media doesn't exist
   /flavours:
     get:
       operationId: getAllFlavours
@@ -722,6 +675,7 @@ components:
     GetReviewResponse:
       type: object
       required:
+        - id
         - user
         - title
         - content
@@ -731,6 +685,9 @@ components:
         - likes
         - dislikes
       properties:
+        id:
+          type: integer
+          format: int64
         user:
           $ref: "#/components/schemas/UserProfile"
         title:
@@ -749,6 +706,20 @@ components:
           type: integer
         dislikes:
           type: integer
+        usersOwnRating:
+          $ref: "#/components/schemas/ReviewRatingType"
+    GetPagedReviewsResponse:
+      type: object
+      required:
+        - reviews
+        - pagination
+      properties:
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetReviewResponse"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
     SaveReviewRequest:
       type: object
       required:
@@ -768,11 +739,13 @@ components:
         - type
       properties:
         type:
-          type: string
-          enum:
-            - LIKE
-            - DISLIKE
-            - NO_RATING
+          $ref: "#/components/schemas/ReviewRatingType"
+    ReviewRatingType:
+      type: string
+      enum:
+        - LIKE
+        - DISLIKE
+        - NO_RATING
     GetFlavourResponse:
       type: object
       required:
@@ -802,6 +775,7 @@ components:
       required:
         - score
         - flavour
+        - count
       properties:
         score:
           type: number
@@ -811,7 +785,19 @@ components:
         count:
           type: integer
           default: 1
-    PagingInfo:
+    GetPagedMediaScoresResponse:
+      type: object
+      required:
+        - scores
+        - pagination
+      properties:
+        scores:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetMediaScoreResponse"
+        pagination:
+          $ref: "#/components/schemas/PaginationInfo"
+    PaginationInfo:
       type: object
       required:
         - pageCount

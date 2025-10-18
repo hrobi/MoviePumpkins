@@ -1,10 +1,9 @@
 package net.moviepumpkins.core.media.mediadetails
 
-import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import net.moviepumpkins.core.app.config.AppProperties
 import net.moviepumpkins.core.filestorage.DevLocalPosterTransferService
 import net.moviepumpkins.core.media.mediadetails.entity.MediaEntity
-import net.moviepumpkins.core.media.mediadetails.entity.MediaModificationRepository
 import net.moviepumpkins.core.media.mediadetails.entity.MediaRepository
 import net.moviepumpkins.core.media.mediadetails.entity.MediaType
 import net.moviepumpkins.core.media.mediadetails.mapping.toGenericMediaDetails
@@ -15,8 +14,7 @@ import org.springframework.stereotype.Component
 class MediaDetailsService(
     private val mediaRepository: MediaRepository,
     private val posterTransferService: DevLocalPosterTransferService,
-    private val mediaModificationRepository: MediaModificationRepository,
-    private val entityManager: EntityManager,
+    private val appProperties: AppProperties,
 ) {
 
     private fun mapMediaEntityToMedia(mediaEntity: MediaEntity): Media {
@@ -49,6 +47,6 @@ class MediaDetailsService(
     }
 
     fun getPosterLink(mediaId: Long): String {
-        return "/media/${mediaId}/poster"
+        return "${appProperties.serverUrlBase}/media/${mediaId}/poster"
     }
 }

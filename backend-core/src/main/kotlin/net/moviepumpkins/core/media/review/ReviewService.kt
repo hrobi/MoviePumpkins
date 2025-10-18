@@ -1,7 +1,7 @@
 package net.moviepumpkins.core.media.review
 
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.app.config.PagedProperties
+import net.moviepumpkins.core.app.config.ReviewingProperties
 import net.moviepumpkins.core.app.model.UserAccount
 import net.moviepumpkins.core.app.model.UserRole
 import net.moviepumpkins.core.media.mediadetails.entity.MediaEntity
@@ -11,6 +11,7 @@ import net.moviepumpkins.core.media.review.entity.ReviewLikeEntity
 import net.moviepumpkins.core.media.review.entity.ReviewLikeRepository
 import net.moviepumpkins.core.media.review.entity.ReviewRepository
 import net.moviepumpkins.core.media.review.mapping.toReview
+import net.moviepumpkins.core.media.review.mapping.toReviewRatingType
 import net.moviepumpkins.core.media.review.model.DisallowedUserError
 import net.moviepumpkins.core.media.review.model.ErrorFindingPagedReviews
 import net.moviepumpkins.core.media.review.model.ErrorRatingReview
@@ -40,19 +41,38 @@ class ReviewService(
     private val reviewRepository: ReviewRepository,
     private val reviewLikeRepository: ReviewLikeRepository,
     private val userRepository: UserAccountRepository,
-    private val pagedProperties: PagedProperties,
+    private val reviewingProperties: ReviewingProperties,
     private val validateReviewService: ValidateReviewService,
 ) {
-    fun getPagedReviews(mediaId: Long, page: Int): Result<List<Review>, ErrorFindingPagedReviews> {
+    fun getPagedReviews(
+        mediaId: Long,
+        page: Int,
+        username: String? = null,
+    ): Result<List<Review>, ErrorFindingPagedReviews> {
         mediaRepository.existsById(mediaId).trueOrElse { return Failure(MediaNotFoundError) }
 
         val mediaReference = mediaRepository.getReferenceById(mediaId)
-        val reviews = reviewRepository.findByMedia(
+        val reviewsWithoutOwnRating = reviewRepository.findByMedia(
             mediaReference,
-            PageRequest.of(page, pagedProperties.pageSize, Sort.by(MediaEntity::modifiedAt.name).descending())
+            PageRequest.of(page, reviewingProperties.pageSize, Sort.by(MediaEntity::modifiedAt.name).descending())
         ).map(ReviewEntity::toReview)
 
-        return Success(reviews)
+        if (username != null) {
+            val reviewLikes = reviewLikeRepository.findByRaterUsernameAndReviewIdIn(
+                username,
+                reviewsWithoutOwnRating.map { it.id }
+            )
+
+            val reviewLikesByReviewId = reviewLikes.groupBy { it.review.id }
+            Success(reviewsWithoutOwnRating.map {
+                val reviewLike = reviewLikesByReviewId.get(it.id)
+                it.copy(
+                    userOwnRating = reviewLike?.get(0).toReviewRatingType()
+                )
+            })
+        }
+
+        return Success(reviewsWithoutOwnRating)
     }
 
     fun getReview(mediaId: Long, creatorUsername: String): Review? {

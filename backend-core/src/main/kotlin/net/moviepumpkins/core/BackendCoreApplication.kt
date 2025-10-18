@@ -1,8 +1,8 @@
 package net.moviepumpkins.core
 
 import net.moviepumpkins.core.app.config.AppProperties
-import net.moviepumpkins.core.app.config.PagedProperties
 import net.moviepumpkins.core.app.config.PosterImageProperties
+import net.moviepumpkins.core.app.config.ReviewingProperties
 import net.moviepumpkins.core.app.config.ScoringProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -14,7 +14,7 @@ import org.springframework.context.annotation.ComponentScan
 @EnableConfigurationProperties(
     AppProperties::class,
     PosterImageProperties::class,
-    PagedProperties::class,
+    ReviewingProperties::class,
     ScoringProperties::class
 )
 class BackendCoreApplication

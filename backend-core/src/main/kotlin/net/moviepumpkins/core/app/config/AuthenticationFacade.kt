@@ -34,6 +34,9 @@ class AuthenticationFacade {
     val authenticationName: String
         get() = SecurityContextHolder.getContext().authentication.name
 
+    val authenticated: Boolean
+        get() = SecurityContextHolder.getContext().authentication != null
+
     private fun Collection<GrantedAuthority>.findFirstRole() =
         find { grantedAuthority -> grantedAuthority.authority.startsWith("ROLE_") }
 

@@ -17,6 +17,9 @@ interface ReviewLikeRepository : JpaRepository<ReviewLikeEntity, Long> {
     fun getIdByReviewAndRater(review: ReviewEntity, rater: UserAccountEntity): Long?
 
     fun findByReviewAndRater(review: ReviewEntity, rater: UserAccountEntity): ReviewLikeEntity?
+
+    @Query("SELECT rle FROM ReviewLikeEntity rle WHERE rle.review.id IN :reviewIds AND rle.rater.username = :raterUsername")
+    fun findByRaterUsernameAndReviewIdIn(raterUsername: String, reviewIds: List<Long>): List<ReviewLikeEntity>
 }
 
 @Entity

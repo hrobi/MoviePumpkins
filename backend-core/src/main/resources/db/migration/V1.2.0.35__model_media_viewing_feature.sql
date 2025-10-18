@@ -119,7 +119,7 @@ ALTER TABLE media_flavour
 
 ALTER TABLE review_like
     DROP CONSTRAINT IF EXISTS review_like_pkey,
-    DROP CONSTRAINT IF EXISTS review_like_user_review_id_fkey,
+    DROP CONSTRAINT IF EXISTS review_like_review_id_fkey,
     DROP CONSTRAINT IF EXISTS review_like_username_fkey;
 
 ALTER TABLE review
