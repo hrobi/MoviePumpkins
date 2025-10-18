@@ -5,6 +5,8 @@ app:
     page-size: 12
   reviewing:
     page-size: 5
+  interest-list:
+    page-size: 5
 spring:
   profiles:
     active: dev

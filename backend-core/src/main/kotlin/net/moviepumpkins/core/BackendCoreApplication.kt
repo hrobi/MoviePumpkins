@@ -1,6 +1,7 @@
 package net.moviepumpkins.core
 
 import net.moviepumpkins.core.app.config.AppProperties
+import net.moviepumpkins.core.app.config.InterestListProperties
 import net.moviepumpkins.core.app.config.PosterImageProperties
 import net.moviepumpkins.core.app.config.ReviewingProperties
 import net.moviepumpkins.core.app.config.ScoringProperties
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.ComponentScan
     AppProperties::class,
     PosterImageProperties::class,
     ReviewingProperties::class,
+    InterestListProperties::class,
     ScoringProperties::class
 )
 class BackendCoreApplication
