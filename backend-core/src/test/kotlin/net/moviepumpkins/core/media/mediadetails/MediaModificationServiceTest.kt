@@ -10,6 +10,7 @@ import net.moviepumpkins.core.media.mediadetails.model.MediaDoesNotExistError
 import net.moviepumpkins.core.media.mediadetails.model.ModificationAlreadyExistsError
 import net.moviepumpkins.core.media.mediadetails.model.MovieModification
 import net.moviepumpkins.core.media.mediadetails.model.UserDoesNotMatchError
+import net.moviepumpkins.core.media.mediadetails.service.MediaModificationService
 import net.moviepumpkins.core.util.result.Failure
 import net.moviepumpkins.core.util.result.Success
 import net.moviepumpkins.core.util.result.succeedOrElse

@@ -18,9 +18,13 @@ import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.annotations.Type
 import org.hibernate.type.SqlTypes
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 
 interface MediaModificationRepository : JpaRepository<MediaModificationEntity, Long> {
     fun existsByMediaAndUser(media: MediaEntity, user: UserAccountEntity): Boolean
+
+    @Query("SELECT mme FROM MediaModificationEntity mme JOIN FETCH mme.media WHERE mme.id = :id")
+    fun findByIdAndFetchMedia(id: Long): MediaModificationEntity?
 }
 
 @Entity

@@ -20,6 +20,7 @@ import net.moviepumpkins.core.media.mediadetails.model.ModificationAlreadyExists
 import net.moviepumpkins.core.media.mediadetails.model.ModificationDoesNotExistError
 import net.moviepumpkins.core.media.mediadetails.model.PosterImageError
 import net.moviepumpkins.core.media.mediadetails.model.UserDoesNotMatchError
+import net.moviepumpkins.core.media.mediadetails.service.MediaModificationService
 import net.moviepumpkins.core.util.result.succeedOrElse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable

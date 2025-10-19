@@ -10,12 +10,11 @@ import net.moviepumpkins.core.media.mediadetails.entity.MediaEntity
 import net.moviepumpkins.core.media.mediadetails.entity.MediaRepository
 import net.moviepumpkins.core.user.entity.UserAccountEntity
 import net.moviepumpkins.core.user.repository.UserAccountRepository
+import net.moviepumpkins.core.util.jpa.relevencyPageRequest
 import net.moviepumpkins.core.util.result.Failure
 import net.moviepumpkins.core.util.result.Result
 import net.moviepumpkins.core.util.result.Success
 import net.moviepumpkins.core.util.result.succeedOrElse
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 
 @Component
@@ -75,11 +74,7 @@ class InterestListService(
         val interestListItemsPaged = interestListRepository.findByUserAndMedia(
             userReference,
             mediaReference,
-            PageRequest.of(
-                page,
-                interestListProperties.pageSize,
-                Sort.by(InterestListEntity::modifiedAt.name).descending()
-            )
+            relevencyPageRequest(page)
         ).map {
             it.toInterestListItem()
         }

@@ -32,6 +32,8 @@ class UserAccountEntity(
     @field:Enumerated
     @field:JdbcType(PostgreSQLEnumJdbcType::class)
     var role: UserRole = UserRole.REVIEWER,
+
+    var enabled: Boolean = true,
 ) : BaseEntity() {
     override fun equals(other: Any?): Boolean = equalsBy(this, other) { email }
     override fun hashCode(): Int = email.hashCode()
