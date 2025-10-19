@@ -17,3 +17,5 @@ ALTER TABLE interest_list
     ADD CONSTRAINT interest_list_pkey PRIMARY KEY (id),
     ADD CONSTRAINT interest_list_username_fkey FOREIGN KEY (username) REFERENCES user_account,
     ADD CONSTRAINT interest_list_media_id_fkey FOREIGN KEY (media_id) REFERENCES media;
+
+CREATE INDEX IF NOT EXISTS interest_list_username_media_id_idx ON interest_list (username, media_id);

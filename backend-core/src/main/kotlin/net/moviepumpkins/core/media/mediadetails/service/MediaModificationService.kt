@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.media.mediadetails
+package net.moviepumpkins.core.media.mediadetails.service
 
 import jakarta.transaction.Transactional
 import net.moviepumpkins.core.app.model.UserAccount
@@ -7,6 +7,7 @@ import net.moviepumpkins.core.filestorage.DevLocalPosterTransferService
 import net.moviepumpkins.core.media.mediadetails.entity.MediaModificationRepository
 import net.moviepumpkins.core.media.mediadetails.entity.MediaRepository
 import net.moviepumpkins.core.media.mediadetails.entity.MediaType
+import net.moviepumpkins.core.media.mediadetails.exception.MediaModificationStateException
 import net.moviepumpkins.core.media.mediadetails.mapping.toMediaModificationEntity
 import net.moviepumpkins.core.media.mediadetails.mapping.toMediaTypeSpecificDetails
 import net.moviepumpkins.core.media.mediadetails.model.ErrorCreatingMediaModification
@@ -138,5 +139,20 @@ class MediaModificationService(
         mediaModificationEntity.posterFile?.let { posterTransferService.delete(it) }
         mediaModificationRepository.delete(mediaModificationEntity)
         return Success(Unit)
+    }
+
+    @Transactional
+    fun removeModification(modificationId: Long) {
+        val mediaModificationEntity = mediaModificationRepository.findByIdAndFetchMedia(modificationId)
+            ?: throw MediaModificationStateException.mediaDoesNotExist()
+        mediaModificationRepository.delete(mediaModificationEntity)
+    }
+
+    @Transactional
+    fun mergeModification(modificationId: Long) {
+        val mediaModificationEntity = mediaModificationRepository.findByIdAndFetchMedia(modificationId)
+            ?: throw MediaModificationStateException.mediaDoesNotExist()
+        val mediaEntity = mediaModificationEntity.media
+        MediaModificationMerger(mediaEntity, mediaModificationEntity).merge()
     }
 }
