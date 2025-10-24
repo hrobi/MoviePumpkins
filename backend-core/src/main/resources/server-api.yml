@@ -11,15 +11,6 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 
 paths:
-  '/spec':
-    get:
-      responses:
-        '200':
-          description: success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Specification'
   '/users':
     post:
       operationId: createOwnUser
@@ -221,35 +212,37 @@ paths:
           description: modification does not exist
   /media/{id}/reviews:
     get:
-      operationId: getReviewsByPageOrCreator
+      operationId: getReviews
       parameters:
         - name: id
-          in: path
           schema:
             type: integer
             format: int64
+          in: path
           required: true
+        - name: reviewerUsername
+          in: query
+          schema:
+            type: string
+          required: false
         - name: page
           in: query
           schema:
             type: integer
           required: false
-        - name: creator
-          in: query
-          schema:
-            type: string
-          required: false
       responses:
+        404:
+          description: reviews cannot be found by media and/or reviewer
         200:
-          description: reviews returned successfully
+          description: reviews returned paged
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetPagedReviewsResponse"
-        404:
-          description: media does not exist
-    put:
-      operationId: saveReview
+                $ref: "#/components/schemas/GetReviewsPagedResponse"
+    post:
+      operationId: createReview
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: id
           in: path
@@ -261,142 +254,52 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SaveReviewRequest"
+              $ref: "#/components/schemas/CreateReviewRequest"
       responses:
-        200:
-          description: review created or modified
+        201:
+          description: review modified or created successfully
+        409:
+          description: user already left a review
         400:
           description: review content is invalid
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequestResponse"
-        401:
-          description: user needs to be logged in
         404:
-          description: media doesn't exist
+          description: media not found
+        401:
+          description: login required
   /reviews/{id}:
-    delete:
-      operationId: deleteReview
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      responses:
-        204:
-          description: review deleted successfully
-        403:
-          description: user either has to be the original creator, a supervisor or an admin
-        401:
-          description: login is required
-        404:
-          description: review couldn't be found
-  /reviews/{id}/rate:
-    get:
-      operationId: getOwnReviewRating
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      responses:
-        200:
-          description: retrieved rating successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ReviewRatingDTO"
-        404:
-          description: review was not found
-        401:
-          description: login is required
     put:
-      operationId: saveReviewRating
+      operationId: updateReview
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: id
-          in: path
           schema:
             type: integer
             format: int64
+          in: path
           required: true
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ReviewRatingDTO"
-      responses:
-        204:
-          description: review rated successfully
-        409:
-          description: user cannot rate own review
-        404:
-          description: review does not exist
-        401:
-          description: login is required
-  /media/{id}/scores:
-    get:
-      operationId: getScoresByPage
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-        - name: page
-          in: query
-          schema:
-            type: integer
-          required: false
-        - name: username
-          in: query
-          schema:
-            type: string
-          required: false
-        - name: flavour
-          in: query
-          schema:
-            type: string
-          required: false
+              $ref: "#/components/schemas/UpdateReviewRequest"
       responses:
         200:
-          description: scores returned successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GetPagedMediaScoresResponse"
+          description: update was successful
         404:
-          description: media does not exist
-    put:
-      operationId: saveScore
-      parameters:
-        - name: id
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SaveMediaScoreRequest"
-      responses:
-        200:
-          description: score saved successfully
+          description: no review with id
         400:
-          description: score is invalid
+          description: review content is invalid
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequestResponse"
-        404:
-          description: media or flavour doesn't exist
+        403:
+          description: user is not the same as the one who created the review
         401:
           description: login required
   /flavours:
@@ -410,7 +313,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/GetFlavourResponse"
+                  $ref: "#/components/schemas/FlavourDTO"
 
 components:
   securitySchemes:
@@ -426,28 +329,6 @@ components:
         type: string
       required: true
   schemas:
-    Specification:
-      type: object
-      required:
-        - version
-        - license
-        - apiTitle
-      properties:
-        version:
-          type: string
-          pattern: '\d+\.\d+\.\d+'
-        license:
-          type: object
-          required:
-            - name
-            - url
-          properties:
-            name:
-              type: string
-            url:
-              type: string
-        apiTitle:
-          type: string
     UserProfile:
       type: object
       required:
@@ -671,44 +552,42 @@ components:
       allOf:
         - $ref: "#/components/schemas/UpdateMediaModificationRequest"
         - $ref: "#/components/schemas/GenericAdditionalSeriesDetails"
-    # reviews
-    GetReviewResponse:
+    # REVIEWS
+    ReviewContentDTO:
       type: object
       required:
-        - id
-        - user
         - title
         - content
         - spoilerFree
-        - createdAt
-        - modifiedAt
-        - likes
-        - dislikes
       properties:
-        id:
-          type: integer
-          format: int64
-        user:
-          $ref: "#/components/schemas/UserProfile"
         title:
           type: string
         content:
           type: string
         spoilerFree:
           type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        modifiedAt:
-          type: string
-          format: date-time
-        likes:
-          type: integer
-        dislikes:
-          type: integer
-        usersOwnRating:
-          $ref: "#/components/schemas/ReviewRatingType"
-    GetPagedReviewsResponse:
+    GetReviewResponse:
+      allOf:
+        - $ref: "#/components/schemas/ReviewContentDTO"
+        - type: object
+          required:
+            - id
+            - user
+            - createdAt
+            - modifiedAt
+          properties:
+            id:
+              type: integer
+              format: int64
+            user:
+              $ref: "#/components/schemas/UserProfile"
+            createdAt:
+              type: string
+              format: date-time
+            modifiedAt:
+              type: string
+              format: date-time
+    GetReviewsPagedResponse:
       type: object
       required:
         - reviews
@@ -720,33 +599,21 @@ components:
             $ref: "#/components/schemas/GetReviewResponse"
         pagination:
           $ref: "#/components/schemas/PaginationInfo"
-    SaveReviewRequest:
-      type: object
-      required:
-        - title
-        - content
-        - spoilerFree
-      properties:
-        title:
-          type: string
-        content:
-          type: string
-        spoilerFree:
-          type: boolean
-    ReviewRatingDTO:
-      type: object
-      required:
-        - type
-      properties:
-        type:
-          $ref: "#/components/schemas/ReviewRatingType"
-    ReviewRatingType:
-      type: string
-      enum:
-        - LIKE
-        - DISLIKE
-        - NO_RATING
-    GetFlavourResponse:
+    CreateReviewRequest:
+      allOf:
+        - $ref: "#/components/schemas/ReviewContentDTO"
+    UpdateReviewRequest:
+      allOf:
+        - $ref: "#/components/schemas/ReviewContentDTO"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              format: int64
+    # flavours DTOs
+    FlavourDTO:
       type: object
       required:
         - id
@@ -759,44 +626,6 @@ components:
           type: string
         description:
           type: string
-    SaveMediaScoreRequest:
-      type: object
-      required:
-        - flavourId
-        - score
-      properties:
-        flavourId:
-          type: string
-        score:
-          type: number
-          format: float
-    GetMediaScoreResponse:
-      type: object
-      required:
-        - score
-        - flavour
-        - count
-      properties:
-        score:
-          type: number
-          format: float
-        flavour:
-          $ref: "#/components/schemas/GetFlavourResponse"
-        count:
-          type: integer
-          default: 1
-    GetPagedMediaScoresResponse:
-      type: object
-      required:
-        - scores
-        - pagination
-      properties:
-        scores:
-          type: array
-          items:
-            $ref: "#/components/schemas/GetMediaScoreResponse"
-        pagination:
-          $ref: "#/components/schemas/PaginationInfo"
     PaginationInfo:
       type: object
       required:

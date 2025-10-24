@@ -1,7 +1,7 @@
 package net.moviepumpkins.core.media.review.validation
 
 import io.konform.validation.Validation
-import io.konform.validation.ValidationError
+import io.konform.validation.ValidationResult
 import io.konform.validation.constraints.maxLength
 import io.konform.validation.constraints.minLength
 import net.moviepumpkins.core.media.review.model.ReviewContent
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class ValidateReviewService {
-    fun validateReviewContent(reviewContent: ReviewContent): List<ValidationError> {
+    fun validateReviewContent(reviewContent: ReviewContent): ValidationResult<ReviewContent> {
         return Validation {
             ReviewContent::title {
                 trimmed()
@@ -23,6 +23,6 @@ class ValidateReviewService {
                 minLength(50)
                 maxLength(2000)
             }
-        }.validate(reviewContent).errors
+        }.validate(reviewContent)
     }
 }

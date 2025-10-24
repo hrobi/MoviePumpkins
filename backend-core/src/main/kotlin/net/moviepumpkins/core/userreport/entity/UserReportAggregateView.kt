@@ -10,8 +10,10 @@ import net.moviepumpkins.core.user.entity.UserAccountEntity
 import org.hibernate.annotations.Immutable
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 
 interface UserReportAggregateRepository : JpaRepository<UserReportAggregateView, String> {
+    @Query("SELECT urav FROM UserReportAggregateView urav")
     fun findAllPaged(pageable: Pageable): List<UserReportAggregateView>
 }
 

@@ -7,8 +7,10 @@ import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
 
 interface UserReinstatementRepository : JpaRepository<UserReinstatementEntity, String> {
+    @Query("SELECT ure FROM UserReinstatementEntity ure")
     fun findAllPaged(pageable: Pageable): List<UserReinstatementEntity>
 }
 

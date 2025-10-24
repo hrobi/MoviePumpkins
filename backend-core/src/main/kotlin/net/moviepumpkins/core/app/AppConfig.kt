@@ -28,7 +28,9 @@ class AppConfig {
         http {
             authorizeHttpRequests {
                 authorize(HttpMethod.POST, "/users", authenticated)
-                authorize(HttpMethod.PUT, "users/*/profile", authenticated)
+                authorize(HttpMethod.PUT, "/users/*/profile", authenticated)
+                authorize(HttpMethod.POST, "/media/*/reviews", authenticated)
+                authorize(HttpMethod.PUT, "/reviews/*", authenticated)
                 authorize(anyRequest, permitAll)
             }
 

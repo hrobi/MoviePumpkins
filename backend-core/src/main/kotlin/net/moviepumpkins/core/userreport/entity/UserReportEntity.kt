@@ -11,7 +11,6 @@ import jakarta.persistence.Table
 import net.moviepumpkins.core.app.entity.BaseEntity
 import net.moviepumpkins.core.media.review.entity.ReviewEntity
 import net.moviepumpkins.core.user.entity.UserAccountEntity
-import net.moviepumpkins.core.userreport.projection.AggregatedReportsOnUserView
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -31,20 +30,20 @@ interface UserReportRepository : JpaRepository<UserReportEntity, Long> {
 
     fun deleteAllByReported(reported: UserAccountEntity)
 
-    @Query(
-        """
-            SELECT 
-                ure.review as review,
-                COUNT(ure.reporter) as reportCount
-            FROM UserReportEntity ure
-            JOIN FETCH ure.reported
-            JOIN FETCH ure.review 
-            WHERE ure.reported = :reported
-            GROUP BY ure.review
-            ORDER BY reportCount DESC
-        """
-    )
-    fun findByReportedGroupByReview(reported: UserAccountEntity, pageable: Pageable): List<AggregatedReportsOnUserView>
+//    @Query(
+//        """
+//            SELECT
+//                ure.review as review,
+//                COUNT(ure.reporter) as reportCount
+//            FROM UserReportEntity ure
+//            JOIN FETCH ure.reported
+//            JOIN FETCH ure.review
+//            WHERE ure.reported = :reported
+//            GROUP BY ure.review
+//            ORDER BY reportCount DESC
+//        """
+//    )
+//    fun findByReportedGroupByReview(reported: UserAccountEntity, pageable: Pageable): List<AggregatedReportsOnUserView>
 }
 
 @Entity

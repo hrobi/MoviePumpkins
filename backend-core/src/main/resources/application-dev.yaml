@@ -27,3 +27,6 @@ spring:
           keycloak:
             client-id: pumpkins-backend-core
             client-secret: K2BZ3BRrmNjaDJ0kiz59Bgakv77JuaaD
+logging:
+  level:
+    net.moviepumpkins.core: debug
