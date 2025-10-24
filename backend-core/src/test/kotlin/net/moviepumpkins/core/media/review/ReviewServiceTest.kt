@@ -9,6 +9,7 @@ import net.moviepumpkins.core.media.review.model.Review
 import net.moviepumpkins.core.media.review.model.ReviewContent
 import net.moviepumpkins.core.media.review.model.ReviewRatingType
 import net.moviepumpkins.core.media.review.model.UserRatingOwnReviewError
+import net.moviepumpkins.core.media.review.service.ReviewService
 import net.moviepumpkins.core.util.result.Failure
 import net.moviepumpkins.core.util.result.Success
 import org.flywaydb.test.annotation.FlywayTest
@@ -148,7 +149,7 @@ class ReviewServiceTest {
     fun `create and update review for dune - success`() {
         val duneMediaId = testHelperService.getDuneId()
 
-        val possibleReviewCreatingError = reviewService.saveReviewOrError(
+        val possibleReviewCreatingError = reviewService.createReview(
             mediaId = duneMediaId,
             creatorUsername = "jack-hoffman",
             reviewContent = ReviewContent(
@@ -165,7 +166,7 @@ class ReviewServiceTest {
 
         assertEquals(ownCreatedComparableReviewView1, TestComparableReviewView.fromReview(review))
 
-        val possibleReviewUpdatingError = reviewService.saveReviewOrError(
+        val possibleReviewUpdatingError = reviewService.createReview(
             mediaId = duneMediaId,
             creatorUsername = "jack-hoffman",
             reviewContent = ReviewContent(
@@ -187,7 +188,7 @@ class ReviewServiceTest {
     fun `create review for dune - invalid content`() {
         val duneMediaId = testHelperService.getDuneId()
 
-        val possibleReviewCreatingError = reviewService.saveReviewOrError(
+        val possibleReviewCreatingError = reviewService.createReview(
             mediaId = duneMediaId,
             creatorUsername = "jack-hoffman",
             reviewContent = ReviewContent(
@@ -206,7 +207,7 @@ class ReviewServiceTest {
 
     @Test
     fun `ceate review for non-existent media - failure`() {
-        val possibleReviewCreatingError = reviewService.saveReviewOrError(
+        val possibleReviewCreatingError = reviewService.createReview(
             mediaId = Long.MIN_VALUE,
             creatorUsername = "jack-hoffman",
             reviewContent = ReviewContent(

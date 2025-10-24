@@ -120,15 +120,15 @@ class ScoreServiceTest {
     @Test
     fun `rate flow - success`() {
         val flowId = testHelperService.getFlowId()
-        assertNull(scoreService.saveMediaScoreOrError(flowId, "THR1", 4.0f, "user7"))
-        assertNull(scoreService.saveMediaScoreOrError(flowId, "GEN2", 5.0f, "user7"))
-        assertNull(scoreService.saveMediaScoreOrError(flowId, "GEN4", 5.0f, "user7"))
-        assertNull(scoreService.saveMediaScoreOrError(flowId, "EMO3", 3.0f, "user7"))
+        assertNull(scoreService.saveMediaScore(flowId, "THR1", 4.0f, "user7"))
+        assertNull(scoreService.saveMediaScore(flowId, "GEN2", 5.0f, "user7"))
+        assertNull(scoreService.saveMediaScore(flowId, "GEN4", 5.0f, "user7"))
+        assertNull(scoreService.saveMediaScore(flowId, "EMO3", 3.0f, "user7"))
 
-        assertNull(scoreService.saveMediaScoreOrError(flowId, "THR1", 4.0f, "user8"))
-        assertNull(scoreService.saveMediaScoreOrError(flowId, "GEN2", 5.0f, "user8"))
+        assertNull(scoreService.saveMediaScore(flowId, "THR1", 4.0f, "user8"))
+        assertNull(scoreService.saveMediaScore(flowId, "GEN2", 5.0f, "user8"))
 
-        assertNull(scoreService.saveMediaScoreOrError(flowId, "GEN2", 4.5f, "user9"))
+        assertNull(scoreService.saveMediaScore(flowId, "GEN2", 4.5f, "user9"))
 
         val mediaScoresPagedResult = scoreService.getMediaScorePaged(flowId, page = 0)
         assertInstanceOf<Success<List<MediaScore>>>(mediaScoresPagedResult)
@@ -174,15 +174,15 @@ class ScoreServiceTest {
     @Test
     fun `rate flow - failure`() {
         val flowId = testHelperService.getFlowId()
-        val try1 = scoreService.saveMediaScoreOrError(Long.MIN_VALUE, "THR1", 4.0f, "user7")
+        val try1 = scoreService.saveMediaScore(Long.MIN_VALUE, "THR1", 4.0f, "user7")
         assertNotNull(try1)
         assertInstanceOf<MediaDoesNotExistError>(try1)
 
-        val try2 = scoreService.saveMediaScoreOrError(flowId, "XXX1", 2.0f, "user7")
+        val try2 = scoreService.saveMediaScore(flowId, "XXX1", 2.0f, "user7")
         assertNotNull(try2)
         assertInstanceOf<FlavourDoesNotExistError>(try2)
 
-        val try3 = scoreService.saveMediaScoreOrError(flowId, "THR1", 7.5f, "user7")
+        val try3 = scoreService.saveMediaScore(flowId, "THR1", 7.5f, "user7")
         assertNotNull(try3)
         assertInstanceOf<InvalidScoreError>(try3)
     }

@@ -7,15 +7,10 @@ import net.moviepumpkins.core.userreport.entity.UserReportAggregateRepository
 import net.moviepumpkins.core.userreport.entity.UserReportAggregateView
 import net.moviepumpkins.core.userreport.entity.UserReportEntity
 import net.moviepumpkins.core.userreport.entity.UserReportRepository
-import net.moviepumpkins.core.userreport.exception.UserReportStateError
-import net.moviepumpkins.core.userreport.exception.UserReportStateException
 import net.moviepumpkins.core.userreport.mapping.AggregatedUserReportsMapper
 import net.moviepumpkins.core.userreport.mapping.UserReportMapper
 import net.moviepumpkins.core.userreport.model.AggregatedUserReports
 import net.moviepumpkins.core.userreport.model.UserReport
-import net.moviepumpkins.core.userreport.projection.AggregatedReportsOnUserView
-import net.moviepumpkins.core.util.jpa.getReferenceByIdOrThrow
-import net.moviepumpkins.core.util.jpa.relevencyPageRequest
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
@@ -70,13 +65,13 @@ class UserReportService(
         userReportRepository.deleteAllByReported(userAccountRepository.getReferenceById(reportedUsername))
     }
 
-    @Transactional
-    fun getReportedReviewsByCreatorPaged(creatorUsername: String, page: Int): List<AggregatedReportsOnUserView> {
-        val creator = userAccountRepository.getReferenceByIdOrThrow(creatorUsername) {
-            throw UserReportStateException(
-                UserReportStateError.ReportedUserDoesNotExist
-            )
-        }
-        return userReportRepository.findByReportedGroupByReview(creator, relevencyPageRequest(page))
-    }
+//    @Transactional
+//    fun getReportedReviewsByCreatorPaged(creatorUsername: String, page: Int): List<AggregatedReportsOnUserView> {
+//        val creator = userAccountRepository.getReferenceByIdOrThrow(creatorUsername) {
+//            throw UserReportStateException(
+//                UserReportStateError.ReportedUserDoesNotExist
+//            )
+//        }
+//        return userReportRepository.findByReportedGroupByReview(creator, relevencyPageRequest(page))
+//    }
 }

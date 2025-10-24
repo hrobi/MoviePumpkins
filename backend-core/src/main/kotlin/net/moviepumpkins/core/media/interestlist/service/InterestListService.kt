@@ -1,7 +1,6 @@
 package net.moviepumpkins.core.media.interestlist.service
 
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.app.config.InterestListProperties
 import net.moviepumpkins.core.media.interestlist.entity.InterestListEntity
 import net.moviepumpkins.core.media.interestlist.entity.InterestListRepository
 import net.moviepumpkins.core.media.interestlist.mapping.toInterestListItem
@@ -22,7 +21,6 @@ class InterestListService(
     private val interestListRepository: InterestListRepository,
     private val userAccountRepository: UserAccountRepository,
     private val mediaRepository: MediaRepository,
-    private val interestListProperties: InterestListProperties,
 ) {
 
     sealed interface ErrorAddingMediaToList

@@ -1,7 +1,10 @@
 package net.moviepumpkins.core.media.scores
 
+import io.konform.validation.Validation
+import io.konform.validation.constraints.maximum
+import io.konform.validation.constraints.minimum
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.app.config.ScoringProperties
+import net.moviepumpkins.core.app.exception.throwIfInvalid
 import net.moviepumpkins.core.flavour.model.MediaFlavour
 import net.moviepumpkins.core.media.mediadetails.entity.MediaRepository
 import net.moviepumpkins.core.media.scores.entity.MediaFlavourRepository
@@ -9,20 +12,19 @@ import net.moviepumpkins.core.media.scores.entity.MediaRatingAggregateRepository
 import net.moviepumpkins.core.media.scores.entity.MediaRatingAggregateView
 import net.moviepumpkins.core.media.scores.entity.MediaRatingEntity
 import net.moviepumpkins.core.media.scores.entity.MediaRatingRepository
+import net.moviepumpkins.core.media.scores.exception.ScoringStateException
 import net.moviepumpkins.core.media.scores.mapping.toMediaScore
-import net.moviepumpkins.core.media.scores.model.ErrorSavingMediaScore
-import net.moviepumpkins.core.media.scores.model.FlavourDoesNotExistError
-import net.moviepumpkins.core.media.scores.model.InvalidScoreError
-import net.moviepumpkins.core.media.scores.model.MediaDoesNotExistError
 import net.moviepumpkins.core.media.scores.model.MediaScore
 import net.moviepumpkins.core.user.repository.UserAccountRepository
-import net.moviepumpkins.core.util.result.Failure
-import net.moviepumpkins.core.util.result.Result
-import net.moviepumpkins.core.util.result.Success
+import net.moviepumpkins.core.util.jpa.getReferenceByIdOrThrow
 import net.moviepumpkins.core.util.shortcircuit.trueOrElse
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
+
+private const val MIN_SCORE = 1
+private const val MAX_SCORE = 5
+private const val PAGE_SIZE = 12
 
 @Component
 class ScoreService(
@@ -31,7 +33,6 @@ class ScoreService(
     private val mediaRatingRepository: MediaRatingRepository,
     private val mediaRatingAggregateRepository: MediaRatingAggregateRepository,
     private val userAccountRepository: UserAccountRepository,
-    private val scoringProperties: ScoringProperties,
 ) {
     @Transactional
     fun getAllFlavours(): Set<MediaFlavour> {
@@ -45,29 +46,29 @@ class ScoreService(
     }
 
     @Transactional
-    fun saveMediaScoreOrError(
+    fun saveMediaScore(
         mediaId: Long,
         flavourId: String,
         score: Float,
         scoreGiverUsername: String,
-    ): ErrorSavingMediaScore? {
-        if (!mediaRepository.existsById(mediaId)) {
-            return MediaDoesNotExistError
-        }
+    ) {
 
-        if (!mediaFlavourRepository.existsById(flavourId)) {
-            return FlavourDoesNotExistError
-        }
+        val userReference =
+            userAccountRepository.getReferenceByIdOrThrow(scoreGiverUsername) { ScoringStateException.userDoesNotExist() }
+        val mediaReference =
+            mediaRepository.getReferenceByIdOrThrow(mediaId) { ScoringStateException.mediaDoesNotExist() }
 
-        val (minScore, maxScore) = scoringProperties
+        Validation<Float> {
+            dynamic {
+                if (it != 0.0f) {
+                    minimum(MIN_SCORE)
+                    maximum(MAX_SCORE)
+                }
+            }
+        }.validate(score).throwIfInvalid()
 
-        if (score != 0.0f && (score < minScore || score > maxScore)) {
-            return InvalidScoreError(minScore, maxScore)
-        }
-
-        val userReference = userAccountRepository.getReferenceById(scoreGiverUsername)
-        val mediaReference = mediaRepository.getReferenceById(mediaId)
-        val flavourReference = mediaFlavourRepository.getReferenceById(flavourId)
+        val flavourReference =
+            mediaFlavourRepository.getReferenceByIdOrThrow(flavourId) { ScoringStateException.flavourDoesNotExist() }
 
         val ratingIdOrNull = mediaRatingRepository.getIdByUserAndMediaAndFlavourOrNull(
             userReference,
@@ -77,7 +78,6 @@ class ScoreService(
 
         if (score == 0.0f && ratingIdOrNull != null) {
             mediaRatingRepository.deleteById(ratingIdOrNull)
-            return null
         }
 
         mediaRatingRepository.save(
@@ -89,25 +89,23 @@ class ScoreService(
                 score = score
             )
         )
-
-        return null
     }
 
     @Transactional
-    fun getMediaScorePaged(mediaId: Long, page: Int): Result<List<MediaScore>, MediaDoesNotExistError> {
+    fun getMediaScorePaged(mediaId: Long, page: Int): List<MediaScore> {
         if (!mediaRepository.existsById(mediaId)) {
-            return Failure(MediaDoesNotExistError)
+            throw ScoringStateException.mediaDoesNotExist()
         }
         val mediaRatingAggregateViews = mediaRatingAggregateRepository.findByMediaId(
             mediaId,
             PageRequest.of(
                 page,
-                scoringProperties.pageSize,
+                PAGE_SIZE,
                 Sort.by(MediaRatingAggregateView::raterCount.name).descending()
             )
         )
 
-        return Success(mediaRatingAggregateViews.map(MediaRatingAggregateView::toMediaScore))
+        return mediaRatingAggregateViews.map(MediaRatingAggregateView::toMediaScore)
     }
 
     @Transactional
@@ -115,22 +113,15 @@ class ScoreService(
         username: String,
         mediaId: Long,
         page: Int,
-    ): Result<List<MediaScore>, MediaDoesNotExistError> {
-        if (!mediaRepository.existsById(mediaId)) {
-            return Failure(MediaDoesNotExistError)
-        }
-
-        if (!userAccountRepository.existsById(username)) {
-            return Success(emptyList())
-        }
+    ): List<MediaScore> {
 
         val mediaRatings = mediaRatingRepository.findByUserAndMedia(
-            userAccountRepository.getReferenceById(username),
-            mediaRepository.getReferenceById(mediaId),
-            PageRequest.of(page, scoringProperties.pageSize, Sort.by(MediaRatingEntity::score.name).descending())
+            userAccountRepository.getReferenceByIdOrThrow(username) { ScoringStateException.userDoesNotExist() },
+            mediaRepository.getReferenceByIdOrThrow(mediaId) { ScoringStateException.mediaDoesNotExist() },
+            PageRequest.of(page, PAGE_SIZE, Sort.by(MediaRatingEntity::score.name).descending())
         )
 
-        return Success(mediaRatings.map(MediaRatingEntity::toMediaScore))
+        return mediaRatings.map(MediaRatingEntity::toMediaScore)
     }
 
     @Transactional
@@ -138,22 +129,15 @@ class ScoreService(
         username: String,
         mediaId: Long,
         flavourId: String,
-    ): Result<MediaScore?, MediaDoesNotExistError> {
-        mediaRepository.existsById(mediaId).trueOrElse { return Failure(MediaDoesNotExistError) }
-        if (
-            !userAccountRepository.existsById(username) ||
-            !mediaFlavourRepository.existsById(flavourId)
-        ) {
-            return Success(null)
-        }
+    ): MediaScore? {
 
         val rating = mediaRatingRepository.findByUserAndMediaAndFlavour(
-            userAccountRepository.getReferenceById(username),
-            mediaRepository.getReferenceById(mediaId),
-            mediaFlavourRepository.getReferenceById(flavourId)
+            userAccountRepository.getReferenceByIdOrThrow(username) { throw ScoringStateException.userDoesNotExist() },
+            mediaRepository.getReferenceByIdOrThrow(mediaId) { throw ScoringStateException.mediaDoesNotExist() },
+            mediaFlavourRepository.getReferenceByIdOrThrow(flavourId) { throw ScoringStateException.flavourDoesNotExist() }
         )
 
-        return Success(rating?.toMediaScore())
+        return rating?.toMediaScore()
     }
 
     @Transactional
