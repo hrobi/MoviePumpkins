@@ -1,0 +1,329 @@
+openapi: 3.0.2
+info:
+  version: '1.0.0'
+  title: net.moviepumpkins.core
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  /media/{id}:
+    get:
+      operationId: getMediaById
+      parameters:
+        - name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          in: path
+      responses:
+        '200':
+          description: media is found and returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMediaResponse"
+        '404':
+          description: media cannot be found
+  /media/{id}/poster:
+    get:
+      operationId: getMediaPosterById
+      parameters:
+        - name: id
+          schema:
+            type: integer
+            format: int64
+          required: true
+          in: path
+      responses:
+        '200':
+          description: media poster is found and returned successfully
+          content:
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+        '410':
+          description: the media id is correct, but there is no poster uploaded
+        '404':
+          description: media cannot be found
+  /media-modifications/:
+    post:
+      operationId: createMediaModification
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - details
+              properties:
+                details:
+                  $ref: "#/components/schemas/CreateMediaModificationRequest"
+                poster:
+                  type: string
+                  format: binary
+            encoding:
+              poster:
+                contentType: image/*
+              details:
+                contentType: application/json
+      responses:
+        '201':
+          description: media modification successfully created
+        '409':
+          description: media modification already exists by user
+        '401':
+          description: user needs to be logged in
+        '404':
+          description: media does not exist
+  /media-modifications/{id}:
+    delete:
+      operationId: deleteMediaModification
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        '204':
+          description: modification deleted successfully
+        '401':
+          description: login required
+        '403':
+          description: no right to delete, user either has to be admin or the author of the modification
+    put:
+      operationId: updateMediaModification
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - details
+              properties:
+                details:
+                  $ref: "#/components/schemas/UpdateMediaModificationRequest"
+                poster:
+                  type: string
+                  format: binary
+            encoding:
+              poster:
+                contentType: image/*
+              details:
+                contentType: application/json
+      responses:
+        '204':
+          description: update was successful
+        '401':
+          description: user needs to be logged in
+        '403':
+          description: user is not the one making the original modification
+        '404':
+          description: modification does not exist
+components:
+  schemas:
+    FlavourDTO:
+      type: object
+      required:
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    PaginationInfo:
+      type: object
+      required:
+        - pageCount
+        - pageSize
+      properties:
+        pageCount:
+          type: integer
+        pageSize:
+          type: integer
+    GetMediaResponse:
+      type: object
+      required:
+        - id
+        - type
+        - title
+        - description
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        directors:
+          type: array
+          items:
+            type: string
+        writers:
+          type: array
+          items:
+            type: string
+        actors:
+          type: array
+          items:
+            type: string
+        originalTitle:
+          type: string
+        countries:
+          type: array
+          items:
+            type: string
+        awards:
+          type: array
+          items:
+            type: string
+            example: "6 oscars"
+        totalWins:
+          type: integer
+        totalNominations:
+          type: integer
+        posterLink:
+          type: string
+      discriminator:
+        propertyName: type
+        mapping:
+          movie: "#/components/schemas/GetMovieResponse"
+          series: "#/components/schemas/GetSeriesResponse"
+    GetMovieResponse:
+      allOf:
+        - $ref: "#/components/schemas/GetMediaResponse"
+        - type: object
+          required:
+            - releaseYear
+          properties:
+            releaseYear:
+              type: integer
+            lengthInMinutes:
+              type: integer
+    GetSeriesResponse:
+      allOf:
+        - $ref: "#/components/schemas/GetMediaResponse"
+        - type: object
+          required:
+            - startedInYear
+          properties:
+            seasons:
+              type: integer
+            startedInYear:
+              type: integer
+            endedInYear:
+              type: integer
+    GenericMediaModification:
+      type: object
+      required:
+        - mediaId
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        directors:
+          type: array
+          items:
+            type: string
+        writers:
+          type: array
+          items:
+            type: string
+        actors:
+          type: array
+          items:
+            type: string
+        originalTitle:
+          type: string
+        countries:
+          type: array
+          items:
+            type: string
+        awards:
+          type: array
+          items:
+            type: string
+            example: "6 oscars"
+        totalWins:
+          type: integer
+        totalNominations:
+          type: integer
+    CreateMediaModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/GenericMediaModification"
+        - type: object
+          required:
+            - mediaId
+          properties:
+            mediaId:
+              type: integer
+              format: int64
+      discriminator:
+        propertyName: mediaType
+        mapping:
+          movie: "#/components/schemas/CreateMovieModificationRequest"
+          series: "#/components/schemas/CreateSeriesModificationRequest"
+    UpdateMediaModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/GenericMediaModification"
+      discriminator:
+        propertyName: mediaType
+        mapping:
+          movie: "#/components/schemas/UpdateMovieModificationRequest"
+          series: "#/components/schemas/UpdateSeriesModificationRequest"
+    GenericAdditionalMovieDetails:
+      type: object
+      properties:
+        releaseYear:
+          type: integer
+        lengthInMinutes:
+          type: integer
+    GenericAdditionalSeriesDetails:
+      type: object
+      properties:
+        seasons:
+          type: integer
+        startedInYear:
+          type: integer
+        endedInYear:
+          type: integer
+    CreateMovieModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/CreateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalMovieDetails"
+    CreateSeriesModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/CreateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalSeriesDetails"
+    UpdateMovieModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/UpdateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalMovieDetails"
+    UpdateSeriesModificationRequest:
+      allOf:
+        - $ref: "#/components/schemas/UpdateMediaModificationRequest"
+        - $ref: "#/components/schemas/GenericAdditionalSeriesDetails"

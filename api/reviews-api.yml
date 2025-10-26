@@ -1,0 +1,161 @@
+openapi: 3.0.2
+info:
+  version: '1.0.0'
+  title: net.moviepumpkins.core
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  /media/{id}/reviews:
+    get:
+      operationId: getReviews
+      parameters:
+        - name: id
+          schema:
+            type: integer
+            format: int64
+          in: path
+          required: true
+        - name: reviewerUsername
+          in: query
+          schema:
+            type: string
+          required: false
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        404:
+          description: reviews cannot be found by media and/or reviewer
+        200:
+          description: reviews returned paged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetReviewsPagedResponse"
+    post:
+      operationId: createReview
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        201:
+          description: review modified or created successfully
+        409:
+          description: user already left a review
+        400:
+          description: review content is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "./common.yml/#/components/schemas/BadRequestResponse"
+        404:
+          description: media not found
+        401:
+          description: login required
+  /reviews/{id}:
+    put:
+      operationId: updateReview
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: id
+          schema:
+            type: integer
+            format: int64
+          in: path
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReviewRequest"
+      responses:
+        200:
+          description: update was successful
+        404:
+          description: no review with id
+        400:
+          description: review content is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "./common.yml/#/components/schemas/BadRequestResponse"
+        403:
+          description: user is not the same as the one who created the review
+        401:
+          description: login required
+components:
+  schemas:
+    ReviewContentDTO:
+      type: object
+      required:
+        - title
+        - content
+        - spoilerFree
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        spoilerFree:
+          type: boolean
+    GetReviewResponse:
+      allOf:
+        - $ref: "#/components/schemas/ReviewContentDTO"
+        - type: object
+          required:
+            - id
+            - user
+            - createdAt
+            - modifiedAt
+          properties:
+            id:
+              type: integer
+              format: int64
+            user:
+              $ref: "./users-api.yml/#/components/schemas/UserProfile"
+            createdAt:
+              type: string
+              format: date-time
+            modifiedAt:
+              type: string
+              format: date-time
+    GetReviewsPagedResponse:
+      type: object
+      required:
+        - reviews
+        - pagination
+      properties:
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetReviewResponse"
+        pagination:
+          $ref: "./common.yml/#/components/schemas/PaginationInfo"
+    CreateReviewRequest:
+      allOf:
+        - $ref: "#/components/schemas/ReviewContentDTO"
+    UpdateReviewRequest:
+      allOf:
+        - $ref: "#/components/schemas/ReviewContentDTO"
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              format: int64

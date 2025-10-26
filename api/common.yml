@@ -1,0 +1,40 @@
+openapi: 3.0.2
+info:
+  version: '1.0.0'
+  title: net.moviepumpkins.core
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths: {}
+
+components:
+  schemas:
+    BadRequestBodyError:
+      type: object
+      required:
+        - field
+        - reason
+      properties:
+        field:
+          type: string
+        reason:
+          type: string
+    BadRequestResponse:
+      type: object
+      required:
+        - violations
+      properties:
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/BadRequestBodyError"
+    PaginationInfo:
+      type: object
+      required:
+        - pageCount
+        - pageSize
+      properties:
+        pageCount:
+          type: integer
+        pageSize:
+          type: integer

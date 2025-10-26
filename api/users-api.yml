@@ -1,0 +1,119 @@
+openapi: 3.0.2
+info:
+  version: '1.0.0'
+  title: net.moviepumpkins.core
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+
+paths:
+  '/users':
+    post:
+      operationId: createOwnUser
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '201':
+          description: user successfully created their own user account
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        '200':
+          description: request was accepted, but user account already exists
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        '401':
+          description: user needs to be authenticated for this operation
+  '/users/{username}/profile':
+    put:
+      operationId: updateUserProfile
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: username
+          schema:
+            type: string
+          required: true
+          description: search by username
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserProfileRequest'
+      responses:
+        '401':
+          description: user must be logged in to modify the profile
+        '403':
+          description: user is not authorized to modify this profile!
+        '400':
+          description: request body is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: "./common.yml/#/components/schemas/BadRequestResponse"
+        '204':
+          description: profile modified successfully
+    get:
+      operationId: getUserProfile
+      parameters:
+        - name: username
+          schema:
+            type: string
+          required: true
+          description: search by username
+          in: path
+      responses:
+        '200':
+          description: user successfully got back attributes of a user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: user with username couldn't be found
+
+components:
+  schemas:
+    UserProfile:
+      type: object
+      required:
+        - username
+        - fullName
+        - email
+        - displayName
+        - role
+      properties:
+        username:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+    UpdateUserProfileRequest:
+      type: object
+      required:
+        - fullName
+        - email
+        - displayName
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+    UserRole:
+      type: string
+      enum:
+        - reviewer
+        - supervisor
+        - admin
