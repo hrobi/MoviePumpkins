@@ -85,7 +85,7 @@ sourceSets {
     }
 }
 
-val serverApiSpecFile = "src/main/resources/server-api.yml"
+val serverApiSpecFile = "../api/output/pumpkins-core-api.yml"
 
 fabrikt {
     generate("core-api-server") {

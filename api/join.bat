@@ -1,0 +1,1 @@
+start cmd /k "redocly join common.yml media-api.yml reviews-api.yml users-api.yml -o output/pumpkins-core-api.yml"

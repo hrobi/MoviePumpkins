@@ -1,86 +1,20 @@
-# GLOSSARY:
-#  ES <- Error Status
-#  ESC400R <- Error Status Code 400 Response
-
 openapi: 3.0.2
 info:
-  version: '1.0.0'
+  version: 1.0.0
   title: net.moviepumpkins.core
   license:
     name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+tags:
+  - name: media-api_other
+    x-displayName: other
+  - name: reviews-api_other
+    x-displayName: other
+  - name: users-api_other
+    x-displayName: other
 paths:
-  '/users':
-    post:
-      operationId: createOwnUser
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '201':
-          description: user successfully created their own user account
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/UserProfile"
-        '200':
-          description: request was accepted, but user account already exists
-          content:
-            "application/json":
-              schema:
-                $ref: "#/components/schemas/UserProfile"
-        '401':
-          description: user needs to be authenticated for this operation
-  '/users/{username}/profile':
-    put:
-      operationId: updateUserProfile
-      security:
-        - bearerAuth: [ ]
-      parameters:
-        - name: username
-          schema:
-            type: string
-          required: true
-          description: search by username
-          in: path
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateUserProfileRequest'
-      responses:
-        '401':
-          description: user must be logged in to modify the profile
-        '403':
-          description: user is not authorized to modify this profile!
-        '400':
-          description: request body is incorrect
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequestResponse"
-        '204':
-          description: profile modified successfully
-    get:
-      operationId: getUserProfile
-      parameters:
-        - name: username
-          schema:
-            type: string
-          required: true
-          description: search by username
-          in: path
-      responses:
-        '200':
-          description: user successfully got back attributes of a user
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserProfile'
-        '404':
-          description: user with username couldn't be found
   /media/{id}:
+    servers: []
     get:
       operationId: getMediaById
       parameters:
@@ -96,10 +30,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetMediaResponse"
+                $ref: '#/components/schemas/GetMediaResponse'
         '404':
           description: media cannot be found
+      tags:
+        - media-api_other
   /media/{id}/poster:
+    servers: []
     get:
       operationId: getMediaPosterById
       parameters:
@@ -117,15 +54,18 @@ paths:
               schema:
                 type: string
                 format: binary
-        '410':
-          description: the media id is correct, but there is no poster uploaded
         '404':
           description: media cannot be found
+        '410':
+          description: the media id is correct, but there is no poster uploaded
+      tags:
+        - media-api_other
   /media-modifications/:
+    servers: []
     post:
       operationId: createMediaModification
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       requestBody:
         content:
           multipart/form-data:
@@ -135,7 +75,7 @@ paths:
                 - details
               properties:
                 details:
-                  $ref: "#/components/schemas/CreateMediaModificationRequest"
+                  $ref: '#/components/schemas/CreateMediaModificationRequest'
                 poster:
                   type: string
                   format: binary
@@ -147,17 +87,20 @@ paths:
       responses:
         '201':
           description: media modification successfully created
-        '409':
-          description: media modification already exists by user
         '401':
           description: user needs to be logged in
         '404':
           description: media does not exist
+        '409':
+          description: media modification already exists by user
+      tags:
+        - media-api_other
   /media-modifications/{id}:
+    servers: []
     delete:
       operationId: deleteMediaModification
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -171,11 +114,15 @@ paths:
         '401':
           description: login required
         '403':
-          description: no right to delete, user either has to be admin or the author of the modification
+          description: >-
+            no right to delete, user either has to be admin or the author of the
+            modification
+      tags:
+        - media-api_other
     put:
       operationId: updateMediaModification
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -192,7 +139,7 @@ paths:
                 - details
               properties:
                 details:
-                  $ref: "#/components/schemas/UpdateMediaModificationRequest"
+                  $ref: '#/components/schemas/UpdateMediaModificationRequest'
                 poster:
                   type: string
                   format: binary
@@ -210,7 +157,10 @@ paths:
           description: user is not the one making the original modification
         '404':
           description: modification does not exist
+      tags:
+        - media-api_other
   /media/{id}/reviews:
+    servers: []
     get:
       operationId: getReviews
       parameters:
@@ -231,18 +181,20 @@ paths:
             type: integer
           required: false
       responses:
-        404:
-          description: reviews cannot be found by media and/or reviewer
-        200:
+        '200':
           description: reviews returned paged
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetReviewsPagedResponse"
+                $ref: '#/components/schemas/GetReviewsPagedResponse'
+        '404':
+          description: reviews cannot be found by media and/or reviewer
+      tags:
+        - reviews-api_other
     post:
       operationId: createReview
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -254,27 +206,30 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateReviewRequest"
+              $ref: '#/components/schemas/CreateReviewRequest'
       responses:
-        201:
+        '201':
           description: review modified or created successfully
-        409:
-          description: user already left a review
-        400:
+        '400':
           description: review content is invalid
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BadRequestResponse"
-        404:
-          description: media not found
-        401:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
           description: login required
+        '404':
+          description: media not found
+        '409':
+          description: user already left a review
+      tags:
+        - reviews-api_other
   /reviews/{id}:
+    servers: []
     put:
       operationId: updateReview
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: id
           schema:
@@ -286,87 +241,103 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateReviewRequest"
+              $ref: '#/components/schemas/UpdateReviewRequest'
       responses:
-        200:
+        '200':
           description: update was successful
-        404:
-          description: no review with id
-        400:
+        '400':
           description: review content is invalid
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/BadRequestResponse"
-        403:
-          description: user is not the same as the one who created the review
-        401:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
           description: login required
-  /flavours:
-    get:
-      operationId: getAllFlavours
+        '403':
+          description: user is not the same as the one who created the review
+        '404':
+          description: no review with id
+      tags:
+        - reviews-api_other
+  /users:
+    servers: []
+    post:
+      operationId: createOwnUser
+      security:
+        - bearerAuth: []
       responses:
-        200:
-          description: retrieved all flavours successfully
+        '200':
+          description: request was accepted, but user account already exists
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/FlavourDTO"
-
+                $ref: '#/components/schemas/UserProfile'
+        '201':
+          description: user successfully created their own user account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          description: user needs to be authenticated for this operation
+      tags:
+        - users-api_other
+  /users/{username}/profile:
+    servers: []
+    put:
+      operationId: updateUserProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          schema:
+            type: string
+          required: true
+          description: search by username
+          in: path
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserProfileRequest'
+      responses:
+        '204':
+          description: profile modified successfully
+        '400':
+          description: request body is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        '401':
+          description: user must be logged in to modify the profile
+        '403':
+          description: user is not authorized to modify this profile!
+      tags:
+        - users-api_other
+    get:
+      operationId: getUserProfile
+      parameters:
+        - name: username
+          schema:
+            type: string
+          required: true
+          description: search by username
+          in: path
+      responses:
+        '200':
+          description: user successfully got back attributes of a user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: user with username couldn't be found
+      tags:
+        - users-api_other
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-  parameters:
-    Authorization:
-      in: header
-      name: Authorization
-      schema:
-        type: string
-      required: true
   schemas:
-    UserProfile:
-      type: object
-      required:
-        - username
-        - fullName
-        - email
-        - displayName
-        - role
-      properties:
-        username:
-          type: string
-        fullName:
-          type: string
-        email:
-          type: string
-        displayName:
-          type: string
-        role:
-          $ref: '#/components/schemas/UserRole'
-    UpdateUserProfileRequest:
-      type: object
-      required:
-        - fullName
-        - email
-        - displayName
-      properties:
-        fullName:
-          type: string
-        email:
-          type: string
-        displayName:
-          type: string
-    UserRole:
-      type: string
-      enum:
-        - reviewer
-        - supervisor
-        - admin
     BadRequestBodyError:
       type: object
       required:
@@ -385,7 +356,30 @@ components:
         violations:
           type: array
           items:
-            $ref: "#/components/schemas/BadRequestBodyError"
+            $ref: '#/components/schemas/BadRequestBodyError'
+    PaginationInfo:
+      type: object
+      required:
+        - pageCount
+        - pageSize
+      properties:
+        pageCount:
+          type: integer
+        pageSize:
+          type: integer
+    FlavourDTO:
+      type: object
+      required:
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
     GetMediaResponse:
       type: object
       required:
@@ -425,7 +419,7 @@ components:
           type: array
           items:
             type: string
-            example: "6 oscars"
+            example: 6 oscars
         totalWins:
           type: integer
         totalNominations:
@@ -435,11 +429,11 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          movie: "#/components/schemas/GetMovieResponse"
-          series: "#/components/schemas/GetSeriesResponse"
+          movie: '#/components/schemas/GetMovieResponse'
+          series: '#/components/schemas/GetSeriesResponse'
     GetMovieResponse:
       allOf:
-        - $ref: "#/components/schemas/GetMediaResponse"
+        - $ref: '#/components/schemas/GetMediaResponse'
         - type: object
           required:
             - releaseYear
@@ -450,7 +444,7 @@ components:
               type: integer
     GetSeriesResponse:
       allOf:
-        - $ref: "#/components/schemas/GetMediaResponse"
+        - $ref: '#/components/schemas/GetMediaResponse'
         - type: object
           required:
             - startedInYear
@@ -492,14 +486,14 @@ components:
           type: array
           items:
             type: string
-            example: "6 oscars"
+            example: 6 oscars
         totalWins:
           type: integer
         totalNominations:
           type: integer
     CreateMediaModificationRequest:
       allOf:
-        - $ref: "#/components/schemas/GenericMediaModification"
+        - $ref: '#/components/schemas/GenericMediaModification'
         - type: object
           required:
             - mediaId
@@ -510,16 +504,16 @@ components:
       discriminator:
         propertyName: mediaType
         mapping:
-          movie: "#/components/schemas/CreateMovieModificationRequest"
-          series: "#/components/schemas/CreateSeriesModificationRequest"
+          movie: '#/components/schemas/CreateMovieModificationRequest'
+          series: '#/components/schemas/CreateSeriesModificationRequest'
     UpdateMediaModificationRequest:
       allOf:
-        - $ref: "#/components/schemas/GenericMediaModification"
+        - $ref: '#/components/schemas/GenericMediaModification'
       discriminator:
         propertyName: mediaType
         mapping:
-          movie: "#/components/schemas/UpdateMovieModificationRequest"
-          series: "#/components/schemas/UpdateSeriesModificationRequest"
+          movie: '#/components/schemas/UpdateMovieModificationRequest'
+          series: '#/components/schemas/UpdateSeriesModificationRequest'
     GenericAdditionalMovieDetails:
       type: object
       properties:
@@ -538,21 +532,20 @@ components:
           type: integer
     CreateMovieModificationRequest:
       allOf:
-        - $ref: "#/components/schemas/CreateMediaModificationRequest"
-        - $ref: "#/components/schemas/GenericAdditionalMovieDetails"
+        - $ref: '#/components/schemas/CreateMediaModificationRequest'
+        - $ref: '#/components/schemas/GenericAdditionalMovieDetails'
     CreateSeriesModificationRequest:
       allOf:
-        - $ref: "#/components/schemas/CreateMediaModificationRequest"
-        - $ref: "#/components/schemas/GenericAdditionalSeriesDetails"
+        - $ref: '#/components/schemas/CreateMediaModificationRequest'
+        - $ref: '#/components/schemas/GenericAdditionalSeriesDetails'
     UpdateMovieModificationRequest:
       allOf:
-        - $ref: "#/components/schemas/UpdateMediaModificationRequest"
-        - $ref: "#/components/schemas/GenericAdditionalMovieDetails"
+        - $ref: '#/components/schemas/UpdateMediaModificationRequest'
+        - $ref: '#/components/schemas/GenericAdditionalMovieDetails'
     UpdateSeriesModificationRequest:
       allOf:
-        - $ref: "#/components/schemas/UpdateMediaModificationRequest"
-        - $ref: "#/components/schemas/GenericAdditionalSeriesDetails"
-    # REVIEWS
+        - $ref: '#/components/schemas/UpdateMediaModificationRequest'
+        - $ref: '#/components/schemas/GenericAdditionalSeriesDetails'
     ReviewContentDTO:
       type: object
       required:
@@ -568,7 +561,7 @@ components:
           type: boolean
     GetReviewResponse:
       allOf:
-        - $ref: "#/components/schemas/ReviewContentDTO"
+        - $ref: '#/components/schemas/ReviewContentDTO'
         - type: object
           required:
             - id
@@ -580,7 +573,7 @@ components:
               type: integer
               format: int64
             user:
-              $ref: "#/components/schemas/UserProfile"
+              $ref: '#/components/schemas/UserProfile'
             createdAt:
               type: string
               format: date-time
@@ -596,15 +589,15 @@ components:
         reviews:
           type: array
           items:
-            $ref: "#/components/schemas/GetReviewResponse"
+            $ref: '#/components/schemas/GetReviewResponse'
         pagination:
-          $ref: "#/components/schemas/PaginationInfo"
+          $ref: '#/components/schemas/PaginationInfo'
     CreateReviewRequest:
       allOf:
-        - $ref: "#/components/schemas/ReviewContentDTO"
+        - $ref: '#/components/schemas/ReviewContentDTO'
     UpdateReviewRequest:
       allOf:
-        - $ref: "#/components/schemas/ReviewContentDTO"
+        - $ref: '#/components/schemas/ReviewContentDTO'
         - type: object
           required:
             - id
@@ -612,27 +605,47 @@ components:
             id:
               type: integer
               format: int64
-    # flavours DTOs
-    FlavourDTO:
+    UserRole:
+      type: string
+      enum:
+        - reviewer
+        - supervisor
+        - admin
+    UserProfile:
       type: object
       required:
-        - id
-        - name
-        - description
+        - username
+        - fullName
+        - email
+        - displayName
+        - role
       properties:
-        id:
+        username:
           type: string
-        name:
+        fullName:
           type: string
-        description:
+        email:
           type: string
-    PaginationInfo:
+        displayName:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+    UpdateUserProfileRequest:
       type: object
       required:
-        - pageCount
-        - pageSize
+        - fullName
+        - email
+        - displayName
       properties:
-        pageCount:
-          type: integer
-        pageSize:
-          type: integer
+        fullName:
+          type: string
+        email:
+          type: string
+        displayName:
+          type: string
+x-tagGroups:
+  - name: net.moviepumpkins.core
+    tags:
+      - media-api_other
+      - reviews-api_other
+      - users-api_other
