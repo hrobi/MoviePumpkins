@@ -1,0 +1,28 @@
+spring:
+  profiles:
+    active: dev,local
+  application:
+    name: MoviePumpkins Backend Core
+  jpa:
+    database: postgresql
+    generate-ddl: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        default_schema: app
+        id:
+          db_structure_naming_strategy: net.moviepumpkins.core.app.config.PostgresSequenceNamingStrategy
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    default-schema: app
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            authorization-grant-type: client_credentials

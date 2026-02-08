@@ -1,0 +1,37 @@
+{
+  "users": [
+    {
+      "username": "jozsef.teszt",
+      "firstName": "József",
+      "lastName": "Teszt",
+      "email": "jozsef.teszt@teszt.com",
+      "displayName": "Teszt József",
+      "role": "REVIEWER"
+    },
+    {
+      "username": "marton.teszt",
+      "firstName": "Márton",
+      "lastName": "Teszt",
+      "email": "marton.teszt@teszt.com",
+      "displayName": "Teszt Márton",
+      "role": "REVIEWER"
+    },
+    {
+      "username": "miklos.teszt",
+      "firstName": "Miklós",
+      "lastName": "Teszt",
+      "email": "miklos.teszt@teszt.com",
+      "displayName": "Teszt Miklós",
+      "role": "SUPERVISOR"
+    },
+    {
+      "username": "admin.teszt",
+      "firstName": "Admin",
+      "lastName": "Teszt",
+      "email": "admin.teszt@teszt.com",
+      "displayName": "Teszt Admin",
+      "role": "ADMIN"
+    }
+  ],
+  "password": "SuperSecretPassword123"
+}

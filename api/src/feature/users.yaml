@@ -1,0 +1,48 @@
+openapi: 3.0.2
+info:
+  title: MoviePumpkins
+  description: MoviePumpkins
+  version: 1.0.0
+paths:
+  /users:
+    post:
+      tags:
+        - simple user management
+      operationId: createUser
+      security:
+        - bearerAuth: [ ]
+      responses:
+        401:
+          $ref: "../common/components.yaml#/components/responses/401"
+        409:
+          $ref: "../common/components.yaml#/components/responses/409"
+        201:
+          description: user successfully created
+  /users/{username}/role:
+    get:
+      tags:
+        - simple user management
+      operationId: getUserRole
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        404:
+          $ref: "../common/components.yaml#/components/responses/404"
+        200:
+          description: role of user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserRoleEnum"
+components:
+  schemas:
+    UserRoleEnum:
+      type: string
+      enum:
+        - REVIEWER
+        - SUPERVISOR
+        - ADMIN
