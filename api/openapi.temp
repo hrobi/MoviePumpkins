@@ -1,0 +1,7 @@
+openapi: 3.0.2
+info:
+  title: MoviePumpkins
+  description: MoviePumpkins
+  version: 1.0.0
+paths:
+components:

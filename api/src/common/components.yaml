@@ -1,0 +1,52 @@
+openapi: 3.0.2
+info:
+  title: MoviePumpkins
+  description: MoviePumpkins
+  version: 1.0.0
+paths: {}
+components:
+  responses:
+    400:
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServiceError"
+    401:
+      description: login required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServiceError"
+    403:
+      description: user not authorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServiceError"
+    404:
+      description: resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServiceError"
+    409:
+      description: resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ServiceError"
+  schemas:
+    ServiceError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true

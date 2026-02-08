@@ -1,0 +1,47 @@
+services:
+  db:
+    container_name: db_container
+    image: postgres:17
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: pumpkins
+      POSTGRES_PASSWORD: gYLWLbQUcY
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2.0
+    container_name: keycloak_container
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db:5432/pumpkins
+      KC_DB_USERNAME: admin
+      KC_DB_PASSWORD: gYLWLbQUcY
+
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 9090
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: gaO1xZDFl5
+    command: start-dev
+    depends_on:
+      - db
+    ports:
+      - "9090:8080"
+    volumes:
+      - keycloak:/opt/keycloak
+      - type: bind
+        source: ./keycloak/themes/pumpkins
+        target: /opt/keycloak/themes/pumpkins
+
+volumes:
+  pg_data:
+  pgadmin_data:
+  keycloak:
