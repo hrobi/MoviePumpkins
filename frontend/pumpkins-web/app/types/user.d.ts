@@ -1,0 +1,1 @@
+export type UserRole = "reviewer" | "supervisor" | "admin";

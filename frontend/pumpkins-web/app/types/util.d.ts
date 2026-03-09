@@ -1,0 +1,1 @@
+export type RecordValuesUndefined<R extends Record<string, any>> = { [K in keyof R]: undefined };
