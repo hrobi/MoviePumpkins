@@ -9,8 +9,8 @@
     </template>
     <UNavigationMenu :items="navigationItems" />
     <template #right>
-      <UButton v-if="showLoginButton" class="cursor-pointer" variant="solid">Login</UButton>
-      <UButton v-if="showLogoutButton" class="cursor-pointer bg-logout hover:bg-logout/70" variant="solid">Logout</UButton>
+      <UButton v-if="showLoginButton" class="cursor-pointer" variant="solid" @click="navigateTo('/api/auth/callback/keycloak', { external: true })">Login</UButton>
+      <UButton v-if="showLogoutButton" class="cursor-pointer bg-logout hover:bg-logout/70" variant="solid" @click="navigateTo('/auth/logout', { external: true })">Logout</UButton>
       <UColorModeButton />
     </template>
     <template #body>

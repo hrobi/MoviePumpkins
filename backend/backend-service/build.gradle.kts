@@ -94,7 +94,7 @@ tasks.register<Exec>("assembleApi") {
 fabrikt {
 
     generate("") {
-        apiFile = file("../../api/out/pumpkins-openapi.yaml")
+        apiFile = file("../../api/pumpkins-openapi.yaml")
         basePackage = "net.moviepumpkins.core.api"
         externalReferenceResolution = targeted
         outputDirectory = file("build/generated/sources/fabrikt")

@@ -1,9 +1,13 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
-import type { UserRole } from "~/types/user";
+import type { UserRole } from "~~/shared/types/user";
 
 export const useNavigationItems = () => {
-  const role = ref(defaultUserRole());
+  const { user, loggedIn } = useUserSession();
   const route = useRoute();
+
+  const role = computed<UserRole | undefined>(() =>
+    loggedIn.value ? user.value?.role : undefined
+  );
 
   const navigationItems = computed<NavigationMenuItem[]>(() => {
 
@@ -29,12 +33,14 @@ export const useNavigationItems = () => {
       active: route.path.startsWith("/notifications")
     };
 
+    watchEffect(() => { console.log(role.value) })
+
     switch(role.value) {
-      case "reviewer":
+      case "REVIEWER":
         return [watchlist, notification];
-      case "admin":
+      case "ADMIN":
         return [watchlist, tasks];
-      case "supervisor":
+      case "SUPERVISOR":
         return [watchlist, tasks];
       case undefined:
         return [watchlist];
@@ -43,8 +49,8 @@ export const useNavigationItems = () => {
     }
   });
 
-  const showLoginButton = computed(() => role.value == undefined);
-  const showLogoutButton = computed(() => role.value != undefined);
+  const showLoginButton = computed(() => !loggedIn.value);
+  const showLogoutButton = computed(() => loggedIn.value);
 
   return { navigationItems, showLoginButton, showLogoutButton };
 }

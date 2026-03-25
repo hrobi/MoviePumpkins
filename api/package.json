@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "redocly:join": "redocly join src/common/*.yaml src/feature/*.yaml -o pumpkins-openapi.yaml"
+  },
+  "dependencies": {
+    "@redocly/cli": "^2.25.1"
+  }
+}

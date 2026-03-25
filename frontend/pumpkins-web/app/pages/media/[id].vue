@@ -1,7 +1,8 @@
 <template>
+  {{ role }}
   <UPageHeader>
     <template #title>
-      <h1 class="text-3xl sm:text-4xl text-pretty font-bold text-highlighted">Dune: Part One</h1>
+      <AppPageTitle>Dune: Part One</AppPageTitle>
     </template>
     <template #links>
         <UNavigationMenu :items="[{ icon: 'i-lucide-pen', label: 'Suggest update', as: 'button' }, { icon: 'i-lucide-star', label: 'Leave your rating' }, { icon: 'i-lucide-notebook-pen', label: 'Add your review' }]" />
@@ -9,17 +10,12 @@
   </UPageHeader>
   <UPageBody>
     <article class="flex flex-col lg:flex-row gap-5 pt-2">
-      <div class="flex flex-row justify-center">
-        <img src="/temp-images/dune-part-1.png" class="rounded-md" width="400" />
-      </div>
-      <div>
-        <div class="flex flex-col justify-start items-center lg:flex-row lg:items-baseline gap-5">
-          <MediaOverallRating />
-          <CondensedInfo :responsive="true" class="mb-5" :items="shortCondensedInfoItems" />
-        </div>
-        <p>Paul Atreides arrives on Arrakis after his father accepts the stewardship of the dangerous planet. However, chaos ensues after a betrayal as forces clash to control melange, a precious resource.</p>
-        <CondensedInfo class="mt-5" direction="vertical" :items="longCondensedInfoItems" />
-      </div>
+      <MediaOverview 
+        :poster-src="mediaOverview.posterSrc"
+        :metadata="mediaOverview.metadata"
+        :overall-rating="mediaOverview.overallRating"
+        :contributors="mediaOverview.contributors"
+      />
     </article>
     <USeparator class="w-1/2 mx-auto" />
     <article>
@@ -47,60 +43,31 @@
 </template>
 
 <script lang="ts" setup>
-  import type { CondensedInfoItem } from '~/components/condensed-info.vue';
+  import type { MediaOverviewProps } from '~/components/media/overview.vue';
 
-  const useMediaDetails = () => ({
-    title: "Dune: Part I",
-    overallRating: 8.0,
-    trivia: {
+  const { data: role } = await useApi("/users/{username}/role", { path: { username: "marton.teszt" } });
+
+  const useMediaOverview = (): MediaOverviewProps => ({
+    posterSrc: "/temp-images/dune-part-1.png",
+    overallRating: {
+      rating: 8.0,
+      voterCount: 1_000_000
+    },
+    metadata: {
       lengthInMinutes: 155,
       releaseYear: 2021,
       mpaRating: "PG-13",
       awards: 5,
+    },
+    contributors: {
       directors: ["Denis Villeneuve"],
       writers: ["Jon Spaihts", "Denis Villeneuve", "Eric Roth"],
       stars: ["Timothée Chalamet", "Rebecca Ferguson", "Zendaya"],
-    }
+    },
   });
 
-  const { title, trivia, overallRating } = useMediaDetails();
 
-  const shortCondensedInfoItems: CondensedInfoItem[] = [
-    {
-      icon: "i-lucide-hourglass",
-      content: formatMinutes(trivia.lengthInMinutes)
-    },
-    {
-      icon: "i-lucide-calendar-1",
-      content: trivia.releaseYear.toString()
-    },
-    {
-      icon: "i-lucide-shield-alert",
-      content: trivia.mpaRating
-    },
-    {
-      icon: "i-lucide-award",
-      content: trivia.awards.toString()
-    }
-  ];
-
-  const longCondensedInfoItems: CondensedInfoItem[] = [
-    {
-      icon: "i-lucide-ship-wheel",
-      title: pluralize("Director", trivia.directors.length),
-      content: trivia.directors.join(", ")
-    },
-    {
-      icon: "i-lucide-pen",
-      title: pluralize("Writer", trivia.writers.length),
-      content: trivia.writers.join(", ")
-    },
-    {
-      icon: "i-lucide-star",
-      title: pluralize("Star", trivia.stars.length),
-      content: trivia.stars.join(", ")
-    },
-  ];
+  const mediaOverview = useMediaOverview();
 
 </script>
 
