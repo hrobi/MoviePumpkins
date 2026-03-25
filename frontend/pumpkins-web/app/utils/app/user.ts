@@ -1,4 +1,4 @@
-import type { UserRole } from "~/types/user"
+import type { UserRole } from "~~/shared/types/user"
 
 export const defaultUserRole = (): UserRole => {
   return "reviewer"

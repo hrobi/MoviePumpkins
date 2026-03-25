@@ -3,7 +3,9 @@
 </template>
 
 <script lang="ts" setup>
-
+  definePageMeta({
+    middleware: ['auth-redirect']
+  });
 </script>
 
 <style>
