@@ -1,0 +1,38 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  --font-sans: 'Public Sans', sans-serif;
+
+  --color-green-50: #EFFDF5;
+  --color-green-100: #D9FBE8;
+  --color-green-200: #B3F5D1;
+  --color-green-300: #75EDAE;
+  --color-green-400: #00DC82;
+  --color-green-500: #00C16A;
+  --color-green-600: #00A155;
+  --color-green-700: #007F45;
+  --color-green-800: #016538;
+  --color-green-900: #0A5331;
+  --color-green-950: #052E16;
+
+  --color-logout: var(--color-error);
+}
+
+:root {
+  --ui-color-red: var(--color-red-500);
+  --ui-color-orange: var(--color-orange-500);
+  --ui-color-blue: var(--color-blue-500);
+  --ui-color-sky: var(--color-sky-500);
+  --ui-color-purple: var(--color-purple-500);
+  --ui-color-amber: var(--color-amber-500);
+}
+
+.dark {
+  --ui-color-red: var(--color-red-400);
+  --ui-color-orange: var(--color-orange-400);
+  --ui-color-blue: var(--color-blue-400);
+  --ui-color-sky: var(--color-sky-300);
+  --ui-color-purple: var(--color-purple-400);
+  --ui-color-amber: var(--color-amber-400);
+}
