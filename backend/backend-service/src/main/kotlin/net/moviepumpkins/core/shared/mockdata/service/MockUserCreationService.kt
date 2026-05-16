@@ -8,10 +8,12 @@ import net.moviepumpkins.core.shared.fileconfig.facade.FileAsObjectReaderFacade
 import net.moviepumpkins.core.shared.logging.util.logger
 import net.moviepumpkins.core.shared.mockdata.dto.MockUserListDto
 import org.springframework.boot.CommandLineRunner
+import org.springframework.context.annotation.Profile
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 
 @Component
+@Profile("mock")
 class MockUserCreationService(
     private val simpleUserPersistenceService: SimpleUserPersistenceService,
     private val keycloakService: KeycloakService,

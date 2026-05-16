@@ -5,7 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
     kotlin("plugin.serialization") version "2.1.20"
-    id("ch.acanda.gradle.fabrikt") version "1.14.0"
+    id("ch.acanda.gradle.fabrikt") version "1.31.0"
 }
 
 group = "net.moviepumpkins"
@@ -120,9 +120,9 @@ fabrikt {
 
 tasks {
 
-    named("fabriktGenerate") {
-        dependsOn(named("assembleApi"))
-    }
+//    named("fabriktGenerate") {
+//        dependsOn(named("assembleApi"))
+//    }
 
     withType<Test> {
         useJUnitPlatform()
