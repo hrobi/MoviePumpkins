@@ -13,9 +13,9 @@ paths:
         - bearerAuth: [ ]
       responses:
         401:
-          $ref: "../common/components.yaml#/components/responses/401"
+          $ref: "common-components.yaml#/components/responses/401"
         409:
-          $ref: "../common/components.yaml#/components/responses/409"
+          $ref: "common-components.yaml#/components/responses/409"
         201:
           description: user successfully created
   /users/{username}/role:
@@ -31,7 +31,7 @@ paths:
             type: string
       responses:
         404:
-          $ref: "../common/components.yaml#/components/responses/404"
+          $ref: "common-components.yaml#/components/responses/404"
         200:
           description: role of user
           content:

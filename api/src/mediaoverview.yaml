@@ -1,0 +1,120 @@
+openapi: 3.0.2
+info:
+  title: MoviePumpkins
+  description: MoviePumpkins
+  version: 1.0.0
+tags:
+  - name: media overview
+paths:
+  /media/{id}:
+    get:
+      tags:
+        - media overview
+      parameters:
+        - $ref: "common-components.yaml/#/components/parameters/IdInPath"
+      responses:
+        404:
+          $ref: "common-components.yaml/#/components/responses/404"
+        200:
+          description: Media fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaDto"
+
+components:
+  schemas:
+    MPARatingEnum:
+      type: string
+      enum:
+        - G
+        - PG
+        - PG_13
+        - R
+        - NC_17
+    MediaCommonPropertiesDto:
+      type: object
+      required:
+        - title
+        - imdbId
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        plot:
+          type: string
+          nullable: true
+        releaseYear:
+          type: integer
+          nullable: true
+        mpaRating:
+          $ref: '#/components/schemas/MPARatingEnum'
+        awardWinCount:
+          type: integer
+          nullable: true
+        awardNominationCount:
+          type: integer
+          nullable: true
+        directors:
+          type: array
+          nullable: true
+          items:
+            type: string
+        writers:
+          type: array
+          nullable: true
+          items:
+            type: string
+        actors:
+          type: array
+          nullable: true
+          items:
+            type: string
+        genres:
+          type: array
+          nullable: true
+          items:
+            type: string
+        posterUrl:
+          type: string
+          nullable: true
+        imdbId:
+          type: string
+    FeatureFilmDto:
+      allOf:
+        - $ref: '#/components/schemas/MediaCommonPropertiesDto'
+        - type: object
+          required:
+            - _tag
+          properties:
+            _tag:
+              type: string
+            runtimeInMinutes:
+              type: integer
+              nullable: true
+    SeriesDto:
+      allOf:
+        - $ref: '#/components/schemas/MediaCommonPropertiesDto'
+        - type: object
+          required:
+            - _tag
+          properties:
+            _tag:
+              type: string
+            numberOfSeasons:
+              type: integer
+              nullable: true
+            lastYear:
+              type: integer
+              nullable: true
+    MediaDto:
+      oneOf:
+        - $ref: '#/components/schemas/FeatureFilmDto'
+        - $ref: '#/components/schemas/SeriesDto'
+      discriminator:
+        propertyName: _tag
+        mapping:
+          FeatureFilm: '#/components/schemas/FeatureFilmDto'
+          Series: '#/components/schemas/SeriesDto'

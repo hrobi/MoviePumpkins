@@ -3,10 +3,8 @@ package net.moviepumpkins.core.shared.api.mapper
 import net.moviepumpkins.core.feature.user.model.UserAccount
 import net.moviepumpkins.core.feature.user.model.UserRole
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.stereotype.Component
 
-@Component
-class JwtMapper {
+object JwtMapper {
     fun mapJwtToUserAccount(jwt: Jwt, userRole: UserRole): UserAccount {
         return with(jwt) {
             UserAccount(

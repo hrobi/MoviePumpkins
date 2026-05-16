@@ -1,79 +1,111 @@
 <template>
-  <div class="flex flex-row justify-center">
-    <img :src="props.posterSrc" class="rounded-md" width="400" />
+  <div class="flex flex-row flex-1 justify-center items-start">
+    <img
+      v-if="props.mediaData.posterUrl"
+      :src="props.mediaData.posterUrl"
+      class="rounded-md w-full"
+    />
   </div>
-  <div>
-    <div class="flex flex-col justify-start items-center lg:flex-row lg:items-baseline gap-5">
-      <MediaOverallRating :rating="props.overallRating.rating" :voter-count="props.overallRating.voterCount" />
-      <CondensedInfo :responsive="true" class="mb-5" :items="metadataItems" />
-    </div>
-    <p>Paul Atreides arrives on Arrakis after his father accepts the stewardship of the dangerous planet. However, chaos ensues after a betrayal as forces clash to control melange, a precious resource.</p>
-    <CondensedInfo class="mt-5" direction="vertical" :items="contributorItems" />
+  <div class="flex-2">
+    <h2 class="text-4xl text-highlighted/60 mb-2">Plot</h2>
+    <p class="text-md text-pretty font-bold text-highlighted pb-5">
+      {{ props.mediaData.plot ?? "?" }}
+    </p>
+    <CondensedInfo :responsive="true" :items="headerConsdensedInfo" />
+    <CondensedInfo
+      class="mt-5"
+      direction="vertical"
+      :items="footerCondensedInfo"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import type { CondensedInfoItem } from '../condensed-info.vue';
+import { Array, Match, Option } from "effect";
+import type { MediaData } from "~~/shared/types/media";
+import type { CondensedInfoItem } from "../condensed-info.vue";
 
-  export interface MediaOverviewProps {
-    posterSrc: string,
-    overallRating: {
-      rating: number,
-      voterCount: number,
-    },
-    metadata: {
-      lengthInMinutes: number,
-      releaseYear: number,
-      mpaRating: string,
-      awards: number,
-    },
-    contributors: {
-      directors: string[],
-      writers: string[],
-      stars: string[]
-    }
-  }
+export interface MediaOverviewProps {
+  overallRating: {
+    rating: number;
+    voterCount: number;
+  };
+  mediaData: MediaData;
+}
 
-  const props = defineProps<MediaOverviewProps>();
+const props = defineProps<MediaOverviewProps>();
 
-  const metadataItems: CondensedInfoItem[] = [
-    {
-      icon: "i-lucide-hourglass",
-      content: formatMinutes(props.metadata.lengthInMinutes)
-    },
-    {
-      icon: "i-lucide-calendar-1",
-      content: props.metadata.releaseYear.toString()
-    },
-    {
-      icon: "i-lucide-shield-alert",
-      content: props.metadata.mpaRating
-    },
-    {
-      icon: "i-lucide-award",
-      content: props.metadata.awards.toString()
-    }
-  ];
+const awardWinCount = props.mediaData.awardWinCount;
+const awardNominationCount = props.mediaData.awardNominationCount;
 
-  const contributorItems: CondensedInfoItem[] = [
-    {
-      icon: "i-lucide-ship-wheel",
-      title: pluralize("Director", props.contributors.directors.length),
-      content: props.contributors.directors.join(", ")
-    },
-    {
-      icon: "i-lucide-pen",
-      title: pluralize("Writer", props.contributors.writers.length),
-      content: props.contributors.writers.join(", ")
-    },
-    {
-      icon: "i-lucide-star",
-      title: pluralize("Star", props.contributors.stars.length),
-      content: props.contributors.stars.join(", ")
-    },
-  ];
+const headerConsdensedInfo: CondensedInfoItem[] = [
+  {
+    icon: "i-lucide-calendar-1",
+    content: Match.value(props.mediaData).pipe(
+      Match.tagsExhaustive({
+        FeatureFilm: ({ releaseYear }) =>
+          releaseYear ? `${releaseYear}` : "?",
+        Series: ({ releaseYear, lastYear }) => {
+          if (!releaseYear) {
+            return "?";
+          }
+
+          return `${releaseYear} - ${lastYear ?? "?"}`;
+        },
+      }),
+    ),
+  },
+  Match.value(props.mediaData).pipe(
+    Match.withReturnType<CondensedInfoItem>(),
+    Match.tagsExhaustive({
+      FeatureFilm: ({ runtimeInMinutes }) => ({
+        icon: "i-lucide-clock",
+        content: runtimeInMinutes ? `${runtimeInMinutes} min` : "? min",
+      }),
+      Series: ({ numberOfSeasons }) => ({
+        icon: "i-lucide-tally-5",
+        content: numberOfSeasons ? `${numberOfSeasons}` : "?",
+      }),
+    }),
+  ),
+  {
+    icon: "i-lucide-flag",
+    content: props.mediaData.mpaRating ?? "?",
+  },
+  ...Array.fromNullable(
+    awardWinCount
+      ? awardWinCount === 0
+        ? undefined
+        : { icon: "i-lucide-award", content: `${awardWinCount}` }
+      : { icon: "i-lucide-award", content: "?" },
+  ),
+  ...Array.fromNullable(
+    awardNominationCount
+      ? awardNominationCount === 0
+        ? undefined
+        : { icon: "i-lucide-hand-heart", content: `${awardNominationCount}` }
+      : { icon: "i-lucide-hand-heart", content: "?" },
+  ),
+];
+
+const footerCondensedInfo: CondensedInfoItem[] = [
+  {
+    title: "Genres",
+    content: props.mediaData.genres?.join(", ") ?? "?",
+  },
+  {
+    title: "Director(s)",
+    content: props.mediaData.directors?.join(", ") ?? "?",
+  },
+  {
+    title: "Writer(s)",
+    content: props.mediaData.writers?.join(", ") ?? "?",
+  },
+  {
+    title: "Actor(s)",
+    content: props.mediaData.actors?.join(", ") ?? "?",
+  },
+];
 </script>
 
-<style>
-
-</style>
+<style></style>

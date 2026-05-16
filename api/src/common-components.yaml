@@ -3,41 +3,49 @@ info:
   title: MoviePumpkins
   description: MoviePumpkins
   version: 1.0.0
-paths: {}
+paths: { }
 components:
+  parameters:
+    IdInPath:
+      required: true
+      in: path
+      schema:
+        type: string
+        format: uuid
+      name: id
   responses:
     400:
       description: bad request
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServiceError"
+            $ref: "#/components/schemas/ApiServiceErrorDto"
     401:
       description: login required
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServiceError"
+            $ref: "#/components/schemas/ApiServiceErrorDto"
     403:
       description: user not authorized
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServiceError"
+            $ref: "#/components/schemas/ApiServiceErrorDto"
     404:
       description: resource not found
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServiceError"
+            $ref: "#/components/schemas/ApiServiceErrorDto"
     409:
       description: resource already exists
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ServiceError"
+            $ref: "#/components/schemas/ApiServiceErrorDto"
   schemas:
-    ServiceError:
+    ApiServiceErrorDto:
       type: object
       required:
         - code
@@ -50,3 +58,11 @@ components:
         details:
           type: object
           additionalProperties: true
+    IdDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
