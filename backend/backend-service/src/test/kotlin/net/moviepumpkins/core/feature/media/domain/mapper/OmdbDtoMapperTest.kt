@@ -1,9 +1,10 @@
 package net.moviepumpkins.core.feature.media.domain.mapper
 
-import net.moviepumpkins.core.feature.media.domain.model.value.MPARating
-import net.moviepumpkins.core.feature.media.domain.model.value.MediaFormatData
-import net.moviepumpkins.core.integration.omdb.dto.OmdbMediaDto
-import net.moviepumpkins.core.integration.omdb.dto.OmdbRatingDto
+import net.moviepumpkins.core.feature.media.omdb.OmdbMediaDtoMapper
+import net.moviepumpkins.core.feature.media.MPARating
+import net.moviepumpkins.core.feature.media.MediaFormatData
+import net.moviepumpkins.core.application.integration.omdb.dto.OmdbMediaDto
+import net.moviepumpkins.core.application.integration.omdb.dto.OmdbRatingDto
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

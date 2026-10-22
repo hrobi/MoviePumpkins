@@ -1,5 +1,6 @@
 package net.moviepumpkins.core.feature.media.domain.mapper
 
+import net.moviepumpkins.core.feature.media.omdb.OmdbMediaDtoPropertyParser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
