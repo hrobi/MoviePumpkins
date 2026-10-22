@@ -1,6 +1,6 @@
 package net.moviepumpkins.core.application.security
 
-import net.moviepumpkins.core.feature.user.application.SimpleUserPersistenceService
+import net.moviepumpkins.core.feature.user.UserAccountRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -17,7 +17,7 @@ class AppSecurityConfig {
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
-        simpleUserPersistenceService: SimpleUserPersistenceService,
+        userAccountRepository: UserAccountRepository,
     ): SecurityFilterChain {
         http {
             authorizeHttpRequests {
@@ -30,7 +30,7 @@ class AppSecurityConfig {
 
             oauth2ResourceServer {
                 jwt {
-                    jwtAuthenticationConverter = JwtToTokenWithCustomAuthoritiesConverter(simpleUserPersistenceService)
+                    jwtAuthenticationConverter = JwtToTokenWithCustomAuthoritiesConverter(userAccountRepository)
                 }
             }
 

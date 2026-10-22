@@ -4,34 +4,26 @@ import net.moviepumpkins.core.api.controllers.UsersController
 import net.moviepumpkins.core.api.controllers.UsersRoleController
 import net.moviepumpkins.core.api.models.UserDto
 import net.moviepumpkins.core.api.models.UserRoleEnum
-import net.moviepumpkins.core.feature.user.error.UserNotFoundException
-import net.moviepumpkins.core.shared.auth.AuthenticationFacade
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 
 @RestController
 class SimpleUserManagementController(
-    private val simpleUserPersistenceService: SimpleUserPersistenceService,
-    private val authenticationFacade: AuthenticationFacade,
+    private val simpleUserManagementService: SimpleUserManagementService,
 ) : UsersController, UsersRoleController {
 
     override fun createUser(): ResponseEntity<Unit> {
-        val userAccount = authenticationFacade.extractUserAccount()
-        val userEntity = simpleUserPersistenceService.createUser(userAccount)
-        return ResponseEntity.created(URI.create("/users/${userEntity.username}")).build()
+        val username = simpleUserManagementService.createUserAndGetUsername()
+        return ResponseEntity.created(URI.create("/users/${username}")).build()
     }
 
     override fun getUser(username: String): ResponseEntity<UserDto> {
-        TODO("Not yet implemented")
+        return ResponseEntity.ok(simpleUserManagementService.getUserByUsername(username))
     }
 
     override fun getUserRole(username: String): ResponseEntity<UserRoleEnum> {
-        val role = simpleUserPersistenceService.getUserAccountEntity(username)?.role
-            ?: throw UserNotFoundException(username)
-        return ResponseEntity.ok(
-            UserRoleEnum.valueOf(role.name)
-        )
+        return ResponseEntity.ok(simpleUserManagementService.getUserRoleByUsername(username))
     }
 
 }

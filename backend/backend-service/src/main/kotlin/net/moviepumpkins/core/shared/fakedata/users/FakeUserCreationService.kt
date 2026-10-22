@@ -1,9 +1,9 @@
 package net.moviepumpkins.core.shared.fakedata.users
 
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.feature.user.UserAccount
-import net.moviepumpkins.core.feature.user.application.SimpleUserPersistenceService
 import net.moviepumpkins.core.application.integration.keycloak.KeycloakService
+import net.moviepumpkins.core.feature.user.UserAccount
+import net.moviepumpkins.core.feature.user.UserAccountRepository
 import net.moviepumpkins.core.shared.fakedata.FileAsObjectReaderFacade
 import net.moviepumpkins.core.shared.logger
 import org.springframework.boot.CommandLineRunner
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 @Profile("mock")
 class FakeUserCreationService(
-    private val simpleUserPersistenceService: SimpleUserPersistenceService,
+    private val userAccountRepository: UserAccountRepository,
     private val keycloakService: KeycloakService,
     private val fileAsObjectReaderFacade: FileAsObjectReaderFacade
 ) : CommandLineRunner {
@@ -25,7 +25,7 @@ class FakeUserCreationService(
 
     private fun createUser(account: UserAccount, password: String) {
         keycloakService.createEmailVerifiedAndEnabledUser(account, password)
-        simpleUserPersistenceService.createUser(account)
+        userAccountRepository.save(account.toEntity())
     }
 
     @Transactional
@@ -40,7 +40,7 @@ class FakeUserCreationService(
             }
 
         for (mockUser in fakeUserListDto.users) {
-            val userAccountEntity = simpleUserPersistenceService.getUserAccountEntity(username = mockUser.username)
+            val userAccountEntity = userAccountRepository.findById(mockUser.username).orElse(null)
             if (userAccountEntity != null) {
                 logger().info("Mock user {} already exists, skipping...", userAccountEntity.username)
                 continue
