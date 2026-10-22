@@ -2,6 +2,7 @@ package net.moviepumpkins.core.feature.user.application
 
 import net.moviepumpkins.core.api.controllers.UsersController
 import net.moviepumpkins.core.api.controllers.UsersRoleController
+import net.moviepumpkins.core.api.models.UserDto
 import net.moviepumpkins.core.api.models.UserRoleEnum
 import net.moviepumpkins.core.feature.user.error.UserNotFoundException
 import net.moviepumpkins.core.shared.auth.AuthenticationFacade
@@ -19,6 +20,10 @@ class SimpleUserManagementController(
         val userAccount = authenticationFacade.extractUserAccount()
         val userEntity = simpleUserPersistenceService.createUser(userAccount)
         return ResponseEntity.created(URI.create("/users/${userEntity.username}")).build()
+    }
+
+    override fun getUser(username: String): ResponseEntity<UserDto> {
+        TODO("Not yet implemented")
     }
 
     override fun getUserRole(username: String): ResponseEntity<UserRoleEnum> {
