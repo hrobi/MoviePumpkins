@@ -3,7 +3,10 @@ package net.moviepumpkins.core.feature.user
 enum class UserRole {
     REVIEWER,
     SUPERVISOR,
-    ADMIN
-}
+    ADMIN;
 
-fun defaultUserRole() = UserRole.REVIEWER
+    companion object {
+        val default = REVIEWER
+    }
+
+}

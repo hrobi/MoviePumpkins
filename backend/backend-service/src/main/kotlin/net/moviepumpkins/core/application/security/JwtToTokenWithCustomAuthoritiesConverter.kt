@@ -1,11 +1,11 @@
 package net.moviepumpkins.core.application.security
 
+import net.moviepumpkins.core.feature.user.UserRole
 import net.moviepumpkins.core.feature.user.application.SimpleUserPersistenceService
-import net.moviepumpkins.core.feature.user.defaultUserRole
 import net.moviepumpkins.core.shared.auth.AuthConstants
+import net.moviepumpkins.core.shared.auth.mapToSimpleGrantedAuthority
 import net.moviepumpkins.core.shared.lazyDebug
 import net.moviepumpkins.core.shared.logger
-import net.moviepumpkins.core.shared.auth.mapToSimpleGrantedAuthority
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
@@ -25,7 +25,7 @@ class JwtToTokenWithCustomAuthoritiesConverter(
                 if (role != null) {
                     add(role.mapToSimpleGrantedAuthority())
                 } else {
-                    add(defaultUserRole().mapToSimpleGrantedAuthority())
+                    add(UserRole.default.mapToSimpleGrantedAuthority())
                     add(SimpleGrantedAuthority(AuthConstants.ROLE_NEW_USER))
                 }
             },

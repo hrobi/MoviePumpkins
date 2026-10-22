@@ -35,4 +35,15 @@ class UserAccountEntity(
 ) {
     override fun equals(other: Any?): Boolean = entityEqualsBy(this, other) { email }
     override fun hashCode(): Int = email.hashCode()
+
+    fun mapToUserAccount() = UserAccount(
+        username = username!!,
+        displayName = displayName,
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        role = role,
+        enabled = enabled
+    )
+
 }

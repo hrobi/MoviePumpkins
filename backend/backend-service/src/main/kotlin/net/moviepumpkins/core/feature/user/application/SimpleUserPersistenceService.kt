@@ -5,7 +5,6 @@ import net.moviepumpkins.core.feature.user.UserAccount
 import net.moviepumpkins.core.feature.user.UserAccountEntity
 import net.moviepumpkins.core.feature.user.UserAccountRepository
 import net.moviepumpkins.core.feature.user.error.UserAlreadyExistsException
-import net.moviepumpkins.core.feature.user.mapToUserAccountEntity
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,6 +24,6 @@ class SimpleUserPersistenceService(
         if (userAccountRepository.existsById(userAccount.username)) {
             throw UserAlreadyExistsException(userAccount.username)
         }
-        return userAccountRepository.save(userAccount.mapToUserAccountEntity())
+        return userAccountRepository.save(userAccount.toEntity())
     }
 }
