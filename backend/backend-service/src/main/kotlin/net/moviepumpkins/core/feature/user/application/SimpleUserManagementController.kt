@@ -3,8 +3,8 @@ package net.moviepumpkins.core.feature.user.application
 import net.moviepumpkins.core.api.controllers.UsersController
 import net.moviepumpkins.core.api.controllers.UsersRoleController
 import net.moviepumpkins.core.api.models.UserRoleEnum
+import net.moviepumpkins.core.feature.user.error.UserNotFoundException
 import net.moviepumpkins.core.shared.auth.AuthenticationFacade
-import net.moviepumpkins.core.shared.error.ServiceException
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.net.URI
@@ -23,11 +23,7 @@ class SimpleUserManagementController(
 
     override fun getUserRole(username: String): ResponseEntity<UserRoleEnum> {
         val role = simpleUserPersistenceService.getUserAccountEntity(username)?.role
-            ?: throw ServiceException.Companion.idNotFound(
-                code = "user.getRole.usernameNotFound",
-                idValue = "username",
-                idName = "username"
-            )
+            ?: throw UserNotFoundException(username)
         return ResponseEntity.ok(
             UserRoleEnum.valueOf(role.name)
         )
