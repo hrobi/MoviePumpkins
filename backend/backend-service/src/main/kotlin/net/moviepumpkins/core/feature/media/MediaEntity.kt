@@ -1,23 +1,25 @@
 package net.moviepumpkins.core.feature.media
 
-import jakarta.persistence.Column
 import jakarta.persistence.Convert
+import jakarta.persistence.DiscriminatorColumn
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Inheritance
+import jakarta.persistence.InheritanceType
 import jakarta.persistence.Table
 import net.moviepumpkins.core.shared.entity.SemicolonSeparatedStringListConverter
-import net.moviepumpkins.core.shared.className
-import net.moviepumpkins.core.shared.UnknownDiscriminatorException
 import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.Version
 import java.util.UUID
 
 @Entity
 @Table(name = "media")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "format")
 class MediaEntity(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.UUID)
@@ -53,61 +55,27 @@ class MediaEntity(
 
     var imdbId: String,
 
-    format: MediaFormatData,
+    @Enumerated(EnumType.STRING)
+    val format: MediaFormat,
 
     ) {
-
-    @Column(name = "format")
-    private lateinit var formatDiscriminator: String
-    private var runtime: Int? = null
-    private var numberOfSeasons: Int? = null
-    private var lastYear: Int? = null
 
     @Version
     private var version: Long = 1
 
-    init {
-        setFormatLogic(format)
-    }
-
-    var format: MediaFormatData
-        get() {
-            return when (formatDiscriminator) {
-                className<MediaFormatData.FeatureFilm>() -> MediaFormatData.FeatureFilm(
-                    runtimeInMinutes = runtime,
-                )
-
-                className<MediaFormatData.Series>() -> MediaFormatData.Series(
-                    numberOfSeasons = numberOfSeasons,
-                    lastYear = lastYear,
-                )
-
-                else -> throw UnknownDiscriminatorException(
-                    formatDiscriminator,
-                    MediaFormatData::class.java
-                )
-            }
-        }
-        set(format) {
-            setFormatLogic(format)
-        }
-
-    private fun setFormatLogic(format: MediaFormatData) {
-        when (format) {
-            is MediaFormatData.FeatureFilm -> {
-                this.formatDiscriminator = className<MediaFormatData.FeatureFilm>()
-                this.runtime = format.runtimeInMinutes
-                this.lastYear = null
-                this.numberOfSeasons = null
-            }
-
-            is MediaFormatData.Series -> {
-                this.formatDiscriminator = className<MediaFormatData.Series>()
-                this.numberOfSeasons = format.numberOfSeasons
-                this.lastYear = format.lastYear
-                this.runtime = null
-            }
-        }
-    }
+    data class CommonData(
+        val title: String,
+        val plot: String?,
+        val releaseYear: Int?,
+        val mpaRating: MPARating?,
+        val awardWinCount: Int?,
+        val awardNominationCount: Int?,
+        val directors: List<String>?,
+        val writers: List<String>?,
+        val actors: List<String>?,
+        val genres: List<String>?,
+        val posterUrl: String?,
+        val imdbId: String,
+    )
 
 }
