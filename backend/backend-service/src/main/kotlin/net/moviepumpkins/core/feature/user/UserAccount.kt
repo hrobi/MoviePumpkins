@@ -1,10 +1,10 @@
 package net.moviepumpkins.core.feature.user
 
+import net.moviepumpkins.core.shared.Loader
 import net.moviepumpkins.core.shared.auth.AuthConstants
 import net.moviepumpkins.core.shared.auth.JwtMapper
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.jwt.Jwt
-import java.util.function.Supplier
 
 data class UserAccount(
     val username: String,
@@ -28,14 +28,13 @@ data class UserAccount(
 
     companion object {
 
-        fun compose(authentication: Authentication, entitySupplier: Supplier<UserAccountEntity?>): UserAccount {
+        fun compose(persistenceLoader: Loader<UserAccountEntity?>, authentication: Authentication): UserAccount {
             val isNewUser =
                 authentication.authorities.any { authority -> authority.authority == AuthConstants.ROLE_NEW_USER }
             return if (isNewUser) {
                 JwtMapper.mapJwtToUserAccount(authentication.principal as Jwt, UserRole.default)
             } else {
-                val entity = entitySupplier.get()
-                entity
+                persistenceLoader.load()
                     ?.mapToUserAccount()
                     ?: throw IllegalStateException("user was not found")
             }
