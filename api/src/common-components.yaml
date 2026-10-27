@@ -19,7 +19,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ApiServiceErrorDto"
+            $ref: "#/components/schemas/ValidationFailureDto"
     401:
       description: login required
       content:
@@ -66,3 +66,39 @@ components:
         id:
           type: string
           format: uuid
+    ValidationFailureDto:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            errors:
+              type: array
+              items:
+                $ref: "#/components/schemas/ValidationErrorDto"
+    ValidationErrorDto:
+      type: object
+      required:
+        - path
+        - violations
+      properties:
+        path:
+          type: string
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintViolationDto"
+    ConstraintViolationDto:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string

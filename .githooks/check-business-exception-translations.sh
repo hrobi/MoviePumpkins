@@ -29,9 +29,9 @@ exception_classes=$(printf '%s\n' "$declarations" \
     | sed -E 's/.*class[[:space:]]+([A-Za-z_][A-Za-z0-9_]*).*/\1/' \
     | sort -u)
 
-set -- "$messages_dir"/*_en.properties
+set -- "$messages_dir"/error_messages_*.properties
 if [ ! -f "$1" ]; then
-    printf 'No English error message files found under %s\n' "$messages_dir" >&2
+    printf 'No validation error messages files found under %s\n' "$messages_dir" >&2
     exit 1
 fi
 
