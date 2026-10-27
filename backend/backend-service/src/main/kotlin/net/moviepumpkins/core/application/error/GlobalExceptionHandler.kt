@@ -1,6 +1,7 @@
 package net.moviepumpkins.core.application.error
 
 import net.moviepumpkins.core.api.models.ApiServiceErrorDto
+import net.moviepumpkins.core.shared.application.BusinessExceptionMessageResolver
 import net.moviepumpkins.core.shared.error.BusinessException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 
 @ControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler(
+    private val businessExceptionMessageResolver: BusinessExceptionMessageResolver
+) {
 
     @ExceptionHandler(AuthenticationException::class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -25,8 +28,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException::class)
     fun handleBusinessException(businessException: BusinessException): ResponseEntity<ApiServiceErrorDto> {
         val response = ApiServiceErrorDto(
-            code = businessException.javaClass.name.removeSuffix("Exception"),
-            message = "unknown error"
+            code = businessException.javaClass.name,
+            message = businessExceptionMessageResolver.resolveOrNull(businessException) ?: "unknown error"
         )
         return ResponseEntity.status(businessException.status).body(response)
     }
