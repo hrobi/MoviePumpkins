@@ -2,12 +2,11 @@ package net.moviepumpkins.core.feature.media
 
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
-import java.util.UUID
 
 @Entity
 @DiscriminatorValue(MediaFormat.Constants.FEATURE_FILM)
 class FeatureFilmEntity(
-    id: UUID? = null,
+    id: Long? = null,
     title: String,
     plot: String?,
     releaseYear: Int?,

@@ -39,8 +39,8 @@ components:
         - imdbId
       properties:
         id:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
         title:
           type: string
         plot:

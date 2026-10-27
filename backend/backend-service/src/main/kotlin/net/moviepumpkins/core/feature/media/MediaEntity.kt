@@ -1,5 +1,6 @@
 package net.moviepumpkins.core.feature.media
 
+import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.DiscriminatorColumn
 import jakarta.persistence.Entity
@@ -12,9 +13,7 @@ import jakarta.persistence.Inheritance
 import jakarta.persistence.InheritanceType
 import jakarta.persistence.Table
 import net.moviepumpkins.core.shared.entity.SemicolonSeparatedStringListConverter
-import org.hibernate.annotations.UuidGenerator
 import org.springframework.data.annotation.Version
-import java.util.UUID
 
 @Entity
 @Table(name = "media")
@@ -22,9 +21,8 @@ import java.util.UUID
 @DiscriminatorColumn(name = "format")
 class MediaEntity(
     @field:Id
-    @field:GeneratedValue(strategy = GenerationType.UUID)
-    @field:UuidGenerator(style = UuidGenerator.Style.TIME)
-    var id: UUID? = null,
+    @field:GeneratedValue(strategy = GenerationType.IDENTITY)
+    var id: Long? = null,
 
     var title: String,
 
@@ -56,6 +54,7 @@ class MediaEntity(
     var imdbId: String,
 
     @Enumerated(EnumType.STRING)
+    @Column(insertable = false, updatable = false)
     val format: MediaFormat,
 
     ) {

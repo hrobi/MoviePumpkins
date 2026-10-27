@@ -1,10 +1,10 @@
-package net.moviepumpkins.core.shared.fakedata.users
+package net.moviepumpkins.core.application.fakedata.users
 
 import jakarta.transaction.Transactional
+import net.moviepumpkins.core.application.fakedata.FileAsObjectReaderFacade
 import net.moviepumpkins.core.application.integration.keycloak.KeycloakService
 import net.moviepumpkins.core.feature.user.UserAccount
 import net.moviepumpkins.core.feature.user.UserAccountRepository
-import net.moviepumpkins.core.shared.fakedata.FileAsObjectReaderFacade
 import net.moviepumpkins.core.shared.logger
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile

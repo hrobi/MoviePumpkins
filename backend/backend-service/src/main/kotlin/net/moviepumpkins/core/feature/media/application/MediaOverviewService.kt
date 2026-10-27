@@ -6,7 +6,6 @@ import net.moviepumpkins.core.feature.media.MediaMapper
 import net.moviepumpkins.core.feature.media.MediaRepository
 import net.moviepumpkins.core.feature.media.error.MediaNotFoundException
 import org.springframework.stereotype.Component
-import java.util.UUID
 
 @Component
 class MediaOverviewService(
@@ -14,7 +13,7 @@ class MediaOverviewService(
 ) {
 
     @Transactional
-    fun getMediaById(id: UUID): MediaDto {
+    fun getMediaById(id: Long): MediaDto {
         return MediaMapper.mapEntityToDto(
             mediaRepository.findById(id)
                 .orElseThrow {

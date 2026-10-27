@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.shared.fakedata.users
+package net.moviepumpkins.core.application.fakedata.users
 
 import net.moviepumpkins.core.feature.user.UserRole
 

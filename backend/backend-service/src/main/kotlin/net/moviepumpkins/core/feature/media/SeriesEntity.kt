@@ -1,13 +1,13 @@
 package net.moviepumpkins.core.feature.media
 
+import jakarta.persistence.Column
 import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
-import java.util.UUID
 
 @Entity
 @DiscriminatorValue(MediaFormat.Constants.SERIES)
 class SeriesEntity(
-    id: UUID? = null,
+    id: Long? = null,
     title: String,
     plot: String?,
     releaseYear: Int?,
@@ -21,6 +21,7 @@ class SeriesEntity(
     posterUrl: String?,
     imdbId: String,
     var lastYear: Int?,
+    @Column(name = "number_of_seasons")
     var seasons: Int?,
 ) : MediaEntity(
     id,

@@ -10,8 +10,8 @@ components:
       required: true
       in: path
       schema:
-        type: string
-        format: uuid
+        type: integer
+        format: int64
       name: id
   responses:
     400:
@@ -64,8 +64,8 @@ components:
         - id
       properties:
         id:
-          type: string
-          format: uuid
+          type: integer
+          format: int64
     ValidationFailureDto:
       type: object
       properties:

@@ -1,10 +1,10 @@
-package net.moviepumpkins.core.shared.fakedata.omdb
+package net.moviepumpkins.core.application.fakedata.omdb
 
 import jakarta.transaction.Transactional
+import net.moviepumpkins.core.application.fakedata.FileAsObjectReaderFacade
 import net.moviepumpkins.core.application.integration.omdb.dto.OmdbMediaDto
 import net.moviepumpkins.core.feature.media.MediaRepository
 import net.moviepumpkins.core.feature.media.omdb.OmdbMediaDtoMapper
-import net.moviepumpkins.core.shared.fakedata.FileAsObjectReaderFacade
 import net.moviepumpkins.core.shared.logger
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile

@@ -1,7 +1,6 @@
 package net.moviepumpkins.core.feature.user.application
 
 import jakarta.transaction.Transactional
-import net.moviepumpkins.core.api.models.UserDto
 import net.moviepumpkins.core.api.models.UserRoleEnum
 import net.moviepumpkins.core.feature.user.UserAccountRepository
 import net.moviepumpkins.core.feature.user.error.UserAlreadyExistsException
@@ -14,14 +13,6 @@ class SimpleUserManagementService(
     private val userAccountRepository: UserAccountRepository,
     private val authenticationFacade: AuthenticationFacade,
 ) {
-
-    @Transactional
-    fun getUserByUsername(username: String): UserDto {
-        return userAccountRepository
-            .findById(username)
-            .orElseThrow { UserNotFoundException(username) }
-            .let { UserMapper.mapToDto(it) }
-    }
 
     @Transactional
     fun createUserAndGetUsername(): String {

@@ -1,4 +1,4 @@
-package net.moviepumpkins.core.shared.fakedata
+package net.moviepumpkins.core.application.fakedata
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Component

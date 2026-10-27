@@ -1,6 +1,6 @@
 CREATE TABLE media
 (
-    id                     UUID         NOT NULL PRIMARY KEY,
+    id                     BIGSERIAL    NOT NULL PRIMARY KEY,
     title                  VARCHAR(500) NOT NULL,
     plot                   VARCHAR(1000),
     release_year           INT,
