@@ -1,11 +1,13 @@
 package net.moviepumpkins.core.feature.media.domain.mapper
 
-import net.moviepumpkins.core.feature.media.domain.model.value.MPARating
-import net.moviepumpkins.core.feature.media.domain.model.value.MediaFormatData
-import net.moviepumpkins.core.integration.omdb.dto.OmdbMediaDto
-import net.moviepumpkins.core.integration.omdb.dto.OmdbRatingDto
+import net.moviepumpkins.core.application.integration.omdb.dto.OmdbMediaDto
+import net.moviepumpkins.core.application.integration.omdb.dto.OmdbRatingDto
+import net.moviepumpkins.core.feature.media.MPARating
+import net.moviepumpkins.core.feature.media.SeriesEntity
+import net.moviepumpkins.core.feature.media.omdb.OmdbMediaDtoMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertInstanceOf
 
 class OmdbDtoMapperTest {
 
@@ -38,6 +40,8 @@ class OmdbDtoMapperTest {
     fun `maps Arcane OMDB dto to media entity`() {
         val result = OmdbMediaDtoMapper.mapToMediaEntity(arcaneDto)
 
+        assertInstanceOf<SeriesEntity>(result)
+
         Assertions.assertAll(
             { Assertions.assertEquals("Arcane", result.title) },
             {
@@ -60,7 +64,8 @@ class OmdbDtoMapperTest {
                     result.posterUrl
                 )
             },
-            { Assertions.assertEquals(MediaFormatData.Series(numberOfSeasons = 2, lastYear = 2024), result.format) },
+            { Assertions.assertEquals(2, result.seasons) },
+            { Assertions.assertEquals(2024, result.lastYear) },
             { Assertions.assertEquals("tt11126994", result.imdbId) },
         )
     }

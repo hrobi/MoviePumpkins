@@ -1,6 +1,6 @@
 package net.moviepumpkins.core
 
-import net.moviepumpkins.core.integration.keycloak.properties.KeycloakProperties
+import net.moviepumpkins.core.application.integration.keycloak.KeycloakProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication

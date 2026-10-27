@@ -1,5 +1,6 @@
 package net.moviepumpkins.core.feature.media.domain.mapper
 
+import net.moviepumpkins.core.feature.media.omdb.OmdbMediaDtoPropertyParser
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -43,7 +44,7 @@ class OmdbDtoPropertyMapperTest {
             {
                 Assertions.assertEquals(
                     2018 to 2022,
-                    OmdbMediaDtoPropertyParser.extractReleaseYearAndEndYear("2018-2022")
+                    OmdbMediaDtoPropertyParser.extractReleaseYearAndEndYear("2018–2022")
                 )
             },
             { Assertions.assertEquals(2005 to null, OmdbMediaDtoPropertyParser.extractReleaseYearAndEndYear("2005")) },

@@ -10,8 +10,8 @@ components:
       required: true
       in: path
       schema:
-        type: string
-        format: uuid
+        type: integer
+        format: int64
       name: id
   responses:
     400:
@@ -19,7 +19,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ApiServiceErrorDto"
+            $ref: "#/components/schemas/ValidationFailureDto"
     401:
       description: login required
       content:
@@ -64,5 +64,41 @@ components:
         - id
       properties:
         id:
+          type: integer
+          format: int64
+    ValidationFailureDto:
+      type: object
+      properties:
+        code:
           type: string
-          format: uuid
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            errors:
+              type: array
+              items:
+                $ref: "#/components/schemas/ValidationErrorDto"
+    ValidationErrorDto:
+      type: object
+      required:
+        - path
+        - violations
+      properties:
+        path:
+          type: string
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintViolationDto"
+    ConstraintViolationDto:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
