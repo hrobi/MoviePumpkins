@@ -4,7 +4,8 @@ export default defineEventHandler(async (event) => {
   const session = await getUserSession(event);
 
   const actualPath = event.path.substring("/proxy/".length);
-  console.log(actualPath)
+  console.log(event.path);
+  console.log(`http://localhost:8080/` + actualPath)
 
   if (session.secure) {
     if (session.secure.accessTokenExpiresAt < Date.now()) {

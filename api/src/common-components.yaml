@@ -1,0 +1,104 @@
+openapi: 3.0.2
+info:
+  title: MoviePumpkins
+  description: MoviePumpkins
+  version: 1.0.0
+paths: { }
+components:
+  parameters:
+    IdInPath:
+      required: true
+      in: path
+      schema:
+        type: integer
+        format: int64
+      name: id
+  responses:
+    400:
+      description: bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationFailureDto"
+    401:
+      description: login required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiServiceErrorDto"
+    403:
+      description: user not authorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiServiceErrorDto"
+    404:
+      description: resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiServiceErrorDto"
+    409:
+      description: resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiServiceErrorDto"
+  schemas:
+    ApiServiceErrorDto:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+    IdDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+    ValidationFailureDto:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          properties:
+            errors:
+              type: array
+              items:
+                $ref: "#/components/schemas/ValidationErrorDto"
+    ValidationErrorDto:
+      type: object
+      required:
+        - path
+        - violations
+      properties:
+        path:
+          type: string
+        violations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintViolationDto"
+    ConstraintViolationDto:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
