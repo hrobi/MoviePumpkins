@@ -3,7 +3,7 @@ package net.moviepumpkins.core.application.fakedata.users
 import jakarta.transaction.Transactional
 import net.moviepumpkins.core.application.fakedata.FileAsObjectReaderFacade
 import net.moviepumpkins.core.application.integration.keycloak.KeycloakService
-import net.moviepumpkins.core.feature.user.UserAccount
+import net.moviepumpkins.core.feature.user.UserAccountDetails
 import net.moviepumpkins.core.feature.user.UserAccountRepository
 import net.moviepumpkins.core.shared.logger
 import org.springframework.boot.CommandLineRunner
@@ -23,7 +23,7 @@ class FakeUserCreationService(
         const val MOCK_USERS_PATH = "mockdata/users/users.json"
     }
 
-    private fun createUser(account: UserAccount, password: String) {
+    private fun createUser(account: UserAccountDetails, password: String) {
         keycloakService.createEmailVerifiedAndEnabledUser(account, password)
         userAccountRepository.save(account.toEntity())
     }
@@ -49,7 +49,7 @@ class FakeUserCreationService(
                 logger().info("Trying to create {}", mockUser.username)
 
                 val userAccount = with(mockUser) {
-                    UserAccount(
+                    UserAccountDetails(
                         username = username,
                         displayName = displayName,
                         firstName = firstName,

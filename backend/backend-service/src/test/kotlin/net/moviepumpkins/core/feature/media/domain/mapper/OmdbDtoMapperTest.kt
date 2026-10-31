@@ -3,7 +3,7 @@ package net.moviepumpkins.core.feature.media.domain.mapper
 import net.moviepumpkins.core.application.integration.omdb.dto.OmdbMediaDto
 import net.moviepumpkins.core.application.integration.omdb.dto.OmdbRatingDto
 import net.moviepumpkins.core.feature.media.MPARating
-import net.moviepumpkins.core.feature.media.SeriesEntity
+import net.moviepumpkins.core.feature.media.Series
 import net.moviepumpkins.core.feature.media.omdb.OmdbMediaDtoMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -40,7 +40,7 @@ class OmdbDtoMapperTest {
     fun `maps Arcane OMDB dto to media entity`() {
         val result = OmdbMediaDtoMapper.mapToMediaEntity(arcaneDto)
 
-        assertInstanceOf<SeriesEntity>(result)
+        assertInstanceOf<Series>(result)
 
         Assertions.assertAll(
             { Assertions.assertEquals("Arcane", result.title) },

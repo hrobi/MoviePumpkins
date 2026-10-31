@@ -1,45 +1,59 @@
 package net.moviepumpkins.core.feature.user
 
-import net.moviepumpkins.core.shared.Loader
-import net.moviepumpkins.core.shared.auth.AuthConstants
-import net.moviepumpkins.core.shared.auth.JwtMapper
-import org.springframework.security.core.Authentication
-import org.springframework.security.oauth2.jwt.Jwt
+import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+import net.moviepumpkins.core.shared.entity.entityEqualsBy
+import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.validator.constraints.Length
+import javax.validation.constraints.Pattern
 
-data class UserAccount(
-    val username: String,
-    val displayName: String,
-    val firstName: String,
-    val lastName: String,
-    val email: String,
-    val role: UserRole,
-    val enabled: Boolean,
+@Entity
+@Table(name = "user_account")
+@DynamicUpdate
+class UserAccount(
+    @field:Id
+    @field:Pattern(regexp = "([a-z0-9]+-?[a-z0-9]+)+")
+    @field:Length(min = 3, max = 100)
+    var username: String?,
+
+    var firstName: String,
+
+    var lastName: String,
+
+    @field:Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+\$")
+    var email: String,
+
+    var displayName: String,
+
+    @field:Enumerated(EnumType.STRING)
+    var role: UserRole = UserRole.REVIEWER,
+
+    var enabled: Boolean = true,
 ) {
+    override fun equals(other: Any?): Boolean = entityEqualsBy(this, other) { email }
+    override fun hashCode(): Int = email.hashCode()
 
-    fun toEntity() = UserAccountEntity(
-        username = username,
+    fun mapToUserAccount() = UserAccountDetails(
+        username = username!!,
+        displayName = displayName,
         firstName = firstName,
         lastName = lastName,
         email = email,
-        displayName = displayName,
         role = role,
-        enabled = enabled,
+        enabled = enabled
     )
 
-    companion object {
-
-        fun compose(persistenceLoader: Loader<UserAccountEntity?>, authentication: Authentication): UserAccount {
-            val isNewUser =
-                authentication.authorities.any { authority -> authority.authority == AuthConstants.ROLE_NEW_USER }
-            return if (isNewUser) {
-                JwtMapper.mapJwtToUserAccount(authentication.principal as Jwt, UserRole.default)
-            } else {
-                persistenceLoader.load()
-                    ?.mapToUserAccount()
-                    ?: throw IllegalStateException("user was not found")
-            }
-        }
-
+    interface View {
+        val username: String
+        val displayName: String
+        val firstName: String
+        val lastName: String
+        val email: String
+        val role: UserRole
+        val enabled: Boolean
     }
 
 }

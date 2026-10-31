@@ -8,7 +8,7 @@ import net.moviepumpkins.core.api.models.ValidationFailureDtoDetails
 import net.moviepumpkins.core.shared.application.BusinessExceptionMessageResolver
 import net.moviepumpkins.core.shared.application.ValidationErrorMessageResolver
 import net.moviepumpkins.core.shared.error.BusinessException
-import net.moviepumpkins.core.shared.error.ValidationException
+import net.moviepumpkins.core.shared.validation.ValidationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.AuthenticationException
@@ -56,7 +56,7 @@ class GlobalExceptionHandler(
         }
         val response = ValidationFailureDto(
             code = validationException.javaClass.name,
-            message = businessExceptionMessageResolver.resolveOrNull(validationException) ?: "unknown error",
+            message = "Validation failed",
             details = ValidationFailureDtoDetails(errors)
         )
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response)

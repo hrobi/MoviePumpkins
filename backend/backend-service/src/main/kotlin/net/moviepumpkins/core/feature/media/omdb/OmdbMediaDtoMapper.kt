@@ -1,24 +1,24 @@
 package net.moviepumpkins.core.feature.media.omdb
 
 import net.moviepumpkins.core.application.integration.omdb.dto.OmdbMediaDto
-import net.moviepumpkins.core.feature.media.FeatureFilmEntity
+import net.moviepumpkins.core.feature.media.FeatureFilm
 import net.moviepumpkins.core.feature.media.MPARating
-import net.moviepumpkins.core.feature.media.MediaEntity
-import net.moviepumpkins.core.feature.media.SeriesEntity
+import net.moviepumpkins.core.feature.media.Media
+import net.moviepumpkins.core.feature.media.Series
 import net.moviepumpkins.core.shared.logger
 
 object OmdbMediaDtoMapper {
 
-    fun mapToMediaEntity(omdbMediaDto: OmdbMediaDto): MediaEntity {
+    fun mapToMediaEntity(omdbMediaDto: OmdbMediaDto): Media {
         val (wins, nominations) = OmdbMediaDtoPropertyParser.extractWinsAndNominations(omdbMediaDto.awards)
         val (releaseYear, endYear) = OmdbMediaDtoPropertyParser.extractReleaseYearAndEndYear(omdbMediaDto.year)
-        val commonData = MediaEntity.CommonData(
+        val commonDetails = Media.CommonDetails(
             title = omdbMediaDto.title.takeIf { it != "N/A" }
                 ?: throw IllegalArgumentException("title of media must be known!"),
             plot = omdbMediaDto.plot.handleNA(),
             releaseYear = releaseYear,
             mpaRating = omdbMediaDto.rated.handleNA()?.let {
-                MPARating.Companion.parseOrNull(it) ?: throw IllegalStateException("Unknown rating")
+                MPARating.parseOrNull(it) ?: throw IllegalStateException("Unknown rating")
             },
             awardWinCount = wins,
             awardNominationCount = nominations,
@@ -30,14 +30,14 @@ object OmdbMediaDtoMapper {
             imdbId = omdbMediaDto.imdbId,
         )
         return when (omdbMediaDto.type) {
-            "series" -> SeriesEntity(
-                commonData,
+            "series" -> Series(
+                commonDetails,
                 endYear,
                 omdbMediaDto.totalSeasons?.handleNA()?.toInt()
             )
 
-            "movie" -> FeatureFilmEntity(
-                commonData,
+            "movie" -> FeatureFilm(
+                commonDetails,
                 OmdbMediaDtoPropertyParser.extractRuntimeInMinutes(omdbMediaDto.runtime)
             )
 

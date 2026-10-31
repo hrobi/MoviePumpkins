@@ -1,6 +1,6 @@
 package net.moviepumpkins.core.shared.auth
 
-import net.moviepumpkins.core.feature.user.UserAccount
+import net.moviepumpkins.core.feature.user.UserAccountDetails
 import net.moviepumpkins.core.feature.user.UserAccountRepository
 import net.moviepumpkins.core.shared.Loader
 import org.springframework.security.core.context.SecurityContextHolder
@@ -13,10 +13,10 @@ class AuthenticationFacade(
 ) {
 
     @Transactional
-    fun extractUserAccount(): UserAccount {
+    fun extractUserAccount(): UserAccountDetails {
         val authentication = SecurityContextHolder.getContext().authentication ?: throw EmptySecurityContextException()
         val persistenceLoader = Loader { userAccountRepository.findById(authentication.name).orElse(null) }
-        return UserAccount.compose(
+        return UserAccountDetails.compose(
             persistenceLoader,
             authentication,
         )

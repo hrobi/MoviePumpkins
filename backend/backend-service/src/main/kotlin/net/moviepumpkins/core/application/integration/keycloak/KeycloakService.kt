@@ -1,6 +1,6 @@
 package net.moviepumpkins.core.application.integration.keycloak
 
-import net.moviepumpkins.core.feature.user.UserAccount
+import net.moviepumpkins.core.feature.user.UserAccountDetails
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository
 import org.springframework.stereotype.Component
 
@@ -30,7 +30,7 @@ class KeycloakService(
     }
 
 
-    fun createEmailVerifiedAndEnabledUser(userAccount: UserAccount, password: String) {
+    fun createEmailVerifiedAndEnabledUser(userAccount: UserAccountDetails, password: String) {
         val adminAccessToken = getAdminAccessToken()
         val userCreatedResponse = keycloakClient.createUser(
             adminAccessToken,

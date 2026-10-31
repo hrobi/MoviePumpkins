@@ -5,7 +5,7 @@ import jakarta.persistence.Entity
 
 @Entity
 @DiscriminatorValue(MediaFormat.Constants.FEATURE_FILM)
-class FeatureFilmEntity(
+class FeatureFilm(
     id: Long? = null,
     title: String,
     plot: String?,
@@ -20,7 +20,7 @@ class FeatureFilmEntity(
     posterUrl: String?,
     imdbId: String,
     var runtime: Int?,
-) : MediaEntity(
+) : Media(
     id,
     title,
     plot,
@@ -37,19 +37,19 @@ class FeatureFilmEntity(
     format = MediaFormat.FEATURE_FILM,
 ) {
 
-    constructor(commonData: CommonData, runtime: Int?) : this(
-        title = commonData.title,
-        plot = commonData.plot,
-        releaseYear = commonData.releaseYear,
-        mpaRating = commonData.mpaRating,
-        awardWinCount = commonData.awardWinCount,
-        awardNominationCount = commonData.awardNominationCount,
-        directors = commonData.directors,
-        writers = commonData.writers,
-        actors = commonData.actors,
-        genres = commonData.genres,
-        posterUrl = commonData.posterUrl,
-        imdbId = commonData.imdbId,
+    constructor(commonDetails: CommonDetails, runtime: Int?) : this(
+        title = commonDetails.title,
+        plot = commonDetails.plot,
+        releaseYear = commonDetails.releaseYear,
+        mpaRating = commonDetails.mpaRating,
+        awardWinCount = commonDetails.awardWinCount,
+        awardNominationCount = commonDetails.awardNominationCount,
+        directors = commonDetails.directors,
+        writers = commonDetails.writers,
+        actors = commonDetails.actors,
+        genres = commonDetails.genres,
+        posterUrl = commonDetails.posterUrl,
+        imdbId = commonDetails.imdbId,
         runtime = runtime,
     )
 

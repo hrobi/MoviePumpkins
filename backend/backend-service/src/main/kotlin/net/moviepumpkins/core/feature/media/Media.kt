@@ -19,7 +19,7 @@ import org.springframework.data.annotation.Version
 @Table(name = "media")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "format")
-class MediaEntity(
+class Media(
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
@@ -62,7 +62,7 @@ class MediaEntity(
     @Version
     private var version: Long = 1
 
-    data class CommonData(
+    data class CommonDetails(
         val title: String,
         val plot: String?,
         val releaseYear: Int?,
