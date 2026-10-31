@@ -1,20 +1,20 @@
-import type { UserRole } from './user'
+import type { UserRole } from "./user";
 
-declare module '#auth-utils' {
+declare module "#auth-utils" {
   interface User {
-    username: string
-    email: string
-    displayName: string
-    firstName: string
-    lastName: string
-    role?: UserRole,
+    username: string;
+    email: string;
+    displayName: string;
+    firstName: string;
+    lastName: string;
+    role?: UserRole;
   }
 
   interface SecureSessionData {
-    accessToken: string
-    refreshToken: string
-    accessTokenExpiresAt: number // Unix timestamp (ms)
+    accessToken: string;
+    refreshToken: string;
+    accessTokenExpiresAt: number; // Unix timestamp (ms)
   }
 }
 
-export {}
+export {};

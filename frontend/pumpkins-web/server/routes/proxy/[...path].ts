@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
 
   const actualPath = event.path.substring("/proxy/".length);
   console.log(event.path);
-  console.log(`http://localhost:8080/` + actualPath)
+  console.log("http://localhost:8080/" + actualPath);
 
   if (session.secure) {
     if (session.secure.accessTokenExpiresAt < Date.now()) {
@@ -13,20 +13,17 @@ export default defineEventHandler(async (event) => {
     }
 
     return proxyRequest(
-      event, 
+      event,
       `http://localhost:8080/${actualPath}`,
-      session.secure 
+      session.secure
         ? {
-          headers: {
-            Authorization: `Bearer ${session.secure.accessToken}`
+            headers: {
+              Authorization: `Bearer ${session.secure.accessToken}`,
+            },
           }
-        } 
-        : undefined
+        : undefined,
     );
   }
 
-  return proxyRequest(
-    event, 
-    `http://localhost:8080/${actualPath}`,
-  );
-})
+  return proxyRequest(event, `http://localhost:8080/${actualPath}`);
+});

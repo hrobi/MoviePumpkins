@@ -11,7 +11,10 @@
     <p class="text-md text-pretty font-bold text-highlighted pb-5">
       {{ props.mediaData.plot ?? "?" }}
     </p>
-    <CondensedInfo :responsive="true" :items="headerConsdensedInfo" />
+    <CondensedInfo
+      :responsive="true"
+      :items="headerConsdensedInfo"
+    />
     <CondensedInfo
       class="mt-5"
       direction="vertical"
@@ -21,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Array, Match, Option } from "effect";
+import { Array, Match } from "effect";
 import type { MediaData } from "~~/shared/types/media";
 import type { CondensedInfoItem } from "../condensed-info.vue";
 

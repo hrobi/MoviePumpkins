@@ -6,16 +6,15 @@ export const useNavigationItems = () => {
   const route = useRoute();
 
   const role = computed<UserRole | undefined>(() =>
-    loggedIn.value ? user.value?.role : undefined
+    loggedIn.value ? user.value?.role : undefined,
   );
 
   const navigationItems = computed<NavigationMenuItem[]>(() => {
-
     const watchlist = {
       label: "Watchlist",
       icon: "i-lucide-eye",
       to: "/watchlist",
-      active: route.path.startsWith("/watchlist")
+      active: route.path.startsWith("/watchlist"),
     };
 
     const tasks = {
@@ -23,19 +22,21 @@ export const useNavigationItems = () => {
       icon: "i-lucide-square-check-big",
       to: "/tasks",
       active: route.path.startsWith("/tasks"),
-      chip: { text: 5, size: "lg" }
+      chip: { text: 5, size: "lg" },
     };
 
     const notification = {
       label: "Notifications",
       icon: "i-lucide-bell",
       to: "/notifications",
-      active: route.path.startsWith("/notifications")
+      active: route.path.startsWith("/notifications"),
     };
 
-    watchEffect(() => { console.log(role.value) })
+    watchEffect(() => {
+      console.log(role.value);
+    });
 
-    switch(role.value) {
+    switch (role.value) {
       case "REVIEWER":
         return [watchlist, notification];
       case "ADMIN":
@@ -53,4 +54,4 @@ export const useNavigationItems = () => {
   const showLogoutButton = computed(() => loggedIn.value);
 
   return { navigationItems, showLoginButton, showLogoutButton };
-}
+};

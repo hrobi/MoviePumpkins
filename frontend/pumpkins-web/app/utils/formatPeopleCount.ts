@@ -8,4 +8,4 @@ export default (count: number) => {
   }
 
   return `${count}`;
-}
+};

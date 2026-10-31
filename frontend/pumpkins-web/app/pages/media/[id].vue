@@ -22,15 +22,39 @@
         :overall-rating="{ rating: 8, voterCount: 100_000 }"
       />
     </article>
-    <USeparator class="w-1/2 mx-auto"/>
+    <USeparator class="w-1/2 mx-auto" />
     <article>
       <UPageGrid>
-        <MediaRatingCard flavor="Visuals" :percentage="97" color="orange"/>
-        <MediaRatingCard flavor="Story" :percentage="90" color="red"/>
-        <MediaRatingCard flavor="Epic" :percentage="89" color="purple"/>
-        <MediaRatingCard flavor="Action" :percentage="80" color="blue"/>
-        <MediaRatingCard flavor="Characters" :percentage="78" color="sky"/>
-        <MediaRatingCard flavor="Something" :percentage="30" color="amber"/>
+        <MediaRatingCard
+          flavor="Visuals"
+          :percentage="97"
+          color="orange"
+        />
+        <MediaRatingCard
+          flavor="Story"
+          :percentage="90"
+          color="red"
+        />
+        <MediaRatingCard
+          flavor="Epic"
+          :percentage="89"
+          color="purple"
+        />
+        <MediaRatingCard
+          flavor="Action"
+          :percentage="80"
+          color="blue"
+        />
+        <MediaRatingCard
+          flavor="Characters"
+          :percentage="78"
+          color="sky"
+        />
+        <MediaRatingCard
+          flavor="Something"
+          :percentage="30"
+          color="amber"
+        />
       </UPageGrid>
       <UPagination
         class="my-10 flex flex-row justify-center"
@@ -38,9 +62,14 @@
         :total="90"
       />
     </article>
-    <USeparator class="w-1/2 mx-auto"/>
+    <USeparator class="w-1/2 mx-auto" />
     <article>
-      <UCard v-for="_ in Array(5)" variant="subtle" class="mb-5">
+      <UCard
+        v-for="x in Array(5)"
+        :key="x"
+        variant="subtle"
+        class="mb-5"
+      >
         <template #header>
           <h2 class="text-xl">Everything i wanted and more</h2>
         </template>
@@ -59,15 +88,15 @@
 </template>
 
 <script lang="ts" setup>
-import type {MediaData} from "#shared/types/media";
+import type { MediaData } from "#shared/types/media";
 
 const useMediaApi = async () => {
   const route = useRoute();
   const mediaId = Number(route.params.id as string);
-  return await useApi("/media/{id}", {path: {id: mediaId}});
+  return await useApi("/media/{id}", { path: { id: mediaId } });
 };
 
-const {error, data} = await useMediaApi();
+const { error, data } = await useMediaApi();
 
 if (error.value) {
   throw createError(error.value);
