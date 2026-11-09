@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <AppHeader />
+  <UApp>
+    <Header />
     <UMain>
       <UContainer>
         <slot />
       </UContainer>
     </UMain>
-  </div>
+  </UApp>
 </template>
 
 <script lang="ts" setup></script>

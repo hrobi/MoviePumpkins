@@ -6,11 +6,17 @@ interface Constraint
 
 sealed interface CheckResult<out T> {
 
-    data class Valid<T>(val obj: T) : CheckResult<T>
-
-    data class Invalid(val errors: List<ValidationError>) : CheckResult<Nothing>
+    fun <K> map(transform: (T) -> K): CheckResult<K> {
+        return when (this) {
+            is Invalid -> this
+            is Valid -> Valid(transform(value))
+        }
+    }
 
 }
+
+data class Invalid(val errors: List<ValidationError>) : CheckResult<Nothing>
+data class Valid<T>(val value: T) : CheckResult<T>
 
 data class ValidationError(val path: String?, val value: Any?, val violations: List<Constraint>) {
 
@@ -39,7 +45,7 @@ class Checking<T>(val value: T) {
         fieldErrors.add(validationError)
     }
 
-    fun runCheck(check: Check<T>) {
+    fun run(check: Check<T>) {
         check.validationAction(this)
     }
 
@@ -68,10 +74,10 @@ class Checking<T>(val value: T) {
         raise(ValidationError(path = name, propertyValue, otherwise()))
     }
 
-    fun <K> KProperty1<T, K>.runCheck(check: Check<K>) {
+    infix fun <K> KProperty1<T, K>.by(check: Check<K>) {
         val propertyValue = get(value)
         val result = check.validate(propertyValue)
-        if (result is CheckResult.Invalid) {
+        if (result is Invalid) {
             raiseAll(result.errors.map { it.prefixed(name) })
         }
     }
@@ -87,11 +93,17 @@ class Checking<T>(val value: T) {
         }
     }
 
-    inline fun <K> KProperty1<T, Collection<K>>.eachAsValue(otherwise: Constraint, checkingAction: Checking<K>.() -> Unit) {
+    inline fun <K> KProperty1<T, Collection<K>>.eachAsValue(
+        otherwise: Constraint,
+        checkingAction: Checking<K>.() -> Unit
+    ) {
         eachAsValue({ listOf(otherwise) }, checkingAction)
     }
 
-    inline fun <K> KProperty1<T, Collection<K>>.eachAsValue(otherwise: () -> List<Constraint>, checkingAction: Checking<K>.() -> Unit) {
+    inline fun <K> KProperty1<T, Collection<K>>.eachAsValue(
+        otherwise: () -> List<Constraint>,
+        checkingAction: Checking<K>.() -> Unit
+    ) {
         val propertyValue = get(value)
         propertyValue.forEachIndexed { index, item ->
 
@@ -110,10 +122,12 @@ class Check<T>(internal val validationAction: Checking<T>.() -> Unit) {
         val checking = Checking(value)
         checking.validationAction()
         return if (checking.errors.isNotEmpty()) {
-            CheckResult.Invalid(checking.errors)
+            Invalid(checking.errors)
         } else {
-            CheckResult.Valid(value)
+            Valid(value)
         }
     }
 
 }
+
+fun <T> runCheck(value: T, validationAction: Checking<T>.() -> Unit) = Check(validationAction).validate(value)

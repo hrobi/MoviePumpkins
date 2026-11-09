@@ -24,7 +24,7 @@ class AppSecurityConfig {
                 authorize(HttpMethod.POST, "/users", authenticated)
                 authorize(HttpMethod.PUT, "/users/*/profile", authenticated)
                 authorize(HttpMethod.POST, "/media/*/reviews", authenticated)
-                authorize(HttpMethod.PUT, "/reviews/*", authenticated)
+                authorize(HttpMethod.GET, "/media/*/own-review", authenticated)
                 authorize(anyRequest, permitAll)
             }
 

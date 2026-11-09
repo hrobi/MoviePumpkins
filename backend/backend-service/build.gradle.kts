@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("net.datafaker:datafaker:2.7.0")
     implementation("javax.validation:validation-api:2.0.1.Final")
     implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.29")
@@ -63,6 +64,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 kotlin {

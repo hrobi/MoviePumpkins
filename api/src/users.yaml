@@ -40,6 +40,31 @@ paths:
                 $ref: "#/components/schemas/UserRoleEnum"
 components:
   schemas:
+    UserDto:
+      type: object
+      required:
+        - username
+        - displayName
+        - firstName
+        - lastName
+        - email
+        - role
+        - enabled
+      properties:
+        username:
+          type: string
+        displayName:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRoleEnum"
+        enabled:
+          type: boolean
     UserRoleEnum:
       type: string
       enum:

@@ -7,6 +7,9 @@ useHead({
   },
 });
 
+const title = "Movie Pumpkins";
+const description = "Movie Pumpkins";
+
 useSeoMeta({
   title,
   description,

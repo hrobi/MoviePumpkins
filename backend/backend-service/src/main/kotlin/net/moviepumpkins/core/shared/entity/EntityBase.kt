@@ -15,10 +15,10 @@ abstract class EntityBase {
     @field:GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
-    final var createdAt: OffsetDateTime = OffsetDateTime.now()
-        private set
-    final var updatedAt: OffsetDateTime = OffsetDateTime.now()
-        private set
+    var createdAt: OffsetDateTime = OffsetDateTime.now()
+        protected set
+    var updatedAt: OffsetDateTime = OffsetDateTime.now()
+        protected set
 
     @PrePersist
     fun onPersist() {

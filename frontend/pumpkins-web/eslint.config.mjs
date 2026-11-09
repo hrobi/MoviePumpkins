@@ -9,13 +9,14 @@ export default withNuxt({
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
     "vue/singleline-html-element-content-newline": "off",
+    "@stylistic/operator-linebreak": "off",
     "@stylistic/quotes": ["error", "double"],
     "@stylistic/semi": ["error", "always"],
     "@stylistic/member-delimiter-style": [
       "error",
       {
         multiline: { delimiter: "semi", requireLast: true },
-        singleline: { delimiter: "semi", requireLast: true },
+        singleline: { delimiter: "semi", requireLast: false },
       },
     ],
     "@stylistic/comma-dangle": ["error", "always-multiline"],

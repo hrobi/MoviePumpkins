@@ -6,7 +6,7 @@ import jakarta.persistence.Entity
 
 @Entity
 @DiscriminatorValue(MediaFormat.Constants.SERIES)
-class SeriesEntity(
+class Series(
     id: Long? = null,
     title: String,
     plot: String?,
@@ -23,7 +23,7 @@ class SeriesEntity(
     var lastYear: Int?,
     @Column(name = "number_of_seasons")
     var seasons: Int?,
-) : MediaEntity(
+) : Media(
     id,
     title,
     plot,
@@ -40,19 +40,19 @@ class SeriesEntity(
     format = MediaFormat.SERIES
 ) {
 
-    constructor(commonData: CommonData, lastYear: Int?, seasons: Int?) : this(
-        title = commonData.title,
-        plot = commonData.plot,
-        releaseYear = commonData.releaseYear,
-        mpaRating = commonData.mpaRating,
-        awardWinCount = commonData.awardWinCount,
-        awardNominationCount = commonData.awardNominationCount,
-        directors = commonData.directors,
-        writers = commonData.writers,
-        actors = commonData.actors,
-        genres = commonData.genres,
-        posterUrl = commonData.posterUrl,
-        imdbId = commonData.imdbId,
+    constructor(commonDetails: CommonDetails, lastYear: Int?, seasons: Int?) : this(
+        title = commonDetails.title,
+        plot = commonDetails.plot,
+        releaseYear = commonDetails.releaseYear,
+        mpaRating = commonDetails.mpaRating,
+        awardWinCount = commonDetails.awardWinCount,
+        awardNominationCount = commonDetails.awardNominationCount,
+        directors = commonDetails.directors,
+        writers = commonDetails.writers,
+        actors = commonDetails.actors,
+        genres = commonDetails.genres,
+        posterUrl = commonDetails.posterUrl,
+        imdbId = commonDetails.imdbId,
         lastYear = lastYear,
         seasons = seasons,
     )

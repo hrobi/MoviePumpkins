@@ -1,0 +1,188 @@
+openapi: 3.0.2
+info:
+  title: MoviePumpkins
+  description: MoviePumpkins
+  version: 1.0.0
+tags:
+  - name: media review
+paths:
+  /media/{mediaId}/reviews:
+    parameters:
+      - name: mediaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    post:
+      tags:
+        - media review
+      operationId: createReview
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertReviewDto"
+      responses:
+        400:
+          $ref: "common-components.yaml#/components/responses/400"
+        401:
+          $ref: "common-components.yaml#/components/responses/401"
+        404:
+          $ref: "common-components.yaml#/components/responses/404"
+        409:
+          $ref: "common-components.yaml#/components/responses/409"
+        201:
+          description: review successfully created
+    get:
+      tags:
+        - media review
+      operationId: getMediaReviews
+      parameters:
+        - $ref: "common-components.yaml#/components/parameters/Pagination"
+      responses:
+        400:
+          $ref: "common-components.yaml#/components/responses/400"
+        404:
+          $ref: "common-components.yaml#/components/responses/404"
+        200:
+          description: reviews fetched successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedReviewDto"
+  /media/{mediaId}/reviews/{reviewId}:
+    parameters:
+      - name: mediaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags:
+        - media review
+      operationId: getMediaReview
+      responses:
+        404:
+          $ref: "common-components.yaml#/components/responses/404"
+        200:
+          description: review returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewDto"
+    put:
+      tags:
+        - media review
+      operationId: updateReview
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertReviewDto"
+      responses:
+        404:
+          $ref: "common-components.yaml#/components/responses/404"
+        401:
+          $ref: "common-components.yaml#/components/responses/401"
+        403:
+          $ref: "common-components.yaml#/components/responses/403"
+        204:
+          description: media modified successfully
+  /media/{mediaId}/own-review:
+    parameters:
+      - name: mediaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags:
+        - media review
+      operationId: getOwnMediaReview
+      responses:
+        401:
+          $ref: "common-components.yaml#/components/responses/401"
+        404:
+          $ref: "common-components.yaml#/components/responses/404"
+        200:
+          description: own review returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnReviewDto"
+
+components:
+  schemas:
+    OwnReviewDto:
+      type: object
+      required:
+        - exists
+      properties:
+        exists:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/ReviewDto"
+    ReviewDto:
+      type: object
+      required:
+        - id
+        - title
+        - content
+        - reviewer
+        - likes
+        - mediaId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        content:
+          type: string
+          maxLength: 1500
+        reviewer:
+          $ref: "users.yaml#/components/schemas/UserDto"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    UpsertReviewDto:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          maxLength: 250
+        content:
+          type: string
+          maxLength: 1500
+    PagedReviewDto:
+      type: object
+      required:
+        - paging
+        - items
+      properties:
+        paging:
+          $ref: "common-components.yaml#/components/schemas/PaginationDto"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReviewDto"

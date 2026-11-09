@@ -13,6 +13,14 @@ components:
         type: integer
         format: int64
       name: id
+    Pagination:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
   responses:
     400:
       description: bad request
@@ -58,6 +66,22 @@ components:
         details:
           type: object
           additionalProperties: true
+    PaginationDto:
+      type: object
+      required:
+        - pageCount
+        - pageSize
+        - currentPage
+      properties:
+        pageCount:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        currentPage:
+          type: integer
+          format: int32
     IdDto:
       type: object
       required:

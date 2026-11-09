@@ -8,11 +8,13 @@ import net.moviepumpkins.core.feature.media.omdb.OmdbMediaDtoMapper
 import net.moviepumpkins.core.shared.logger
 import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Profile
+import org.springframework.core.annotation.Order
 import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 
 @Component
 @Profile("mock")
+@Order(1)
 class FakeOmdbMediaService(
     private val mediaRepository: MediaRepository,
     private val fileAsObjectReaderFacade: FileAsObjectReaderFacade,

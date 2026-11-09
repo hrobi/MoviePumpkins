@@ -63,40 +63,50 @@
       />
     </article>
     <USeparator class="w-1/2 mx-auto" />
-    <article>
-      <UCard
-        v-for="x in Array(5)"
-        :key="x"
-        variant="subtle"
-        class="mb-5"
-      >
-        <template #header>
-          <h2 class="text-xl">Everything i wanted and more</h2>
-        </template>
-        <p>
-          This movie is not only beautiful in every aspect its also unique in
-          the way its filmed whitch makes it unbelievably good.
-        </p>
-      </UCard>
-      <UPagination
-        class="my-10 flex flex-row justify-center"
-        variant="ghost"
-        :total="90"
-      />
-    </article>
+    <UCollapsible
+      v-if="loggedIn"
+      :unmount-on-hide="false"
+    >
+      <div class="flex flex-row justify-end">
+        <UButton
+          label="Leave review"
+          color="neutral"
+          variant="subtle"
+          icon="i-lucide-notebook-pen"
+        />
+      </div>
+
+      <template #content>
+        <MediaOwnReview
+          v-model="ownReview.form"
+          :data="ownReview.data"
+          :submit="ownReview.submit"
+          :submitting="ownReview.submitting"
+        />
+      </template>
+    </UCollapsible>
+    <MediaReviews
+      v-model:page="reviews.page.value"
+      :data="reviews.data.value"
+      :paging="reviews.paging.value"
+      :status="reviews.status.value"
+    />
   </UPageBody>
 </template>
 
 <script lang="ts" setup>
 import type { MediaData } from "#shared/types/media";
 
-const useMediaApi = async () => {
-  const route = useRoute();
-  const mediaId = Number(route.params.id as string);
+const { loggedIn } = useUserSession();
+
+const route = useRoute();
+const mediaId = Number(route.params.id as string);
+
+const useApiMedia = async ({ mediaId }: { mediaId: number }) => {
   return await useApi("/media/{id}", { path: { id: mediaId } });
 };
 
-const { error, data } = await useMediaApi();
+const { error, data } = await useApiMedia({ mediaId });
 
 if (error.value) {
   throw createError(error.value);
@@ -105,6 +115,10 @@ if (error.value) {
 const mediaData: ComputedRef<MediaData | undefined> = computed(() => {
   return data.value;
 });
+
+const reviews = await useReviews({ mediaId });
+
+const ownReview = await useOwnReview({ mediaId });
 </script>
 
 <style></style>
