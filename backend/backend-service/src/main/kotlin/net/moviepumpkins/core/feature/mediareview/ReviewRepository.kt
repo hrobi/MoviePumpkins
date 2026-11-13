@@ -16,7 +16,7 @@ interface ReviewRepository : RepositoryBase<Review> {
         from Review review
         join fetch review.reviewer
         where review.id = :reviewId
-        and review.parentMedia.id = :mediaId
+        and review.media.id = :mediaId
     """
     )
     fun findByMediaIdAndReviewIdWithReviewer(
@@ -26,65 +26,50 @@ interface ReviewRepository : RepositoryBase<Review> {
 
     @Query(
         """
-        select r.id AS id,
-               r.title AS title,
-               r.content AS content,
-               r.createdAt AS createdAt,
-               r.updatedAt AS updatedAt,
-               r.reviewer AS reviewer
+        select r
         from Review r
         join fetch r.reviewer
-        where r.parentMedia.id = :mediaId
+        where r.media.id = :mediaId
         order by r.createdAt desc, r.id desc
         """,
         countQuery = """
         select count(review.id)
         from Review review
-        join review.parentMedia media
+        join review.media media
         where media.id = :mediaId
         """,
     )
-    fun findViewPageByMediaId(
+    fun findPageByMediaId(
         @Param("mediaId") mediaId: Long,
         @Param("currentUsername") currentUsername: String?,
         pageable: Pageable
-    ): Page<Review.View>
+    ): Page<Review>
 
     @Query(
         """
-        select r.id AS id,
-               r.title AS title,
-               r.content AS content,
-               r.createdAt AS createdAt,
-               r.updatedAt AS updatedAt,
-               r.reviewer AS reviewer
+        select r
         from Review r
         join fetch r.reviewer
         where r.id = :reviewId
-        and r.parentMedia.id = :mediaId
+        and r.media.id = :mediaId
     """
     )
-    fun findViewByMediaIdAndReviewId(
+    fun findByMediaIdAndReviewId(
         @Param("mediaId") mediaId: Long,
         @Param("reviewId") reviewId: Long,
         @Param("currentUsername") currentUsername: String?
-    ): Review.View?
+    ): Review?
 
     @Query(
         """
-        select r.id AS id,
-               r.title AS title,
-               r.content AS content,
-               r.createdAt AS createdAt,
-               r.updatedAt AS updatedAt,
-               r.reviewer AS reviewer
+        select r
         from Review r
         join fetch r.reviewer
-        where r.parentMedia.id = :mediaId
+        where r.media.id = :mediaId
         and r.reviewer.username = :username
     """
     )
-    fun findViewByReviewerUsernameAndMediaId(username: String, mediaId: Long): Review.View?
+    fun findViewByReviewerUsernameAndMediaId(username: String, mediaId: Long): Review?
 
     fun existsByReviewerAndMedia(reviewer: UserAccount, media: Media): Boolean
 

@@ -7,7 +7,6 @@ import jakarta.persistence.Table
 import net.moviepumpkins.core.feature.media.Media
 import net.moviepumpkins.core.feature.user.UserAccount
 import net.moviepumpkins.core.shared.entity.EntityBase
-import java.time.OffsetDateTime
 
 @Entity
 @Table(name = "review")
@@ -23,17 +22,6 @@ class Review(
 
     @field:ManyToOne
     @field:JoinColumn(name = "media_id")
-    var parentMedia: Media,
+    var media: Media
 
-    ) : EntityBase() {
-
-    interface View {
-        val id: Long
-        val title: String
-        val content: String
-        val createdAt: OffsetDateTime
-        val updatedAt: OffsetDateTime
-        val reviewer: UserAccount.View
-    }
-
-}
+) : EntityBase()

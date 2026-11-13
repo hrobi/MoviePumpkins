@@ -12,12 +12,12 @@ import net.moviepumpkins.core.shared.validation.runCheckOrThrow
 
 object ReviewMapper {
 
-    fun toResponse(projection: Review.View): ReviewDto = with(projection) {
+    fun toResponse(entity: Review): ReviewDto = with(entity) {
         ReviewDto(
-            id = id,
+            id = id!!,
             title = title,
             content = content,
-            reviewer = UserMapper.toResponse(projection.reviewer),
+            reviewer = UserMapper.toResponse(reviewer),
             createdAt = createdAt,
             updatedAt = updatedAt,
         )
@@ -37,7 +37,7 @@ object ReviewMapper {
                 title = title,
                 content = content,
                 reviewer = reviewer,
-                parentMedia = media,
+                media = media,
             )
         }
     }

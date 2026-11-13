@@ -5,9 +5,9 @@ import net.moviepumpkins.core.feature.user.UserAccount
 
 object UserMapper {
 
-    fun toResponse(projection: UserAccount.View): UserDto = with(projection) {
+    fun toResponse(entity: UserAccount): UserDto = with(entity) {
         UserDto(
-            username = username,
+            username = username!!,
             displayName = displayName,
             firstName = firstName,
             lastName = lastName,

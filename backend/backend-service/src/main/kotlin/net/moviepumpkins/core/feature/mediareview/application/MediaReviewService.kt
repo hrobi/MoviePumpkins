@@ -33,7 +33,7 @@ class MediaReviewService(
             throw MediaNotFoundException(mediaId)
         }
 
-        val reviewPage = reviewRepository.findViewPageByMediaId(
+        val reviewPage = reviewRepository.findPageByMediaId(
             mediaId = mediaId,
             currentUsername = getAuthUsernameOrNull(),
             pageable = PageRequest.of(page - 1, REVIEW_PAGE_SIZE),
@@ -54,7 +54,7 @@ class MediaReviewService(
         if (!mediaRepository.existsById(mediaId)) {
             throw MediaNotFoundException(mediaId)
         }
-        val review = reviewRepository.findViewByMediaIdAndReviewId(
+        val review = reviewRepository.findByMediaIdAndReviewId(
             mediaId,
             reviewId,
             getAuthUsernameOrNull(),
