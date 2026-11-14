@@ -99,6 +99,34 @@ paths:
           $ref: "common-components.yaml#/components/responses/403"
         204:
           description: media modified successfully
+  /media/{mediaId}/reviews/{reviewId}/toggle-like:
+    parameters:
+      - name: mediaId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    post:
+      operationId: toggleMediaReviewLike
+      responses:
+        200:
+          description: like toggled successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewLikeDto"
+        401:
+          $ref: "common-components.yaml#/components/responses/401"
+        404:
+          $ref: "common-components.yaml#/components/responses/404"
+
   /media/{mediaId}/own-review:
     parameters:
       - name: mediaId
@@ -162,6 +190,12 @@ components:
         updatedAt:
           type: string
           format: date-time
+        likes:
+          type: integer
+          format: int32
+        likedByYou:
+          type: boolean
+          nullable: true
     UpsertReviewDto:
       type: object
       required:
@@ -186,3 +220,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ReviewDto"
+    ReviewLikeDto:
+      type: object
+      required:
+        - currentLikeCount
+        - likedByYou
+      properties:
+        likedByYou:
+          type: boolean
+        currentLikeCount:
+          type: integer
+          format: int32

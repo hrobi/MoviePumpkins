@@ -2,9 +2,11 @@ package net.moviepumpkins.core.feature.mediareview.application
 
 import net.moviepumpkins.core.api.controllers.MediaOwnReviewController
 import net.moviepumpkins.core.api.controllers.MediaReviewsController
+import net.moviepumpkins.core.api.controllers.MediaReviewsToggleLikeController
 import net.moviepumpkins.core.api.models.OwnReviewDto
 import net.moviepumpkins.core.api.models.PagedReviewDto
 import net.moviepumpkins.core.api.models.ReviewDto
+import net.moviepumpkins.core.api.models.ReviewLikeDto
 import net.moviepumpkins.core.api.models.UpsertReviewDto
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -15,7 +17,7 @@ import java.net.URI
 @Validated
 class MediaReviewController(
     private val mediaReviewService: MediaReviewService,
-) : MediaReviewsController, MediaOwnReviewController {
+) : MediaReviewsController, MediaOwnReviewController, MediaReviewsToggleLikeController {
 
     override fun createReview(
         upsertReviewDto: UpsertReviewDto,
@@ -51,6 +53,14 @@ class MediaReviewController(
     override fun getOwnMediaReview(mediaId: Long): ResponseEntity<OwnReviewDto> {
         val ownMediaReview = mediaReviewService.getOwnMediaReview(mediaId)
         return ResponseEntity.ok(ownMediaReview)
+    }
+
+    override fun toggleMediaReviewLike(
+        mediaId: Long,
+        reviewId: Long
+    ): ResponseEntity<ReviewLikeDto> {
+        val likeDto = mediaReviewService.toggleLike(mediaId, reviewId)
+        return ResponseEntity.ok(likeDto)
     }
 
 }

@@ -5,13 +5,19 @@ import net.moviepumpkins.core.api.models.OwnReviewDto
 import net.moviepumpkins.core.api.models.PagedReviewDto
 import net.moviepumpkins.core.api.models.PaginationDto
 import net.moviepumpkins.core.api.models.ReviewDto
+import net.moviepumpkins.core.api.models.ReviewLikeDto
 import net.moviepumpkins.core.api.models.UpsertReviewDto
 import net.moviepumpkins.core.feature.media.MediaRepository
 import net.moviepumpkins.core.feature.media.error.MediaNotFoundException
 import net.moviepumpkins.core.feature.mediareview.ReviewRepository
+import net.moviepumpkins.core.feature.mediareview.error.LikingOwnReviewForbiddenException
 import net.moviepumpkins.core.feature.mediareview.error.MediaReviewAlreadyExists
 import net.moviepumpkins.core.feature.mediareview.error.MediaReviewNotFoundException
 import net.moviepumpkins.core.feature.mediareview.error.MediaReviewUpdateDeniedException
+import net.moviepumpkins.core.feature.mediareview.likes.ReviewLike
+import net.moviepumpkins.core.feature.mediareview.likes.ReviewLikeAggregateRepository
+import net.moviepumpkins.core.feature.mediareview.likes.ReviewLikeId
+import net.moviepumpkins.core.feature.mediareview.likes.ReviewLikeRepository
 import net.moviepumpkins.core.feature.user.UserAccountRepository
 import net.moviepumpkins.core.shared.auth.getAuthUsernameOrNull
 import net.moviepumpkins.core.shared.auth.getAuthUsernameOrThrow
@@ -24,7 +30,9 @@ private const val REVIEW_PAGE_SIZE = 5
 class MediaReviewService(
     private val userAccountRepository: UserAccountRepository,
     private val reviewRepository: ReviewRepository,
+    private val reviewLikeRepository: ReviewLikeRepository,
     private val mediaRepository: MediaRepository,
+    private val reviewLikeAggregateRepository: ReviewLikeAggregateRepository,
 ) {
 
     @Transactional
@@ -35,9 +43,9 @@ class MediaReviewService(
 
         val reviewPage = reviewRepository.findPageByMediaId(
             mediaId = mediaId,
-            currentUsername = getAuthUsernameOrNull(),
             pageable = PageRequest.of(page - 1, REVIEW_PAGE_SIZE),
         )
+        val likedReviewIds = findLikedReviewIds(reviewPage.content.map { it.id!! })
 
         return PagedReviewDto(
             paging = PaginationDto(
@@ -45,7 +53,9 @@ class MediaReviewService(
                 pageSize = REVIEW_PAGE_SIZE,
                 currentPage = page,
             ),
-            items = reviewPage.content.map(ReviewMapper::toResponse),
+            items = reviewPage.content.map { review ->
+                ReviewMapper.toResponse(review, likedReviewIds?.contains(review.id!!))
+            },
         )
     }
 
@@ -57,11 +67,11 @@ class MediaReviewService(
         val review = reviewRepository.findByMediaIdAndReviewId(
             mediaId,
             reviewId,
-            getAuthUsernameOrNull(),
         )
             ?: throw MediaReviewNotFoundException(mediaId, reviewId)
 
-        return ReviewMapper.toResponse(review)
+        val likedReviewIds = findLikedReviewIds(listOf(reviewId))
+        return ReviewMapper.toResponse(review, likedReviewIds?.contains(reviewId))
     }
 
     @Transactional
@@ -97,10 +107,36 @@ class MediaReviewService(
         if (!mediaRepository.existsById(mediaId)) {
             throw MediaNotFoundException(mediaId)
         }
-        val dto = reviewRepository
-            .findViewByReviewerUsernameAndMediaId(getAuthUsernameOrThrow(), mediaId)
-            ?.let { ReviewMapper.toResponse(it) }
+        val review = reviewRepository.findByReviewerUsernameAndMediaId(getAuthUsernameOrThrow(), mediaId)
+        val dto = review?.let {
+            ReviewMapper.toResponse(it, false)
+        }
         return OwnReviewDto(exists = dto != null, data = dto)
+    }
+
+    @Transactional
+    fun toggleLike(mediaId: Long, reviewId: Long): ReviewLikeDto {
+        val currentUsername = getAuthUsernameOrThrow()
+        val review = reviewRepository.findByIdWithReviewer(reviewId)
+            ?: throw MediaReviewNotFoundException(mediaId, reviewId)
+        if (review.reviewer.username == currentUsername) {
+            throw LikingOwnReviewForbiddenException()
+        }
+        val id = ReviewLikeId(reviewId, currentUsername)
+        val likeByUserExists = reviewLikeRepository.existsById(id)
+        val currentLikeCount = reviewLikeAggregateRepository.findById(reviewId).map { it.likeSum }.orElse(0)
+        if (!likeByUserExists) {
+            reviewLikeRepository.save(ReviewLike(id))
+            return ReviewLikeDto(likedByYou = true, currentLikeCount)
+        } else {
+            reviewLikeRepository.deleteById(id)
+            return ReviewLikeDto(likedByYou = false, currentLikeCount)
+        }
+    }
+
+    private fun findLikedReviewIds(reviewIds: List<Long>): Set<Long>? {
+        val username = getAuthUsernameOrNull() ?: return null
+        return reviewLikeRepository.findReviewIdsLikedByUser(reviewIds, username)
     }
 
 }

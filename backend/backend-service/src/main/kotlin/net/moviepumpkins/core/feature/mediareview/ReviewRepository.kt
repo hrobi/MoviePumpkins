@@ -10,6 +10,9 @@ import org.springframework.data.repository.query.Param
 
 interface ReviewRepository : RepositoryBase<Review> {
 
+    @Query("select r from Review r join fetch r.reviewer where r.id = :id")
+    fun findByIdWithReviewer(@Param("id") id: Long): Review?
+
     @Query(
         """
         select review
@@ -29,8 +32,9 @@ interface ReviewRepository : RepositoryBase<Review> {
         select r
         from Review r
         join fetch r.reviewer
+        left join fetch r.likeAggregate
         where r.media.id = :mediaId
-        order by r.createdAt desc, r.id desc
+        order by r.likeAggregate.likeSum, r.createdAt desc, r.id desc
         """,
         countQuery = """
         select count(review.id)
@@ -41,7 +45,6 @@ interface ReviewRepository : RepositoryBase<Review> {
     )
     fun findPageByMediaId(
         @Param("mediaId") mediaId: Long,
-        @Param("currentUsername") currentUsername: String?,
         pageable: Pageable
     ): Page<Review>
 
@@ -50,14 +53,14 @@ interface ReviewRepository : RepositoryBase<Review> {
         select r
         from Review r
         join fetch r.reviewer
+        left join fetch r.likeAggregate
         where r.id = :reviewId
         and r.media.id = :mediaId
     """
     )
     fun findByMediaIdAndReviewId(
         @Param("mediaId") mediaId: Long,
-        @Param("reviewId") reviewId: Long,
-        @Param("currentUsername") currentUsername: String?
+        @Param("reviewId") reviewId: Long
     ): Review?
 
     @Query(
@@ -65,11 +68,12 @@ interface ReviewRepository : RepositoryBase<Review> {
         select r
         from Review r
         join fetch r.reviewer
+        left join fetch r.likeAggregate
         where r.media.id = :mediaId
         and r.reviewer.username = :username
     """
     )
-    fun findViewByReviewerUsernameAndMediaId(username: String, mediaId: Long): Review?
+    fun findByReviewerUsernameAndMediaId(username: String, mediaId: Long): Review?
 
     fun existsByReviewerAndMedia(reviewer: UserAccount, media: Media): Boolean
 

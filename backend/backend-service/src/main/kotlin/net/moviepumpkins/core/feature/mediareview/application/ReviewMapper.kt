@@ -12,7 +12,7 @@ import net.moviepumpkins.core.shared.validation.runCheckOrThrow
 
 object ReviewMapper {
 
-    fun toResponse(entity: Review): ReviewDto = with(entity) {
+    fun toResponse(entity: Review, likedByYou: Boolean? = null): ReviewDto = with(entity) {
         ReviewDto(
             id = id!!,
             title = title,
@@ -20,6 +20,8 @@ object ReviewMapper {
             reviewer = UserMapper.toResponse(reviewer),
             createdAt = createdAt,
             updatedAt = updatedAt,
+            likes = likeAggregate?.likeSum ?: 0,
+            likedByYou = likedByYou,
         )
     }
 
